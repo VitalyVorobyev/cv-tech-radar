@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 
 from sqlalchemy import select
 
-from radar.filters.keyword_filter import classify_item, classify_items_for_date
+from radar.filters.keyword_filter import classify_item, classify_items_for_date, keyword_matches
 from radar.models import Item, Source
 
 
@@ -36,7 +36,7 @@ def test_classification_maps_calibration_geometry(app_config):
     result = classify_item(item, config=app_config, source=source)
     assert "Calibration & Camera Models" in result.tracks
     assert "3D Geometry & Reconstruction" in result.tracks
-    assert result.final_score >= app_config.scoring.thresholds.evaluate
+    assert result.final_score >= app_config.scoring.thresholds.watch
 
 
 def test_negative_topics_reduce_score_without_hard_delete(app_config):
@@ -55,6 +55,13 @@ def test_negative_topics_reduce_score_without_hard_delete(app_config):
     assert noisy_result.negative_topic_penalty > 0
     assert noisy_result.final_score < clean_result.final_score
     assert "Calibration & Camera Models" in noisy_result.tracks
+
+
+def test_keyword_matching_avoids_substring_false_positives():
+    assert keyword_matches("sam", "SAM improves segmentation.")
+    assert keyword_matches("multi-view", "multi view reconstruction")
+    assert not keyword_matches("sam", "temporal-window sampling strategy")
+    assert not keyword_matches("tracking", "benchmarking detectors")
 
 
 def test_classify_items_for_date_persists_results(db_engine, app_config):

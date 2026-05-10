@@ -13,7 +13,8 @@ The current implementation is the Phase 1-2 backend slice:
 - SQLite is the canonical state.
 - arXiv `cs.CV` ingestion is implemented.
 - Deterministic keyword scoring classifies items into radar tracks and rings.
-- Candidate Markdown and JSON exports are generated for human/Claude review.
+- Candidate Markdown and JSON exports are generated for human/Claude review and early scoring
+  calibration.
 - Optional Ollama embedding plumbing exists, disabled by default.
 
 ## Quick Start
@@ -95,7 +96,8 @@ You can already run the complete local Phase 1-2 loop:
 1. Initialize SQLite.
 2. Fetch recent `cs.CV` arXiv papers.
 3. Classify papers into configured tracks.
-4. Generate a top-25 candidate review queue.
+4. Generate a top-25 candidate review queue, including borderline and suggested-ignore items
+   while the scoring model is being tuned.
 
 If arXiv has no papers inside the requested date window, the commands still complete and
 produce an empty candidate queue. Use a wider `--days` value for a visible demo.
@@ -107,3 +109,6 @@ produce an empty candidate queue. Use a wider `--days` value for a visible demo.
 3. Add explicit curation decisions and daily digest generation.
 4. Stabilize the JSON export shape for the future React dashboard.
 5. Build the static local dashboard once the backend signal quality is acceptable.
+
+See [docs/roadmap.md](docs/roadmap.md), [docs/tasks.md](docs/tasks.md), and
+[docs/skills.md](docs/skills.md) for the working development plan.

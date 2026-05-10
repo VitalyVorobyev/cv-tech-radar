@@ -216,6 +216,7 @@ data/exports/*
 reports/*
 !reports/examples/
 !reports/examples/**
+.tmp-real-run/
 
 # Marimo
 marimo/_static/

@@ -5,8 +5,12 @@ tracks:
       - calibration
       - camera calibration
       - camera model
-      - intrinsic
-      - extrinsic
+      - camera intrinsic
+      - intrinsic calibration
+      - intrinsic parameter
+      - camera extrinsic
+      - extrinsic calibration
+      - extrinsic parameter
       - distortion
       - rolling shutter
       - bundle adjustment

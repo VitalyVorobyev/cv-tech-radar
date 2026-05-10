@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -45,15 +47,14 @@ def classify_item(
         score = 0.0
         matches: list[str] = []
         for keyword in track.positive_keywords:
-            keyword_lower = keyword.casefold()
-            if keyword_lower in title_text:
+            if keyword_matches(keyword, title_text):
                 score += 18
                 matches.append(keyword)
-            elif keyword_lower in body_text:
+            elif keyword_matches(keyword, body_text):
                 score += 10
                 matches.append(keyword)
         for keyword in track.negative_keywords:
-            if keyword.casefold() in full_text:
+            if keyword_matches(keyword, full_text):
                 score -= 12
         if score > 0:
             selected_tracks.append(track.name)
@@ -61,7 +62,9 @@ def classify_item(
             track_scores.append(min(score, 100.0))
 
     negative_keywords = [
-        topic for topic in config.negative_topics.negative_topics if topic.casefold() in full_text
+        topic
+        for topic in config.negative_topics.negative_topics
+        if keyword_matches(topic, full_text)
     ]
     negative_penalty = min(100.0, 25.0 + max(len(negative_keywords) - 1, 0) * 10.0)
     if not negative_keywords:
@@ -115,6 +118,14 @@ def classify_item(
         confidence=round(confidence, 2),
         rationale=" ".join(rationale_parts),
     )
+
+
+def keyword_matches(keyword: str, text: str) -> bool:
+    escaped_parts = [re.escape(part) for part in re.split(r"[\s-]+", keyword.casefold()) if part]
+    if not escaped_parts:
+        return False
+    pattern = r"\b" + r"[\s-]+".join(escaped_parts) + r"\b"
+    return re.search(pattern, text.casefold()) is not None
 
 
 def upsert_classification(session: Session, item: Item, result: ClassificationResult) -> None:

@@ -57,3 +57,51 @@ def test_candidate_queue_sorted_capped_and_written(db_engine, app_config, tmp_pa
     payload = json.loads(export_path.read_text(encoding="utf-8"))
     assert payload["date"] == "2026-05-10"
     assert len(payload["candidates"]) == 25
+
+
+def test_candidate_queue_includes_scored_ignore_items(db_engine, app_config):
+    from radar.filters.keyword_filter import upsert_classification
+    from radar.schemas import ClassificationResult, RadarRing
+
+    with session_scope(db_engine) as session:
+        item = Item(
+            type="paper",
+            title="Low Scored Tracking Paper",
+            normalized_title="low scored tracking paper",
+            abstract_or_summary="Object tracking, but not enough signal for Watch.",
+            url="https://example.test/low",
+            pdf_url=None,
+            published_at=datetime(2026, 5, 10, 10, 0, tzinfo=UTC),
+            updated_at=None,
+            source_name="arXiv cs.CV",
+            external_id="low",
+            arxiv_id="low",
+            authors_json=[],
+            organizations_json=[],
+            metadata_json={},
+        )
+        session.add(item)
+        session.flush()
+        upsert_classification(
+            session,
+            item,
+            ClassificationResult(
+                tracks=["Object Tracking"],
+                positive_keywords=["object tracking"],
+                negative_keywords=[],
+                relevance_score=30,
+                novelty_score=60,
+                source_priority_score=20,
+                implementation_score=0,
+                attention_score=0,
+                final_score=24.5,
+                negative_topic_penalty=0,
+                recommended_ring=RadarRing.IGNORE,
+                confidence=0.5,
+                rationale="Low score but useful for calibration.",
+            ),
+        )
+        candidates = collect_candidates(session, datetime(2026, 5, 10).date(), limit=25)
+
+    assert len(candidates) == 1
+    assert candidates[0].ring == RadarRing.IGNORE

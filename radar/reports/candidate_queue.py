@@ -23,7 +23,7 @@ def collect_candidates(
         select(Item, ItemClassification)
         .join(ItemClassification, ItemClassification.item_id == Item.id)
         .where(Item.published_at >= start, Item.published_at <= end)
-        .where(ItemClassification.recommended_ring != RadarRing.IGNORE.value)
+        .where(ItemClassification.final_score > 0)
         .order_by(ItemClassification.final_score.desc(), Item.title.asc())
         .limit(limit)
     ).all()
