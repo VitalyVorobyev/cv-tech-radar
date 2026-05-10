@@ -6,7 +6,7 @@ from typer.testing import CliRunner
 
 from radar.cli import app
 from radar.db import get_engine, session_scope
-from radar.models import Item
+from radar.models import Item, RadarDecision
 
 
 def test_cli_smoke_init_classify_candidates(tmp_path):
@@ -66,3 +66,41 @@ def test_cli_smoke_init_classify_candidates(tmp_path):
     assert result.exit_code == 0
     assert (reports_dir / "2026-05-10.md").exists()
     assert (exports_dir / "2026-05-10.json").exists()
+
+    result = runner.invoke(
+        app,
+        ["score-debug", "--date", "2026-05-10", "--db-path", str(db_path)],
+    )
+    assert result.exit_code == 0
+    assert "Score debug" in result.output
+
+    result = runner.invoke(
+        app,
+        [
+            "decide",
+            "1",
+            "--ring",
+            "Watch",
+            "--reason",
+            "Relevant enough to track.",
+            "--action",
+            "Read PDF later.",
+            "--decided-by",
+            "tester",
+            "--db-path",
+            str(db_path),
+        ],
+    )
+    assert result.exit_code == 0
+    assert "Recorded decision" in result.output
+
+    with session_scope(engine) as session:
+        stored = session.query(RadarDecision).one()
+        assert stored.ring == "Watch"
+
+    result = runner.invoke(
+        app,
+        ["decisions", "--date", "2026-05-10", "--db-path", str(db_path)],
+    )
+    assert result.exit_code == 0
+    assert "Relevant enough to track." in result.output

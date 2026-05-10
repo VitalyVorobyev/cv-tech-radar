@@ -19,13 +19,14 @@ open items are meant to be small enough to turn into GitHub issues.
 - [x] Fix substring keyword false positives from the real run.
 - [x] Include top nonzero scored items in candidate queues, even when the suggested
       ring is `Ignore`, so early scoring can be tuned from real examples.
+- [x] Add `radar decide` to record ring, tracks, decision reason, and action in SQLite.
+- [x] Add `radar decisions` to list persisted decisions for a date.
+- [x] Add `radar score-debug --date YYYY-MM-DD` to inspect score components and keyword matches.
 
 ## Immediate Tasks
 
-- [ ] Add `radar decide` to record ring, tracks, decision reason, and action in SQLite.
 - [ ] Add candidate queue parsing or a separate review input format so Markdown TODOs
       are not the only review surface.
-- [ ] Add `radar score-debug --date YYYY-MM-DD` to inspect score components and keyword matches.
 - [ ] Add regression fixtures for the first real false positives:
       event-camera tracking, generic video editing, broad multimodal benchmarks,
       vehicle re-identification, and crop disease edge-AI papers.

@@ -13,6 +13,8 @@ uv run radar init-db
 uv run radar fetch-arxiv --days 365 --max-results 100
 uv run radar classify --date 2026-05-07
 uv run radar candidates --date 2026-05-07
+uv run radar score-debug --date 2026-05-07
+uv run radar decide ITEM_ID --ring Watch --reason "..." --action "..."
 ```
 
 The latest real smoke test fetched 100 arXiv entries and generated a 25-item
@@ -26,9 +28,8 @@ next phase: we can inspect real noise instead of guessing.
 Goal: make the candidate queue trustworthy before adding more sources.
 
 - Build a small labeled evaluation set from real candidate queues.
-- Add a `review` or `decide` command that records human/Claude decisions in
-  SQLite instead of leaving decisions only in Markdown.
-- Add score-debug output showing why each item crossed or missed thresholds.
+- Add a review import format so Markdown TODOs are not the only bulk-review surface.
+- Extend score-debug output into a reusable scoring evaluation report.
 - Tune keywords, negative topics, and thresholds against observed false positives.
 - Add regression tests for known noise patterns such as broad VLM papers, video
   generation, person re-identification, and generic dataset papers.
@@ -39,6 +40,7 @@ Exit criteria:
 - Obvious hype/noise stays visible for calibration but does not look promoted.
 - A few genuinely relevant calibration, 3D geometry, edge, robotics, or
   industrial-vision items surface when present.
+- Explicit decisions can be persisted and listed from SQLite.
 
 ## Phase 3 - RSS And Vendor Sources
 

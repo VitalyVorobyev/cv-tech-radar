@@ -57,6 +57,11 @@ uv run radar candidates \
   --db-path .tmp-real-run/radar.sqlite \
   --reports-dir .tmp-real-run/reports \
   --exports-dir .tmp-real-run/exports
+
+uv run radar score-debug \
+  --date "$latest_date" \
+  --db-path .tmp-real-run/radar.sqlite \
+  --limit 10
 ```
 
 Inspect:
@@ -77,10 +82,17 @@ Assign rings, write concise decision reasons, identify noise patterns, and list
 which items should become Watch/Evaluate/Ignore.
 ```
 
-Current project limitation:
+Record a decision:
 
-- Decisions are still Markdown/manual.
-- The next implementation task is `radar decide`, which will persist decisions in SQLite.
+```bash
+uv run radar decide ITEM_ID \
+  --ring Watch \
+  --reason "Relevant but needs more evidence." \
+  --action "Read PDF later." \
+  --db-path .tmp-real-run/radar.sqlite
+
+uv run radar decisions --date "$latest_date" --db-path .tmp-real-run/radar.sqlite
+```
 
 Expected output:
 
@@ -160,8 +172,8 @@ candidates. Do not promote raw candidates.
 
 Current project limitation:
 
-- Digest writing should wait until decisions are explicit.
-- Until `radar decide` exists, use reviewed candidate Markdown as the decision source.
+- Digest generation is not implemented yet.
+- Use `radar decisions` as the source of accepted decisions until digest commands exist.
 
 Expected output:
 

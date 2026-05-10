@@ -59,6 +59,9 @@ uv run radar init-db
 uv run radar fetch-arxiv --days 1 --max-results 100
 uv run radar classify --date YYYY-MM-DD
 uv run radar candidates --date YYYY-MM-DD
+uv run radar score-debug --date YYYY-MM-DD
+uv run radar decide ITEM_ID --ring Watch --reason "..." --action "..."
+uv run radar decisions --date YYYY-MM-DD
 ```
 
 Use `--date today` for the current local date.
@@ -98,6 +101,8 @@ You can already run the complete local Phase 1-2 loop:
 3. Classify papers into configured tracks.
 4. Generate a top-25 candidate review queue, including borderline and suggested-ignore items
    while the scoring model is being tuned.
+5. Inspect score components and matched keywords.
+6. Persist explicit radar decisions in SQLite.
 
 If arXiv has no papers inside the requested date window, the commands still complete and
 produce an empty candidate queue. Use a wider `--days` value for a visible demo.
