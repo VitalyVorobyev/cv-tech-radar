@@ -110,5 +110,6 @@ produce an empty candidate queue. Use a wider `--days` value for a visible demo.
 4. Stabilize the JSON export shape for the future React dashboard.
 5. Build the static local dashboard once the backend signal quality is acceptable.
 
-See [docs/roadmap.md](docs/roadmap.md), [docs/tasks.md](docs/tasks.md), and
-[docs/skills.md](docs/skills.md) for the working development plan.
+See [docs/roadmap.md](docs/roadmap.md), [docs/tasks.md](docs/tasks.md),
+[docs/skills.md](docs/skills.md), and [docs/skill-workflows.md](docs/skill-workflows.md)
+for the working development plan and Codex skill workflows.

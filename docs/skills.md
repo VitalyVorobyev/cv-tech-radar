@@ -1,8 +1,7 @@
 # Proposed Codex Skills For CV Radar
 
-These are project-specific skills worth creating if the workflow becomes repetitive.
-Do not create all of them immediately. Start with the skills that protect decision
-quality and source onboarding.
+These project-specific skills are implemented in `$CODEX_HOME/skills/`.
+See [skill-workflows.md](skill-workflows.md) for a short tutorial on using them.
 
 ## 1. `cv-radar-curator`
 
@@ -91,9 +90,10 @@ Useful bundled references:
 - Frontmatter/export conventions once `vitavision.dev` integration is known.
 - Examples of "watch only" versus "Atlas candidate" decisions.
 
-## Recommended Creation Order
+## Recommended Usage Order
 
-1. Create `cv-radar-curator` after `radar decide` exists.
-2. Create `cv-radar-scoring-evaluator` before serious threshold tuning.
-3. Create `cv-radar-source-onboarding` before adding more than a handful of RSS feeds.
-4. Create digest and Atlas skills only after the data model for decisions stabilizes.
+1. Use `cv-radar-scoring-evaluator` now, while candidate quality is still being tuned.
+2. Use `cv-radar-curator` after `radar decide` exists, or for manual Markdown review now.
+3. Use `cv-radar-source-onboarding` before adding any RSS/vendor source.
+4. Use `cv-radar-digest-writer` after explicit decisions exist.
+5. Use `cv-radar-atlas-bridge` only for accepted, durable items.
