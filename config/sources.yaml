@@ -1,0 +1,10 @@
+sources:
+  - id: arxiv-cs-cv
+    name: arXiv cs.CV
+    kind: arxiv
+    url: https://export.arxiv.org/api/query
+    enabled: true
+    priority: 1
+    notes: Computer vision papers from arXiv.
+    categories:
+      - cs.CV

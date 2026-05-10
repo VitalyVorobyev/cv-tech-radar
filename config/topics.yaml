@@ -1,0 +1,188 @@
+tracks:
+  - id: calibration-camera-models
+    name: Calibration & Camera Models
+    positive_keywords:
+      - calibration
+      - camera calibration
+      - camera model
+      - intrinsic
+      - extrinsic
+      - distortion
+      - rolling shutter
+      - bundle adjustment
+      - hand-eye
+      - homography
+    negative_keywords: []
+
+  - id: target-detection-fiducials
+    name: Target Detection & Fiducials
+    positive_keywords:
+      - checkerboard
+      - chessboard
+      - fiducial
+      - aruco
+      - charuco
+      - calibration target
+      - marker detection
+      - corner detection
+      - subpixel
+    negative_keywords: []
+
+  - id: 3d-geometry-reconstruction
+    name: 3D Geometry & Reconstruction
+    positive_keywords:
+      - 3d reconstruction
+      - reconstruction
+      - structure from motion
+      - sfm
+      - stereo
+      - multi-view
+      - point cloud
+      - depth estimation
+      - pose estimation
+      - epipolar
+      - triangulation
+    negative_keywords: []
+
+  - id: 3d-sensors
+    name: 3D Sensors
+    positive_keywords:
+      - lidar
+      - time-of-flight
+      - tof
+      - structured light
+      - depth camera
+      - rgb-d
+      - 3d sensor
+      - event camera
+    negative_keywords: []
+
+  - id: robotics-vision
+    name: Robotics Vision
+    positive_keywords:
+      - robotics
+      - robot vision
+      - visual servoing
+      - visual odometry
+      - slam
+      - navigation
+      - manipulation
+    negative_keywords: []
+
+  - id: robot-guidance
+    name: Robot Guidance
+    positive_keywords:
+      - robot guidance
+      - grasping
+      - bin picking
+      - pick and place
+      - hand-eye calibration
+      - path planning
+      - pose refinement
+    negative_keywords: []
+
+  - id: object-tracking
+    name: Object Tracking
+    positive_keywords:
+      - object tracking
+      - multi-object tracking
+      - tracking
+      - re-identification
+      - temporal association
+      - motion model
+    negative_keywords:
+      - person re-identification
+
+  - id: industrial-vision-inspection
+    name: Industrial Vision Inspection
+    positive_keywords:
+      - industrial inspection
+      - visual inspection
+      - defect detection
+      - anomaly detection
+      - surface inspection
+      - quality control
+      - metrology
+      - machine vision
+    negative_keywords: []
+
+  - id: edge-ai-deployment
+    name: Edge AI & Deployment
+    positive_keywords:
+      - edge ai
+      - deployment
+      - quantization
+      - pruning
+      - tensorrt
+      - onnx
+      - openvino
+      - embedded vision
+      - real-time inference
+    negative_keywords: []
+
+  - id: vision-foundation-models
+    name: Vision Foundation Models
+    positive_keywords:
+      - vision foundation model
+      - segmentation anything
+      - sam
+      - dinov2
+      - clip
+      - visual language model
+      - multimodal
+      - foundation model
+    negative_keywords:
+      - image generation
+      - video generation
+
+  - id: open-source-cv-tooling
+    name: Open-Source CV Tooling
+    positive_keywords:
+      - opencv
+      - open-source
+      - open source
+      - library
+      - toolkit
+      - sdk
+      - computer vision toolkit
+      - github
+    negative_keywords: []
+
+  - id: sensors-cameras-standards
+    name: Sensors, Cameras & Standards
+    positive_keywords:
+      - genicam
+      - gige vision
+      - usb3 vision
+      - camera standard
+      - industrial camera
+      - image sensor
+      - cmos sensor
+      - global shutter
+      - rolling shutter
+      - emva
+    negative_keywords: []
+
+  - id: synthetic-data-simulation
+    name: Synthetic Data & Simulation
+    positive_keywords:
+      - synthetic data
+      - simulation
+      - simulator
+      - domain randomization
+      - digital twin
+      - sim-to-real
+      - rendering pipeline
+    negative_keywords:
+      - art generation
+
+  - id: datasets-benchmarks
+    name: Datasets & Benchmarks
+    positive_keywords:
+      - dataset
+      - benchmark
+      - evaluation protocol
+      - leaderboard
+      - test set
+      - ground truth
+    negative_keywords: []
