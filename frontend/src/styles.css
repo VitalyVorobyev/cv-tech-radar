@@ -1,0 +1,160 @@
+@import "tailwindcss";
+
+/* Self-hosted variable fonts — no Google CDN */
+@import "@fontsource-variable/newsreader";
+@import "@fontsource-variable/ibm-plex-sans";
+@import "@fontsource-variable/jetbrains-mono";
+
+@theme {
+  /* Palette */
+  --color-paper: #fafaf7;
+  --color-ink: #1a1a1a;
+  --color-paper-dark: #0f0f0e;
+  --color-ink-dark: #edeae0;
+  --color-accent: #b45309;
+  --color-muted: #6b6b6b;
+  --color-muted-dark: #9c9a93;
+  --color-rule: rgba(26, 26, 26, 0.08); /* 8% ink for hairlines */
+  --color-rule-dark: rgba(237, 234, 224, 0.094);
+
+  /* Typography families */
+  --font-display: "Newsreader Variable", ui-serif, Georgia, serif;
+  --font-sans: "IBM Plex Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "SF Mono", monospace;
+
+  /* Type scale */
+  --text-display-xl: 2.5rem;
+  --text-display-l: 1.5rem;
+  --text-body: 1rem;
+  --text-small: 0.8125rem;
+  --text-micro: 0.6875rem;
+
+  /* Letter spacing */
+  --tracking-tight: -0.01em;
+  --tracking-caps: 0.08em;
+
+  /* Spacing — 8px scale */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+
+  /* Border radius cap */
+  --radius-sm: 2px;
+
+  /* Motion */
+  --duration-expand: 180ms;
+  --duration-focus: 80ms;
+  --easing-expand: ease-out;
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-display: swap;
+  }
+
+  /* Dark mode: system preference */
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme="light"]) {
+      background: var(--color-paper-dark);
+      color: var(--color-ink-dark);
+    }
+  }
+
+  /* Dark mode: manual override */
+  html[data-theme="dark"] {
+    background: var(--color-paper-dark);
+    color: var(--color-ink-dark);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    font-size: var(--text-body);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-paper);
+  }
+
+  /* Hairline rules — 0.5px visual on retina via CSS */
+  .hairline {
+    border-color: var(--color-rule);
+  }
+
+  html[data-theme="dark"] .hairline,
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme="light"]) .hairline {
+      border-color: var(--color-rule-dark);
+    }
+  }
+}
+
+/* Utility: muted text for dark-mode-aware muted color */
+.text-muted {
+  color: var(--color-muted);
+}
+
+html[data-theme="dark"] .text-muted {
+  color: var(--color-muted-dark);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .text-muted {
+    color: var(--color-muted-dark);
+  }
+}
+
+/* Row expand/collapse animation */
+.row-panel {
+  overflow: hidden;
+  transition: max-height var(--duration-expand) var(--easing-expand),
+    opacity var(--duration-expand) var(--easing-expand);
+}
+
+.row-panel[data-open="false"] {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.row-panel[data-open="true"] {
+  max-height: 800px;
+  opacity: 1;
+}
+
+/* Focus ring — 80ms */
+:focus-visible {
+  outline: 1.5px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+  transition: outline-offset var(--duration-focus);
+}
+
+/* Skeleton loading blocks — flat, rule-bordered */
+.skeleton-block {
+  opacity: 0.4;
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-sm);
+  background: transparent;
+}
+
+/* Abstract line-clamp */
+.abstract-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
