@@ -74,7 +74,7 @@ export function QueueView() {
 
   // UI state
   const [focusedIndex, setFocusedIndex] = useState(0);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
   const [shortcutOpen, setShortcutOpen] = useState(false);
 
   // Filter state — synced to URL search params for shareability
@@ -114,7 +114,7 @@ export function QueueView() {
     (c) => c.current_decision?.uncertain === true,
   ).length;
 
-  function toggleExpand(id: string) {
+  function toggleExpand(id: number) {
     setExpandedId((prev) => (prev === id ? null : id));
   }
 

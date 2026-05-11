@@ -15,7 +15,7 @@ function wrapper({ children }: { children: React.ReactNode }) {
 }
 
 const BASE_CANDIDATE: Candidate = {
-  id: "142",
+  id: 142,
   type: "paper",
   title: "Robust Bundle Adjustment for Industrial Multi-Camera Rigs",
   abstract: "A multi-camera BA formulation with reference code and industrial rig dataset.",
@@ -137,7 +137,7 @@ describe("CandidateRow — collapsed", () => {
       ...BASE_CANDIDATE,
       ring_suggested: "Prototype",
       current_decision: {
-        id: "dec-1",
+        id: 1,
         ring: "Watch",
         reason: "Waiting for code.",
         action: "",

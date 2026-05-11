@@ -21,12 +21,10 @@ export function formatScore(score: number): string {
 }
 
 /**
- * Truncate an item ID for display — show last 6 hex chars or full ID if short.
- * IDs from the backend are numeric strings; keep as-is with min 3 chars.
+ * Render an item ID for the row gutter — backend integer, zero-padded to 3.
  */
-export function formatId(id: string): string {
-  if (id.length <= 6) return id.padStart(3, "0");
-  return id.slice(-6);
+export function formatId(id: number): string {
+  return String(id).padStart(3, "0");
 }
 
 /**

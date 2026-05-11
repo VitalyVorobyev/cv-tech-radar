@@ -14,7 +14,7 @@ export interface Scores {
 }
 
 export interface Decision {
-  id: string;
+  id: number;
   ring: Ring;
   reason: string;
   action: string;
@@ -25,7 +25,7 @@ export interface Decision {
 }
 
 export interface Candidate {
-  id: string;
+  id: number;
   type: string;
   title: string;
   abstract: string;
@@ -51,7 +51,7 @@ export interface HealthResponse {
 }
 
 export interface DecisionRequest {
-  item_id: string;
+  item_id: number;
   ring: Ring;
   reason: string;
   action?: string;
@@ -61,7 +61,7 @@ export interface DecisionRequest {
 }
 
 export interface DecisionResponse {
-  decision_id: string;
+  decision_id: number;
   created_at: string;
 }
 

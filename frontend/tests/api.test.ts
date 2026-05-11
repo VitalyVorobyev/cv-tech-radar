@@ -75,19 +75,19 @@ describe("api.queue", () => {
 
 describe("api.postDecision", () => {
   it("returns decision_id on 201", async () => {
-    stubFetch(201, { decision_id: "abc-123", created_at: "2026-05-11T10:00:00Z" });
+    stubFetch(201, { decision_id: 123, created_at: "2026-05-11T10:00:00Z" });
     const result = await api.postDecision({
-      item_id: "1",
+      item_id: 1,
       ring: "Watch",
       reason: "Waiting for code.",
     });
-    expect(result.decision_id).toBe("abc-123");
+    expect(result.decision_id).toBe(123);
   });
 
   it("throws ApiError with status 422 on validation error", async () => {
     stubFetch(422, { detail: "ring: Input should be one of Use, Prototype…" });
     await expect(
-      api.postDecision({ item_id: "1", ring: "Watch", reason: "" }),
+      api.postDecision({ item_id: 1, ring: "Watch", reason: "" }),
     ).rejects.toMatchObject({
       name: "ApiError",
       status: 422,
@@ -97,7 +97,7 @@ describe("api.postDecision", () => {
   it("throws ApiError with status 404 when item is unknown", async () => {
     stubFetch(404, { detail: "Item 999 not found" });
     await expect(
-      api.postDecision({ item_id: "999", ring: "Ignore", reason: "Gone." }),
+      api.postDecision({ item_id: 999, ring: "Ignore", reason: "Gone." }),
     ).rejects.toMatchObject({
       name: "ApiError",
       status: 404,
