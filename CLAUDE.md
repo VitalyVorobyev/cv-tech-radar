@@ -93,6 +93,31 @@ Date handling: all timestamps are timezone-aware UTC (`utc_now()`); `parse_date_
 - **Scoring change**: never broaden a formula without a regression test that pins the old vs. new behavior on a concrete item. Use `uv run radar score-debug` to inspect component scores before/after.
 - **New CLI command**: add to `radar/cli.py`, mirror the `_load(config_dir)` + `session_scope()` pattern; keep CLI commands thin (config load + session + one call into a domain module).
 
+## Delegating Implementation Work
+
+Reserve the main conversation's context for planning, integration, and verification.
+Delegate routine implementation to subagents whenever the work is bounded enough that
+a self-contained brief can replace a chat back-and-forth — especially when:
+
+- a new module, package, or directory needs to be scaffolded from scratch
+  (e.g. `radar/api/`, `frontend/`, a new collector under `radar/collectors/`),
+- a change spans many files with predictable structure (e.g. adding a CLI command +
+  its module + its tests + its docs),
+- there is heavy file content to read that is incidental to the decision (dependency
+  trees, generated bundles, large fixtures).
+
+Brief subagents like a colleague who has not seen the conversation: paste the API
+contract, the design tokens, the exact file paths to touch, the verification
+commands, and the explicit instruction *not to commit* (commits and PRs are the
+main agent's responsibility). When two halves are disjoint (e.g. backend API vs.
+frontend app under separate directories) launch them in parallel.
+
+Do **not** delegate: design decisions, cross-cutting refactors, anything that
+requires understanding the conversation history, or the final verification +
+commit + PR sequence. Trust-but-verify: subagents report what they intended to do,
+not necessarily what they did — always re-run the tests and review the diff yourself
+before committing.
+
 ## Before Finishing Any Change
 
 - If code changed: `uv run pytest`, `uv run ruff check .`, `uv run ruff format . --check`.
