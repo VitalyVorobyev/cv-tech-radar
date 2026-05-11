@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import threading
+import webbrowser
 from pathlib import Path
 from typing import Annotated
 
@@ -269,6 +271,51 @@ def decisions_command(
     for line in detail_lines:
         console.print(line)
     console.print(f"{len(rows)} decision(s)")
+
+
+@app.command("serve")
+def serve_command(
+    host: Annotated[str, typer.Option("--host")] = "127.0.0.1",
+    port: Annotated[int, typer.Option("--port", min=1, max=65535)] = 7878,
+    reload: Annotated[bool, typer.Option("--reload")] = False,
+    open_browser: Annotated[bool, typer.Option("--open", "-o")] = False,
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+    config_dir: Annotated[Path, typer.Option("--config-dir")] = DefaultConfigDir,
+) -> None:
+    """Run the FastAPI HTTP server for the curation UI."""
+    import uvicorn
+
+    from radar.api.app import create_app
+
+    # Validate config early so misconfigurations fail fast.
+    _load(config_dir)
+
+    if open_browser:
+        url = f"http://{host}:{port}"
+
+        def _open() -> None:
+            webbrowser.open(url)
+
+        threading.Timer(1.0, _open).start()
+
+    if reload:
+        # uvicorn's reload mode requires an import string, not an app instance.
+        # Pass settings via env vars so the reloaded process can pick them up.
+        import os
+
+        os.environ["CV_RADAR_DB_PATH"] = str(db_path)
+        os.environ["CV_RADAR_CONFIG_DIR"] = str(config_dir)
+        uvicorn.run(
+            "radar.api.app:_app_for_reload",
+            host=host,
+            port=port,
+            reload=True,
+            factory=True,
+        )
+        return
+
+    app_instance = create_app(db_path=db_path, config_dir=config_dir)
+    uvicorn.run(app_instance, host=host, port=port)
 
 
 @app.command("score-debug")

@@ -28,7 +28,11 @@ def make_sqlite_url(db_path: Path | str | None = None) -> str:
 
 
 def get_engine(db_path: Path | str | None = None) -> Engine:
-    return create_engine(make_sqlite_url(db_path), future=True)
+    return create_engine(
+        make_sqlite_url(db_path),
+        future=True,
+        connect_args={"check_same_thread": False},
+    )
 
 
 def init_db(engine: Engine) -> None:
