@@ -1,0 +1,17 @@
+weights:
+  relevance: 0.55
+  source_priority: 0.10
+  implementation: 0.10
+  attention: 0.10
+  novelty: 0.10
+  negative_penalty: 0.15
+
+thresholds:
+  use: 90
+  prototype: 80
+  evaluate: 65
+  watch: 45
+  ignore: 0
+
+source_priority_cap: 60
+candidate_limit: 25

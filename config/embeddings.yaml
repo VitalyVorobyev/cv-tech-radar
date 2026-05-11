@@ -1,0 +1,6 @@
+embeddings:
+  enabled: false
+  provider: ollama
+  model: embeddinggemma:latest
+  base_url: http://localhost:11434
+  timeout_seconds: 30

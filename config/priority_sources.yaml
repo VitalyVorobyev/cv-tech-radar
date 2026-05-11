@@ -1,0 +1,38 @@
+organizations:
+  high:
+    - OpenCV
+    - CVF
+    - ETH Zurich
+    - Oxford VGG
+    - TU Munich
+    - NVIDIA Research
+    - Meta FAIR
+    - Google DeepMind
+    - MVTec
+    - Fraunhofer
+    - Basler
+    - GenICam
+    - EMVA
+  medium:
+    - Microsoft Research
+    - Apple Machine Learning Research
+    - Adobe Research
+    - EPFL
+    - INRIA
+    - Max Planck Institute
+    - CMU
+    - Stanford
+    - MIT CSAIL
+
+vendors:
+  high:
+    - Basler
+    - IDS Imaging
+    - Allied Vision
+    - Teledyne
+    - Zivid
+    - Photoneo
+    - SICK
+    - ifm
+    - Balluff
+    - Lucid Vision Labs

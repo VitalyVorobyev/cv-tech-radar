@@ -95,10 +95,7 @@ ipython_config.py
 # Pipfile.lock
 
 # UV
-#   Similar to Pipfile.lock, it is generally recommended to include uv.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-# uv.lock
+#   Keep uv.lock tracked for reproducible local radar runs.
 
 # poetry
 #   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
@@ -208,6 +205,18 @@ tempCodeRunnerFile.py
 
 # PyPI configuration file
 .pypirc
+
+# CV Radar generated runtime state
+data/radar.sqlite
+data/radar.sqlite-*
+data/raw/
+data/exports/*
+!data/exports/examples/
+!data/exports/examples/**
+reports/*
+!reports/examples/
+!reports/examples/**
+.tmp-real-run/
 
 # Marimo
 marimo/_static/

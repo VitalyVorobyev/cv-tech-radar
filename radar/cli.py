@@ -1,0 +1,259 @@
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Annotated
+
+import typer
+from rich.console import Console
+from rich.table import Table
+from sqlalchemy import select
+
+from radar.collectors.arxiv import fetch_and_store_arxiv
+from radar.config import ConfigError, load_app_config
+from radar.db import ensure_sources, get_engine, init_db, session_scope
+from radar.decisions import DecisionError, list_decisions_for_date, parse_tracks, record_decision
+from radar.filters.keyword_filter import classify_items_for_date
+from radar.models import Source
+from radar.reports.candidate_queue import collect_candidates, write_candidate_outputs
+from radar.reports.score_debug import collect_score_debug_rows
+from radar.schemas import RadarRing
+from radar.utils import parse_date_arg
+
+app = typer.Typer(help="CV Radar command line interface.")
+console = Console()
+DefaultDbPath = Path("data/radar.sqlite")
+DefaultConfigDir = Path("config")
+DefaultReportsDir = Path("reports/candidates")
+DefaultExportsDir = Path("data/exports/candidates")
+
+
+def _load(config_dir: Path):
+    try:
+        return load_app_config(config_dir)
+    except ConfigError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+
+
+@app.command("init-db")
+def init_db_command(
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+    config_dir: Annotated[Path, typer.Option("--config-dir")] = DefaultConfigDir,
+) -> None:
+    """Create SQLite tables and synchronize configured sources."""
+    config = _load(config_dir)
+    engine = get_engine(db_path)
+    init_db(engine)
+    with session_scope(engine) as session:
+        ensure_sources(session, config.sources)
+    console.print(f"Initialized database: {db_path}")
+
+
+@app.command("fetch-arxiv")
+def fetch_arxiv_command(
+    days: Annotated[int, typer.Option("--days", min=1)] = 1,
+    max_results: Annotated[int, typer.Option("--max-results", min=1)] = 100,
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+    config_dir: Annotated[Path, typer.Option("--config-dir")] = DefaultConfigDir,
+) -> None:
+    """Fetch recent papers from enabled arXiv sources."""
+    config = _load(config_dir)
+    engine = get_engine(db_path)
+    init_db(engine)
+    total_fetched = total_stored = total_updated = total_skipped = 0
+    with session_scope(engine) as session:
+        ensure_sources(session, config.sources)
+        for source_config in config.sources.sources:
+            if not source_config.enabled or source_config.kind != "arxiv":
+                continue
+            source = session.scalar(select(Source).where(Source.key == source_config.id))
+            if source is None:
+                continue
+            stats = fetch_and_store_arxiv(
+                session,
+                source,
+                source_config,
+                days=days,
+                max_results=max_results,
+            )
+            total_fetched += stats.fetched
+            total_stored += stats.stored
+            total_updated += stats.updated
+            total_skipped += stats.skipped_old
+    console.print(
+        "Fetched arXiv entries: "
+        f"{total_fetched}; stored: {total_stored}; updated: {total_updated}; "
+        f"skipped old: {total_skipped}"
+    )
+
+
+@app.command("classify")
+def classify_command(
+    date: Annotated[str, typer.Option("--date")] = "today",
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+    config_dir: Annotated[Path, typer.Option("--config-dir")] = DefaultConfigDir,
+) -> None:
+    """Classify stored items for a date."""
+    config = _load(config_dir)
+    target_date = parse_date_arg(date)
+    engine = get_engine(db_path)
+    init_db(engine)
+    with session_scope(engine) as session:
+        count = classify_items_for_date(session, config, target_date)
+    console.print(f"Classified {count} item(s) for {target_date.isoformat()}")
+
+
+@app.command("candidates")
+def candidates_command(
+    date: Annotated[str, typer.Option("--date")] = "today",
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+    config_dir: Annotated[Path, typer.Option("--config-dir")] = DefaultConfigDir,
+    reports_dir: Annotated[Path, typer.Option("--reports-dir")] = DefaultReportsDir,
+    exports_dir: Annotated[Path, typer.Option("--exports-dir")] = DefaultExportsDir,
+) -> None:
+    """Generate the candidate queue Markdown and JSON debug export."""
+    config = _load(config_dir)
+    target_date = parse_date_arg(date)
+    engine = get_engine(db_path)
+    init_db(engine)
+    with session_scope(engine) as session:
+        candidates = collect_candidates(
+            session,
+            target_date,
+            limit=config.scoring.candidate_limit,
+        )
+    report_path, export_path = write_candidate_outputs(
+        candidates,
+        target_date,
+        reports_dir=reports_dir,
+        exports_dir=exports_dir,
+    )
+    console.print(f"Wrote {len(candidates)} candidate(s): {report_path}")
+    console.print(f"Wrote JSON export: {export_path}")
+
+
+@app.command("decide")
+def decide_command(
+    item_id: Annotated[int, typer.Argument(help="SQLite item id to decide.")],
+    ring: Annotated[RadarRing, typer.Option("--ring", case_sensitive=False)],
+    reason: Annotated[str, typer.Option("--reason", help="Short decision rationale.")],
+    action: Annotated[str, typer.Option("--action", help="Next action or disposition.")] = "",
+    tracks: Annotated[
+        str | None,
+        typer.Option(
+            "--tracks",
+            help="Comma-separated track names. Defaults to classifier tracks.",
+        ),
+    ] = None,
+    decided_by: Annotated[str, typer.Option("--decided-by")] = "codex",
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+) -> None:
+    """Record a durable radar decision for an item."""
+    engine = get_engine(db_path)
+    init_db(engine)
+    with session_scope(engine) as session:
+        try:
+            decision = record_decision(
+                session,
+                item_id=item_id,
+                ring=ring,
+                tracks=parse_tracks(tracks),
+                reason=reason,
+                action=action,
+                decided_by=decided_by,
+            )
+        except DecisionError as exc:
+            raise typer.BadParameter(str(exc)) from exc
+        console.print(f"Recorded decision {decision.id}: item {item_id} -> {decision.ring}")
+
+
+@app.command("decisions")
+def decisions_command(
+    date: Annotated[str, typer.Option("--date")] = "today",
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+) -> None:
+    """List radar decisions for items published on a date."""
+    target_date = parse_date_arg(date)
+    engine = get_engine(db_path)
+    init_db(engine)
+    table = Table(title=f"Radar decisions - {target_date.isoformat()}")
+    table.add_column("Item")
+    table.add_column("Ring")
+    table.add_column("Tracks")
+    table.add_column("Reason", overflow="fold")
+    table.add_column("Action", overflow="fold")
+    detail_lines: list[str] = []
+    with session_scope(engine) as session:
+        rows = list_decisions_for_date(session, target_date)
+        for item, decision in rows:
+            detail_lines.append(
+                f"{item.id} {decision.ring}: {decision.decision_reason} | {decision.action}"
+            )
+            table.add_row(
+                str(item.id),
+                decision.ring,
+                ", ".join(decision.tracks_json or []),
+                decision.decision_reason,
+                decision.action,
+            )
+    console.print(table)
+    for line in detail_lines:
+        console.print(line)
+    console.print(f"{len(rows)} decision(s)")
+
+
+@app.command("score-debug")
+def score_debug_command(
+    date: Annotated[str, typer.Option("--date")] = "today",
+    limit: Annotated[int, typer.Option("--limit", min=1)] = 25,
+    include_zero: Annotated[bool, typer.Option("--include-zero")] = False,
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+) -> None:
+    """Show score components and matched keywords for classified items."""
+    target_date = parse_date_arg(date)
+    engine = get_engine(db_path)
+    init_db(engine)
+    table = Table(title=f"Score debug - {target_date.isoformat()}")
+    table.add_column("Item")
+    table.add_column("Final", justify="right")
+    table.add_column("Ring")
+    table.add_column("Rel", justify="right")
+    table.add_column("Src", justify="right")
+    table.add_column("Impl", justify="right")
+    table.add_column("Novel", justify="right")
+    table.add_column("Neg", justify="right")
+    table.add_column("Tracks")
+    table.add_column("Keywords")
+    table.add_column("Title")
+    detail_lines: list[str] = []
+    with session_scope(engine) as session:
+        rows = collect_score_debug_rows(
+            session,
+            target_date,
+            limit=limit,
+            include_zero=include_zero,
+        )
+        for item, classification in rows:
+            detail_lines.append(
+                f"{item.id} final={classification.final_score:g} "
+                f"ring={classification.recommended_ring} "
+                f"tracks={', '.join(classification.tracks_json or [])} "
+                f"keywords={', '.join(classification.positive_keywords_json or [])} "
+                f"title={item.title}"
+            )
+            table.add_row(
+                str(item.id),
+                f"{classification.final_score:g}",
+                classification.recommended_ring,
+                f"{classification.relevance_score:g}",
+                f"{classification.source_priority_score:g}",
+                f"{classification.implementation_score:g}",
+                f"{classification.novelty_score:g}",
+                f"{classification.negative_topic_penalty:g}",
+                ", ".join(classification.tracks_json or []),
+                ", ".join(classification.positive_keywords_json or []),
+                item.title,
+            )
+    console.print(table)
+    for line in detail_lines:
+        console.print(line)
+    console.print(f"{len(rows)} row(s)")
