@@ -51,13 +51,25 @@ function filterCandidates(
   });
 }
 
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function readDateParam(): string {
+  const v = new URLSearchParams(window.location.search).get("date");
+  if (!v) return "today";
+  return v === "today" || DATE_RE.test(v) ? v : "today";
+}
+
 export function QueueView() {
   const filterId = useId();
+  const dateId = useId();
 
-  // Server state
+  // Date is part of the route — drives the query and the empty-state copy.
+  const [date, setDate] = useState<string>(readDateParam);
+
+  // Server state — date is part of the cache key so changing it refetches.
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["queue", "today"],
-    queryFn: () => api.queue("today"),
+    queryKey: ["queue", date],
+    queryFn: () => api.queue(date),
   });
 
   // UI state
@@ -75,8 +87,14 @@ export function QueueView() {
     () => new URLSearchParams(window.location.search).get("track"),
   );
 
-  function updateUrl(newQ: string, newRing: Ring | null, newTrack: string | null) {
+  function updateUrl(
+    newQ: string,
+    newRing: Ring | null,
+    newTrack: string | null,
+    newDate: string,
+  ) {
     const params = new URLSearchParams();
+    if (newDate && newDate !== "today") params.set("date", newDate);
     if (newQ) params.set("q", newQ);
     if (newRing) params.set("ring", newRing);
     if (newTrack) params.set("track", newTrack);
@@ -198,28 +216,61 @@ export function QueueView() {
       <Chrome
         stats={{ total: candidates.length, reviewed, uncertain }}
         filterSlot={
-          <input
-            id={filterId}
-            type="search"
-            value={q}
-            onChange={(e) => {
-              setQ(e.target.value);
-              updateUrl(e.target.value, ringFilter, trackFilter);
-            }}
-            placeholder="Filter…"
-            aria-label="Filter candidates"
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-small)",
-              background: "transparent",
-              border: "none",
-              borderBottom: "1px solid var(--color-rule)",
-              color: "inherit",
-              outline: "none",
-              padding: "0.25rem 0",
-              width: "12rem",
-            }}
-          />
+          <div style={{ display: "flex", alignItems: "baseline", gap: "1rem" }}>
+            <label
+              htmlFor={dateId}
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-micro)",
+                color: "var(--color-muted)",
+              }}
+            >
+              date
+            </label>
+            <input
+              id={dateId}
+              type="date"
+              value={date === "today" ? new Date().toISOString().slice(0, 10) : date}
+              onChange={(e) => {
+                const next = e.target.value || "today";
+                setDate(next);
+                updateUrl(q, ringFilter, trackFilter, next);
+              }}
+              aria-label="Queue date"
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-small)",
+                background: "transparent",
+                border: "none",
+                borderBottom: "1px solid var(--color-rule)",
+                color: "inherit",
+                outline: "none",
+                padding: "0.25rem 0",
+              }}
+            />
+            <input
+              id={filterId}
+              type="search"
+              value={q}
+              onChange={(e) => {
+                setQ(e.target.value);
+                updateUrl(e.target.value, ringFilter, trackFilter, date);
+              }}
+              placeholder="Filter…"
+              aria-label="Filter candidates"
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-small)",
+                background: "transparent",
+                border: "none",
+                borderBottom: "1px solid var(--color-rule)",
+                color: "inherit",
+                outline: "none",
+                padding: "0.25rem 0",
+                width: "12rem",
+              }}
+            />
+          </div>
         }
       />
 
@@ -252,7 +303,7 @@ export function QueueView() {
               onClick={() => {
                 const next = ringFilter === r ? null : r;
                 setRingFilter(next);
-                updateUrl(q, next, trackFilter);
+                updateUrl(q, next, trackFilter, date);
               }}
               aria-pressed={ringFilter === r}
               style={{
@@ -288,7 +339,7 @@ export function QueueView() {
                   onClick={() => {
                     const next = trackFilter === t ? null : t;
                     setTrackFilter(next);
-                    updateUrl(q, ringFilter, next);
+                    updateUrl(q, ringFilter, next, date);
                   }}
                   aria-pressed={trackFilter === t}
                   style={{
@@ -359,7 +410,7 @@ export function QueueView() {
           >
             {candidates.length === 0 ? (
               <>
-                No candidates for today. Run{" "}
+                No candidates for{" "}
                 <code
                   style={{
                     fontFamily: "var(--font-mono)",
@@ -367,9 +418,19 @@ export function QueueView() {
                     fontStyle: "normal",
                   }}
                 >
-                  radar fetch-arxiv && radar classify --date today
-                </code>{" "}
-                to refresh.
+                  {date}
+                </code>
+                . Pick another date above, or run{" "}
+                <code
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "0.875em",
+                    fontStyle: "normal",
+                  }}
+                >
+                  radar fetch-arxiv && radar classify --date {date === "today" ? "today" : date}
+                </code>
+                .
               </>
             ) : (
               "No candidates match the current filters."
