@@ -54,6 +54,8 @@ def test_candidate_queue_sorted_capped_and_written(db_engine, app_config, tmp_pa
     report = report_path.read_text(encoding="utf-8")
     assert "# Candidate Queue - 2026-05-10" in report
     assert "### Claude decision" in report
+    for candidate in candidates:
+        assert f"- Item ID: {candidate.id}" in report
     payload = json.loads(export_path.read_text(encoding="utf-8"))
     assert payload["date"] == "2026-05-10"
     assert len(payload["candidates"]) == 25

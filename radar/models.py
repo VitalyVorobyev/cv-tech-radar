@@ -116,6 +116,7 @@ class RadarDecision(Base):
     decision_reason: Mapped[str] = mapped_column(Text, default="")
     action: Mapped[str] = mapped_column(Text, default="")
     decided_by: Mapped[str] = mapped_column(String(120), default="")
+    uncertain: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
     item: Mapped[Item] = relationship(back_populates="decisions")
@@ -123,6 +124,7 @@ class RadarDecision(Base):
 
 class Digest(Base):
     __tablename__ = "digests"
+    __table_args__ = (UniqueConstraint("kind", "date", name="uq_digest_kind_date"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     kind: Mapped[str] = mapped_column(String(40), index=True)
@@ -131,3 +133,4 @@ class Digest(Base):
     markdown_path: Mapped[str] = mapped_column(Text)
     json_path: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)

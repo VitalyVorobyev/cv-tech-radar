@@ -10,11 +10,13 @@ from sqlalchemy import select
 
 from radar.collectors.arxiv import fetch_and_store_arxiv
 from radar.config import ConfigError, load_app_config
+from radar.curation import ProposalParseError, apply_proposals, parse_proposals_file
 from radar.db import ensure_sources, get_engine, init_db, session_scope
 from radar.decisions import DecisionError, list_decisions_for_date, parse_tracks, record_decision
 from radar.filters.keyword_filter import classify_items_for_date
 from radar.models import Source
 from radar.reports.candidate_queue import collect_candidates, write_candidate_outputs
+from radar.reports.digest import collect_digest_rows, write_digest_outputs
 from radar.reports.score_debug import collect_score_debug_rows
 from radar.schemas import RadarRing
 from radar.utils import parse_date_arg
@@ -25,6 +27,8 @@ DefaultDbPath = Path("data/radar.sqlite")
 DefaultConfigDir = Path("config")
 DefaultReportsDir = Path("reports/candidates")
 DefaultExportsDir = Path("data/exports/candidates")
+DefaultDigestReportsDir = Path("reports/digests")
+DefaultDigestExportsDir = Path("data/exports/digests")
 
 
 def _load(config_dir: Path):
@@ -164,6 +168,72 @@ def decide_command(
         except DecisionError as exc:
             raise typer.BadParameter(str(exc)) from exc
         console.print(f"Recorded decision {decision.id}: item {item_id} -> {decision.ring}")
+
+
+@app.command("apply")
+def apply_command(
+    markdown_path: Annotated[Path, typer.Argument(help="Candidate Markdown to apply.")],
+    decided_by: Annotated[str, typer.Option("--decided-by")] = "claude-curator",
+    dry_run: Annotated[bool, typer.Option("--dry-run")] = False,
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+) -> None:
+    """Bulk-record decisions written into a candidate Markdown file."""
+    if not markdown_path.exists():
+        raise typer.BadParameter(f"Markdown file not found: {markdown_path}")
+    try:
+        proposals = parse_proposals_file(markdown_path)
+    except ProposalParseError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+
+    engine = get_engine(db_path)
+    init_db(engine)
+    with session_scope(engine) as session:
+        try:
+            report = apply_proposals(session, proposals, decided_by=decided_by, dry_run=dry_run)
+        except ProposalParseError as exc:
+            raise typer.BadParameter(str(exc)) from exc
+
+    label = "Would apply" if dry_run else "Applied"
+    console.print(
+        f"{label} {len(report.applied)} decision(s); "
+        f"skipped {len(report.skipped)}; warnings {len(report.warnings)}"
+    )
+    for parsed in report.applied:
+        proposal = parsed.proposal
+        if proposal is None:
+            continue
+        ring = proposal.ring.value if hasattr(proposal.ring, "value") else str(proposal.ring)
+        console.print(f"  item {parsed.item_id} -> {ring}: {proposal.reason[:80]}")
+    for parsed in report.skipped:
+        console.print(f"  skipped item {parsed.item_id}: {parsed.skipped_reason}")
+    for warning in report.warnings:
+        console.print(f"  warning: {warning}")
+
+
+@app.command("digest")
+def digest_command(
+    date: Annotated[str, typer.Option("--date")] = "today",
+    days: Annotated[int, typer.Option("--days", min=1)] = 1,
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+    reports_dir: Annotated[Path, typer.Option("--reports-dir")] = DefaultDigestReportsDir,
+    exports_dir: Annotated[Path, typer.Option("--exports-dir")] = DefaultDigestExportsDir,
+) -> None:
+    """Generate a short daily digest Markdown from recorded decisions."""
+    target_date = parse_date_arg(date)
+    engine = get_engine(db_path)
+    init_db(engine)
+    with session_scope(engine) as session:
+        rows = collect_digest_rows(session, target_date, days)
+        report_path, export_path = write_digest_outputs(
+            session,
+            rows,
+            target_date,
+            days,
+            reports_dir=reports_dir,
+            exports_dir=exports_dir,
+        )
+    console.print(f"Wrote digest ({len(rows)} item(s)): {report_path}")
+    console.print(f"Wrote JSON export: {export_path}")
 
 
 @app.command("decisions")

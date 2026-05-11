@@ -82,7 +82,18 @@ Assign rings, write concise decision reasons, identify noise patterns, and list
 which items should become Watch/Evaluate/Ignore.
 ```
 
-Record a decision:
+Apply decisions in bulk (recommended) — the curator fills `### Claude decision` TODO
+blocks in the generated Markdown with a small YAML payload, then:
+
+```bash
+uv run radar apply ".tmp-real-run/reports/$latest_date.md" \
+  --db-path .tmp-real-run/radar.sqlite --dry-run
+uv run radar apply ".tmp-real-run/reports/$latest_date.md" \
+  --db-path .tmp-real-run/radar.sqlite
+uv run radar decisions --date "$latest_date" --db-path .tmp-real-run/radar.sqlite
+```
+
+Or record a single decision directly:
 
 ```bash
 uv run radar decide ITEM_ID \
@@ -90,8 +101,6 @@ uv run radar decide ITEM_ID \
   --reason "Relevant but needs more evidence." \
   --action "Read PDF later." \
   --db-path .tmp-real-run/radar.sqlite
-
-uv run radar decisions --date "$latest_date" --db-path .tmp-real-run/radar.sqlite
 ```
 
 Expected output:
@@ -170,10 +179,16 @@ short daily digest with Radar Changes, Watch, Ignore/noise patterns, and Atlas
 candidates. Do not promote raw candidates.
 ```
 
-Current project limitation:
+Run the generator:
 
-- Digest generation is not implemented yet.
-- Use `radar decisions` as the source of accepted decisions until digest commands exist.
+```bash
+uv run radar digest --date "$latest_date" --db-path .tmp-real-run/radar.sqlite
+uv run radar digest --date "$latest_date" --days 7  # rolling weekly window
+```
+
+The digest is sectioned by ring (Use → Prototype → Evaluate → Watch → Ignore summary →
+Uncertainty) and reads decisions in the window keyed by `Item.published_at`. Re-running
+upserts the same `digests` row — safe to iterate.
 
 Expected output:
 

@@ -200,3 +200,13 @@ class CandidateRecord(BaseModel):
     scores: CandidateScores
     summary: str
     pipeline_rationale: str
+
+
+class DecisionProposal(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    ring: RadarRing
+    reason: str = Field(min_length=1)
+    action: str = ""
+    tracks: list[str] | None = None
+    uncertain: bool = False

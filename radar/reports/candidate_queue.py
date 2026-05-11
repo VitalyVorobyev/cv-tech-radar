@@ -94,6 +94,7 @@ def render_candidate_markdown(candidates: list[CandidateRecord], target_date: da
             [
                 f"## Candidate {index}: {candidate.title}",
                 "",
+                f"- Item ID: {candidate.id}",
                 f"- Type: {item_type}",
                 f"- Source: {candidate.source}",
                 f"- URL: {candidate.url}",
