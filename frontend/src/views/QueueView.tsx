@@ -237,16 +237,7 @@ export function QueueView() {
                 updateUrl(q, ringFilter, trackFilter, next);
               }}
               aria-label="Queue date"
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: "var(--text-small)",
-                background: "transparent",
-                border: "none",
-                borderBottom: "1px solid var(--color-rule)",
-                color: "inherit",
-                outline: "none",
-                padding: "0.25rem 0",
-              }}
+              className="queue-input queue-input--date"
             />
             <input
               id={filterId}
@@ -258,17 +249,7 @@ export function QueueView() {
               }}
               placeholder="Filter…"
               aria-label="Filter candidates"
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: "var(--text-small)",
-                background: "transparent",
-                border: "none",
-                borderBottom: "1px solid var(--color-rule)",
-                color: "inherit",
-                outline: "none",
-                padding: "0.25rem 0",
-                width: "12rem",
-              }}
+              className="queue-input queue-input--filter"
             />
           </div>
         }

@@ -158,3 +158,54 @@ html[data-theme="dark"] .text-muted {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Header inputs — visible affordance for date + filter */
+.queue-input {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-muted);
+  color: inherit;
+  outline: none;
+  padding: 0.25rem 0.5rem 0.25rem 0;
+  transition: border-color var(--duration-focus) ease-out;
+}
+
+.queue-input:hover {
+  border-bottom-color: var(--color-ink);
+}
+
+.queue-input:focus,
+.queue-input:focus-visible {
+  border-bottom-color: var(--color-accent);
+  outline: none;
+}
+
+.queue-input--date {
+  cursor: pointer;
+  min-width: 8.5rem;
+}
+
+.queue-input--filter {
+  width: 12rem;
+}
+
+/* Force the calendar picker indicator to remain visible & accent-tinted */
+.queue-input--date::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  cursor: pointer;
+  filter: invert(34%) sepia(82%) saturate(1014%) hue-rotate(13deg)
+    brightness(94%) contrast(94%);
+  margin-left: 0.25rem;
+}
+
+html[data-theme="dark"] .queue-input,
+html:not([data-theme="light"]) .queue-input {
+  border-bottom-color: var(--color-muted-dark);
+}
+
+html[data-theme="dark"] .queue-input:hover,
+html:not([data-theme="light"]) .queue-input:hover {
+  border-bottom-color: var(--color-ink-dark);
+}
