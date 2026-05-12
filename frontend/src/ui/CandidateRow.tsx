@@ -5,6 +5,7 @@
 import { useRef } from "react";
 import type { Candidate } from "../lib/api";
 import { RingLabel } from "./RingLabel";
+import { LLMBadge } from "./LLMBadge";
 import { CandidatePanel } from "./CandidatePanel";
 import { formatDate, formatScore, formatId, formatTracks } from "../lib/format";
 
@@ -45,7 +46,6 @@ export function CandidateRow({
       ref={rowRef}
       style={{
         borderBottom: "1px solid var(--color-rule)",
-        outline: focused ? "none" : undefined,
       }}
     >
       {/* Collapsed row — the clickable / keyboard-focusable surface */}
@@ -58,17 +58,19 @@ export function CandidateRow({
         onKeyDown={handleKeyDown}
         style={{
           display: "grid",
-          gridTemplateColumns: "4rem 7rem 1fr 8rem 3rem 10rem",
+          // Spec widths: 60/90/1fr/200/50/140. Column 5 widened to 80px to fit
+          // the LLM badge alongside the score; everything else matches spec.
+          gridTemplateColumns: "60px 90px 1fr 200px 80px 140px",
           alignItems: "center",
           gap: "0 1rem",
-          padding: "0.625rem 1.5rem",
+          padding: "0.65rem 1.5rem",
           cursor: "pointer",
-          outline: focused
-            ? "1.5px solid var(--color-accent)"
-            : "none",
-          outlineOffset: "-2px",
-          background: expanded ? "var(--color-rule)" : "transparent",
-          transition: `background var(--duration-expand) var(--easing-expand)`,
+          border: focused
+            ? "1px solid var(--color-accent)"
+            : "1px solid transparent",
+          borderRadius: "var(--radius-sm)",
+          background: "transparent",
+          transition: `border-color var(--duration-focus) ease-out`,
         }}
       >
         {/* ID */}
@@ -132,16 +134,20 @@ export function CandidateRow({
           {formatTracks(candidate.tracks)}
         </span>
 
-        {/* Score */}
+        {/* Score + LLM signal */}
         <span
           style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "baseline",
+            gap: "0.5rem",
             fontFamily: "var(--font-mono)",
             fontSize: "var(--text-micro)",
             color: "var(--color-muted)",
-            textAlign: "right",
           }}
         >
-          {formatScore(candidate.scores.final)}
+          {candidate.llm_judgment && <LLMBadge judgment={candidate.llm_judgment} />}
+          <span>{formatScore(candidate.scores.final)}</span>
         </span>
 
         {/* Source · date */}

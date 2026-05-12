@@ -115,6 +115,39 @@ describe("api.postDecision", () => {
   });
 });
 
+describe("api.board", () => {
+  function stubBoard() {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          rings: { Use: [], Prototype: [], Evaluate: [], Watch: [], Ignore: [] },
+          counts: { Use: 0, Prototype: 0, Evaluate: 0, Watch: 0, Ignore: 2 },
+          decided_since: null,
+          include_ignore: false,
+        }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    return fetchMock;
+  }
+
+  it("calls /api/board with no params by default", async () => {
+    const fetchMock = stubBoard();
+    await api.board();
+    expect(fetchMock).toHaveBeenCalledWith("/api/board", undefined);
+  });
+
+  it("forwards decided_since and include_ignore as query params", async () => {
+    const fetchMock = stubBoard();
+    await api.board({ decided_since: "2026-05-01T00:00:00Z", include_ignore: true });
+    const url = fetchMock.mock.calls[0]?.[0] ?? "";
+    expect(url).toContain("/api/board?");
+    expect(url).toContain("decided_since=2026-05-01T00%3A00%3A00Z");
+    expect(url).toContain("include_ignore=true");
+  });
+});
+
 describe("ApiError", () => {
   it("is an instance of Error", () => {
     const err = new ApiError(404, "not found");

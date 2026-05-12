@@ -70,6 +70,71 @@ def test_fetch_arxiv_stores_and_dedupes(db_engine, app_config):
         assert len(session.scalars(select(RawItem)).all()) == 2
 
 
+def test_fetch_arxiv_pagination_stops_when_cutoff_hit(db_engine, app_config):
+    feed_text = Path("tests/fixtures/arxiv_feed.xml").read_text(encoding="utf-8")
+    calls: list[int] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        start = int(request.url.params["start"])
+        calls.append(start)
+        return httpx.Response(200, text=feed_text)
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    source_config = app_config.sources.sources[0]
+    with session_scope(db_engine) as session:
+        source = session.scalar(select(Source).where(Source.key == source_config.id))
+        # Cutoff is 2026-05-12, fixture entries are all 2026-05-10, so every entry
+        # is below the cutoff and the loop must terminate on the first page.
+        stats = fetch_and_store_arxiv(
+            session,
+            source,
+            source_config,
+            days=1,
+            max_results=2,
+            max_pages=5,
+            client=client,
+            now=datetime(2026, 5, 12, 0, 0, tzinfo=UTC),
+        )
+    assert calls == [0]
+    assert stats.pages == 1
+    assert stats.skipped_old == 2
+    assert stats.stored == 0
+
+
+def test_fetch_arxiv_pagination_walks_multiple_pages(db_engine, app_config):
+    """When entries fit within --days, walk pages until results are exhausted."""
+    feed_text = Path("tests/fixtures/arxiv_feed.xml").read_text(encoding="utf-8")
+    empty_feed = (
+        '<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"></feed>'
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        start = int(request.url.params["start"])
+        # First page (start=0) returns 2 entries; second page (start=2) is empty.
+        if start == 0:
+            return httpx.Response(200, text=feed_text)
+        return httpx.Response(200, text=empty_feed)
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    source_config = app_config.sources.sources[0]
+    with session_scope(db_engine) as session:
+        source = session.scalar(select(Source).where(Source.key == source_config.id))
+        stats = fetch_and_store_arxiv(
+            session,
+            source,
+            source_config,
+            days=30,
+            max_results=2,
+            max_pages=5,
+            client=client,
+            now=datetime(2026, 5, 11, 0, 0, tzinfo=UTC),
+        )
+    # We walk both pages: 2 stored from page 1, 0 from empty page 2.
+    assert stats.stored == 2
+    assert stats.pages == 2
+    assert stats.latest_published_at == datetime(2026, 5, 10, 10, 0, tzinfo=UTC)
+
+
 def test_store_normalized_item_dedupes_by_normalized_title(db_engine, app_config):
     source_config = app_config.sources.sources[0]
     item = NormalizedItem(

@@ -1,8 +1,10 @@
 tracks:
   - id: calibration-camera-models
     name: Calibration & Camera Models
+    # Bare `calibration` / `distortion` were dropped after they false-positived
+    # on MLLM-evaluation papers ("Calibrated Accuracy", "distortion localization").
+    # Use phrase keywords so the track only fires on real camera/geometry context.
     positive_keywords:
-      - calibration
       - camera calibration
       - camera model
       - camera intrinsic
@@ -11,7 +13,13 @@ tracks:
       - camera extrinsic
       - extrinsic calibration
       - extrinsic parameter
-      - distortion
+      - geometric calibration
+      - photometric calibration
+      - lens distortion
+      - radial distortion
+      - tangential distortion
+      - pinhole model
+      - fisheye
       - rolling shutter
       - bundle adjustment
       - hand-eye

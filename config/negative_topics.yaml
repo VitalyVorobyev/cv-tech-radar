@@ -7,3 +7,11 @@ negative_topics:
   - diffusion art generation
   - video generation
   - image generation
+  # MLLM/VLM-evaluation noise — added after 2026-05-11 and 2026-05-08 curation
+  # showed 14 false positives in 50 candidates. Phrases are chosen to fire on
+  # MLLM-eval papers without breaking legitimate vision-foundation-model work
+  # (DINOv2 / SAM / CLIP papers don't use these phrases verbatim).
+  - vision-language
+  - multimodal large language
+  - image editing
+  - omnimodal

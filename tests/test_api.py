@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -9,8 +9,9 @@ from fastapi.testclient import TestClient
 from radar.api.app import create_app
 from radar.db import session_scope
 from radar.filters.keyword_filter import classify_items_for_date
-from radar.models import Item, RadarDecision
+from radar.models import Item, ItemLLMJudgment, RadarDecision
 from radar.schemas import RadarRing
+from radar.utils import utc_now
 
 
 @pytest.fixture
@@ -131,6 +132,82 @@ def test_queue_with_seeded_items_has_correct_shape(client, api_db, app_config):
         "final",
     ):
         assert key in candidate["scores"]
+
+
+def test_queue_includes_llm_judgment_when_present(client, api_db, app_config):
+    _db_path, engine = api_db
+    target = date(2026, 5, 11)
+    published = datetime(2026, 5, 11, 10, tzinfo=UTC)
+    with session_scope(engine) as session:
+        _seed_item(
+            session, item_id=1, title="Subpixel checkerboard calibration", published=published
+        )
+        session.flush()
+        classify_items_for_date(session, app_config, target)
+        session.add(
+            ItemLLMJudgment(
+                item_id=1,
+                model="gemma-test",
+                decision="yes",
+                reason="On-topic for calibration.",
+                raw_response="DECISION: yes",
+                created_at=datetime(2026, 5, 11, 12, tzinfo=UTC),
+            )
+        )
+
+    response = client.get("/api/queue", params={"date": "2026-05-11"})
+    candidate = response.json()["candidates"][0]
+    assert candidate["llm_judgment"] is not None
+    assert candidate["llm_judgment"]["verdict"] == "yes"
+    assert candidate["llm_judgment"]["model"] == "gemma-test"
+    assert candidate["llm_judgment"]["reason"] == "On-topic for calibration."
+
+
+def test_queue_llm_judgment_null_when_absent(client, api_db, app_config):
+    _db_path, engine = api_db
+    target = date(2026, 5, 11)
+    published = datetime(2026, 5, 11, 10, tzinfo=UTC)
+    with session_scope(engine) as session:
+        _seed_item(
+            session, item_id=1, title="Subpixel checkerboard calibration", published=published
+        )
+        session.flush()
+        classify_items_for_date(session, app_config, target)
+
+    response = client.get("/api/queue", params={"date": "2026-05-11"})
+    candidate = response.json()["candidates"][0]
+    assert candidate["llm_judgment"] is None
+
+
+def test_board_includes_llm_judgment_when_present(client, api_db):
+    _db_path, engine = api_db
+    published = datetime(2026, 5, 11, 10, tzinfo=UTC)
+    decided = datetime(2026, 5, 11, 12, tzinfo=UTC)
+    with session_scope(engine) as session:
+        _seed_item(session, item_id=1, title="Subpixel calibration", published=published)
+        session.flush()
+        _seed_decision(
+            session,
+            item_id=1,
+            ring=RadarRing.USE,
+            tracks=[],
+            reason="ship",
+            created_at=decided,
+        )
+        session.add(
+            ItemLLMJudgment(
+                item_id=1,
+                model="gemma-test",
+                decision="yes",
+                reason="agrees with curator",
+                raw_response="DECISION: yes",
+                created_at=datetime(2026, 5, 11, 13, tzinfo=UTC),
+            )
+        )
+
+    response = client.get("/api/board")
+    rings = response.json()["rings"]
+    assert rings["Use"][0]["llm_judgment"]["verdict"] == "yes"
 
 
 def test_queue_shows_current_decision_after_post(client, api_db, app_config):
@@ -344,14 +421,109 @@ def test_board_groups_by_ring(client, api_db):
             created_at=decided,
         )
 
-    response = client.get("/api/board", params={"date": "2026-05-11", "days": 7})
+    # Default: Ignore is hidden but its count is reported in the counts envelope.
+    response = client.get("/api/board")
     assert response.status_code == 200
-    rings = response.json()["rings"]
+    body = response.json()
+    rings = body["rings"]
+    counts = body["counts"]
     assert [row["item_id"] for row in rings["Use"]] == [1]
     assert [row["item_id"] for row in rings["Watch"]] == [2]
-    assert [row["item_id"] for row in rings["Ignore"]] == [3]
+    assert rings["Ignore"] == []
     assert rings["Prototype"] == []
     assert rings["Evaluate"] == []
+    assert counts == {"Use": 1, "Prototype": 0, "Evaluate": 0, "Watch": 1, "Ignore": 1}
+
+    # decided_at populated on each row.
+    use_row = rings["Use"][0]
+    assert use_row["decided_at"].startswith("2026-05-11")
+    assert use_row["score"] is None  # no classification was run
+
+    # include_ignore exposes the slush pile.
+    response = client.get("/api/board", params={"include_ignore": "true"})
+    rings = response.json()["rings"]
+    assert [row["item_id"] for row in rings["Ignore"]] == [3]
+
+
+def test_board_returns_latest_decision_regardless_of_publish_date(client, api_db):
+    """A paper decided weeks ago must still appear on the persistent board."""
+    _db_path, engine = api_db
+    old_published = datetime(2026, 3, 1, 10, tzinfo=UTC)
+    old_decided = datetime(2026, 3, 2, 10, tzinfo=UTC)
+    with session_scope(engine) as session:
+        _seed_item(session, item_id=10, title="Old Use Item", published=old_published)
+        session.flush()
+        _seed_decision(
+            session,
+            item_id=10,
+            ring=RadarRing.USE,
+            tracks=["Calibration"],
+            reason="still relevant",
+            created_at=old_decided,
+        )
+
+    response = client.get("/api/board")
+    rings = response.json()["rings"]
+    assert [row["item_id"] for row in rings["Use"]] == [10]
+
+
+def test_board_latest_decision_supersedes_earlier(client, api_db):
+    _db_path, engine = api_db
+    published = datetime(2026, 5, 1, 10, tzinfo=UTC)
+    with session_scope(engine) as session:
+        _seed_item(session, item_id=42, title="Reclassified Item", published=published)
+        session.flush()
+        _seed_decision(
+            session,
+            item_id=42,
+            ring=RadarRing.WATCH,
+            tracks=[],
+            reason="initial watch",
+            created_at=datetime(2026, 5, 2, 9, tzinfo=UTC),
+        )
+        _seed_decision(
+            session,
+            item_id=42,
+            ring=RadarRing.USE,
+            tracks=[],
+            reason="promoted",
+            created_at=datetime(2026, 5, 10, 9, tzinfo=UTC),
+        )
+
+    response = client.get("/api/board")
+    rings = response.json()["rings"]
+    assert rings["Watch"] == []
+    assert [row["item_id"] for row in rings["Use"]] == [42]
+    assert rings["Use"][0]["reason"] == "promoted"
+
+
+def test_board_decided_since_filter(client, api_db):
+    _db_path, engine = api_db
+    published = datetime(2026, 5, 1, 10, tzinfo=UTC)
+    with session_scope(engine) as session:
+        _seed_item(session, item_id=1, title="Old", published=published)
+        _seed_item(session, item_id=2, title="Fresh", published=published)
+        session.flush()
+        _seed_decision(
+            session,
+            item_id=1,
+            ring=RadarRing.USE,
+            tracks=[],
+            reason="old",
+            created_at=datetime(2026, 3, 1, 10, tzinfo=UTC),
+        )
+        _seed_decision(
+            session,
+            item_id=2,
+            ring=RadarRing.USE,
+            tracks=[],
+            reason="fresh",
+            created_at=datetime(2026, 5, 10, 10, tzinfo=UTC),
+        )
+
+    response = client.get("/api/board", params={"decided_since": "2026-05-01T00:00:00+00:00"})
+    rings = response.json()["rings"]
+    assert [row["item_id"] for row in rings["Use"]] == [2]
 
 
 def test_tracks_reflects_config(client, app_config):
@@ -373,3 +545,200 @@ def test_sources_endpoint(client, app_config):
     for entry in sources:
         for key in ("id", "name", "kind", "enabled", "priority"):
             assert key in entry
+
+
+def test_get_item_happy_path_with_history_and_movement(client, api_db):
+    _db_path, engine = api_db
+    published = datetime(2026, 5, 1, 10, tzinfo=UTC)
+    # First decision must be outside the 7-day window so "new" precedence
+    # does not pre-empt the "in" classification we want to assert on.
+    now = utc_now()
+    first_decided = now - timedelta(days=30)
+    second_decided = now - timedelta(days=1)
+    with session_scope(engine) as session:
+        _seed_item(session, item_id=7, title="Calibration paper", published=published)
+        session.flush()
+        item = session.get(Item, 7)
+        assert item is not None
+        item.first_decided_at = first_decided
+        session.add(
+            RadarDecision(
+                item_id=7,
+                ring=RadarRing.WATCH.value,
+                tracks_json=["Calibration & Camera Models"],
+                decision_reason="initial watch",
+                action="",
+                decided_by="tester",
+                uncertain=False,
+                previous_ring=None,
+                created_at=first_decided,
+            )
+        )
+        session.add(
+            RadarDecision(
+                item_id=7,
+                ring=RadarRing.USE.value,
+                tracks_json=["Calibration & Camera Models"],
+                decision_reason="promoted to Use",
+                action="ship it",
+                decided_by="tester",
+                uncertain=False,
+                previous_ring=RadarRing.WATCH.value,
+                created_at=second_decided,
+            )
+        )
+
+    response = client.get("/api/items/7")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["id"] == 7
+    assert body["title"] == "Calibration paper"
+    assert body["abstract"].startswith("Camera calibration")
+    assert body["ring"] == "Use"
+    assert body["track"] == "Calibration & Camera Models"
+    assert body["tracks"] == ["Calibration & Camera Models"]
+    assert body["reason"] == "promoted to Use"
+    assert body["uncertain"] is False
+    assert body["source"] == "arXiv cs.CV"
+    assert body["decided_by"] == "tester"
+    history = body["history"]
+    assert [entry["ring"] for entry in history] == ["Watch", "Use"]
+    assert body["movement"] == "in"
+
+
+def test_get_item_returns_404_for_unknown_id(client):
+    response = client.get("/api/items/9999")
+    assert response.status_code == 404
+
+
+def test_get_item_no_decisions_returns_empty_ring(client, api_db):
+    _db_path, engine = api_db
+    published = datetime(2026, 5, 1, 10, tzinfo=UTC)
+    with session_scope(engine) as session:
+        _seed_item(session, item_id=11, title="Uncurated", published=published)
+
+    response = client.get("/api/items/11")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["ring"] == ""
+    assert body["history"] == []
+    assert body["movement"] is None
+    assert body["track"] == ""
+    assert body["tracks"] == []
+    assert body["decided_by"] is None
+
+
+def test_timeline_returns_requested_weeks_with_correct_buckets(client, api_db):
+    _db_path, engine = api_db
+    now = utc_now()
+    today = now.date()
+    this_monday = datetime(today.year, today.month, today.day, tzinfo=UTC) - timedelta(
+        days=today.weekday()
+    )
+    # Three items, each in a distinct ISO week within the 4-week window.
+    week0 = this_monday + timedelta(days=2)  # current week
+    week1 = this_monday - timedelta(weeks=1) + timedelta(days=1)
+    week3 = this_monday - timedelta(weeks=3) + timedelta(days=3)
+
+    published = datetime(2026, 1, 1, 10, tzinfo=UTC)
+    with session_scope(engine) as session:
+        for idx, decided_at, ring in [
+            (1, week0, RadarRing.USE),
+            (2, week1, RadarRing.EVALUATE),
+            (3, week3, RadarRing.WATCH),
+        ]:
+            _seed_item(session, item_id=idx, title=f"item-{idx}", published=published)
+            session.flush()
+            item = session.get(Item, idx)
+            assert item is not None
+            item.first_decided_at = decided_at
+            session.add(
+                RadarDecision(
+                    item_id=idx,
+                    ring=ring.value,
+                    tracks_json=[],
+                    decision_reason="seed",
+                    action="",
+                    decided_by="tester",
+                    uncertain=False,
+                    previous_ring=None,
+                    created_at=decided_at,
+                )
+            )
+
+    response = client.get("/api/timeline", params={"weeks": 4})
+    assert response.status_code == 200
+    body = response.json()
+    weeks = body["weeks"]
+    assert len(weeks) == 4
+
+    # Chronologically ordered: oldest first.
+    iso_keys = [w["iso"] for w in weeks]
+    assert iso_keys == sorted(iso_keys)
+
+    def _iso_for(moment: datetime) -> str:
+        iso = moment.isocalendar()
+        return f"{iso.year}-W{iso.week:02d}"
+
+    by_iso = {w["iso"]: w for w in weeks}
+    assert by_iso[_iso_for(week0)]["Use"] == 1
+    assert by_iso[_iso_for(week1)]["Evaluate"] == 1
+    assert by_iso[_iso_for(week3)]["Watch"] == 1
+    # Buckets that should NOT be incremented.
+    assert by_iso[_iso_for(week0)]["Watch"] == 0
+    assert by_iso[_iso_for(week1)]["Use"] == 0
+
+
+def test_board_items_include_movement_field(client, api_db):
+    _db_path, engine = api_db
+    published = datetime(2026, 5, 1, 10, tzinfo=UTC)
+    now = utc_now()
+    # first_decided_at outside 7d window so "new" doesn't pre-empt "in".
+    first_decided = now - timedelta(days=30)
+    second_decided = now - timedelta(days=1)
+    with session_scope(engine) as session:
+        _seed_item(session, item_id=20, title="Promoted item", published=published)
+        session.flush()
+        item = session.get(Item, 20)
+        assert item is not None
+        item.first_decided_at = first_decided
+        session.add(
+            RadarDecision(
+                item_id=20,
+                ring=RadarRing.WATCH.value,
+                tracks_json=[],
+                decision_reason="initial",
+                action="",
+                decided_by="tester",
+                uncertain=False,
+                previous_ring=None,
+                created_at=first_decided,
+            )
+        )
+        session.add(
+            RadarDecision(
+                item_id=20,
+                ring=RadarRing.USE.value,
+                tracks_json=[],
+                decision_reason="promoted",
+                action="",
+                decided_by="tester",
+                uncertain=False,
+                previous_ring=RadarRing.WATCH.value,
+                created_at=second_decided,
+            )
+        )
+
+    response = client.get("/api/board")
+    assert response.status_code == 200
+    rings = response.json()["rings"]
+    use_rows = rings["Use"]
+    assert use_rows, "expected at least one Use row"
+    target = next(row for row in use_rows if row["item_id"] == 20)
+    assert "movement" in target
+    # Promotion within the 7-day window -> "in".
+    assert target["movement"] == "in"
+    # All rows must have the movement key (even if None).
+    for ring_rows in rings.values():
+        for row in ring_rows:
+            assert "movement" in row

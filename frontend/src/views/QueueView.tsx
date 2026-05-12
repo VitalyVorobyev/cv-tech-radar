@@ -11,6 +11,7 @@ import { Chrome } from "../ui/Chrome";
 import { CandidateRow } from "../ui/CandidateRow";
 import { ShortcutSheet } from "../ui/ShortcutSheet";
 import type { Ring } from "../lib/api";
+import { writeUrlParams } from "../lib/urlState";
 
 const RINGS: Ring[] = ["Use", "Prototype", "Evaluate", "Watch", "Ignore"];
 
@@ -93,13 +94,10 @@ export function QueueView() {
     newTrack: string | null,
     newDate: string,
   ) {
-    const params = new URLSearchParams();
-    if (newDate && newDate !== "today") params.set("date", newDate);
-    if (newQ) params.set("q", newQ);
-    if (newRing) params.set("ring", newRing);
-    if (newTrack) params.set("track", newTrack);
-    const search = params.toString();
-    window.history.replaceState({}, "", search ? `?${search}` : window.location.pathname);
+    writeUrlParams(
+      { date: newDate, q: newQ, ring: newRing, track: newTrack },
+      { date: "today" },
+    );
   }
 
   const candidates = data?.candidates ?? [];
@@ -214,7 +212,6 @@ export function QueueView() {
       }}
     >
       <Chrome
-        stats={{ total: candidates.length, reviewed, uncertain }}
         filterSlot={
           <div style={{ display: "flex", alignItems: "baseline", gap: "1rem" }}>
             <label
@@ -255,11 +252,45 @@ export function QueueView() {
         }
       />
 
-      {/* Filter chips — ring toggles */}
+      {/* Top stats bar — counts on the left, hotkey hint on the right */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "baseline",
+          padding: "0.625rem 1.5rem",
+          borderTop: "1px solid var(--color-rule)",
+          borderBottom: "1px solid var(--color-rule)",
+          flexWrap: "wrap",
+          gap: "1rem",
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-small)",
+            color: "var(--color-muted)",
+          }}
+        >
+          {reviewed} reviewed · {Math.max(0, candidates.length - reviewed)} still TODO
+          {uncertain > 0 ? ` · ${uncertain} uncertain` : ""}
+        </div>
+        <div
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-micro)",
+            color: "var(--color-muted)",
+          }}
+        >
+          j/k navigate · enter expand · ? shortcuts
+        </div>
+      </div>
+
+      {/* Ring legend + track filter strip */}
       {!isLoading && !isError && candidates.length > 0 && (
         <div
           role="group"
-          aria-label="Filter by ring"
+          aria-label="Ring legend and track filters"
           style={{
             display: "flex",
             gap: "1.25rem",
@@ -278,29 +309,36 @@ export function QueueView() {
           >
             ring:
           </span>
-          {RINGS.map((r) => (
-            <button
-              key={r}
-              onClick={() => {
-                const next = ringFilter === r ? null : r;
-                setRingFilter(next);
-                updateUrl(q, next, trackFilter, date);
-              }}
-              aria-pressed={ringFilter === r}
-              style={{
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                padding: 0,
-                borderBottom: ringFilter === r ? "1px solid currentColor" : "1px solid transparent",
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--text-small)",
-                color: "inherit",
-              }}
-            >
-              {r}
-            </button>
-          ))}
+          {RINGS.map((r) => {
+            const active = ringFilter === r;
+            return (
+              <button
+                key={r}
+                onClick={() => {
+                  const next = active ? null : r;
+                  setRingFilter(next);
+                  updateUrl(q, next, trackFilter, date);
+                }}
+                aria-pressed={active}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: 0,
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "var(--text-micro)",
+                  letterSpacing: "0.04em",
+                  color: active ? "var(--color-accent)" : "var(--color-muted)",
+                  borderBottom: active
+                    ? "1px solid var(--color-accent)"
+                    : "1px solid transparent",
+                  textTransform: "lowercase",
+                }}
+              >
+                {r}
+              </button>
+            );
+          })}
 
           {allTracks.length > 0 && (
             <>
@@ -314,32 +352,34 @@ export function QueueView() {
               >
                 track:
               </span>
-              {allTracks.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => {
-                    const next = trackFilter === t ? null : t;
-                    setTrackFilter(next);
-                    updateUrl(q, ringFilter, next, date);
-                  }}
-                  aria-pressed={trackFilter === t}
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: 0,
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "var(--text-micro)",
-                    color: "var(--color-muted)",
-                    borderBottom:
-                      trackFilter === t
-                        ? "1px solid var(--color-muted)"
+              {allTracks.map((t) => {
+                const active = trackFilter === t;
+                return (
+                  <button
+                    key={t}
+                    onClick={() => {
+                      const next = active ? null : t;
+                      setTrackFilter(next);
+                      updateUrl(q, ringFilter, next, date);
+                    }}
+                    aria-pressed={active}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: 0,
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "var(--text-micro)",
+                      color: active ? "var(--color-accent)" : "var(--color-muted)",
+                      borderBottom: active
+                        ? "1px solid var(--color-accent)"
                         : "1px solid transparent",
-                  }}
-                >
-                  {t}
-                </button>
-              ))}
+                    }}
+                  >
+                    {t}
+                  </button>
+                );
+              })}
             </>
           )}
         </div>

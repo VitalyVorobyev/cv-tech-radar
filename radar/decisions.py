@@ -37,6 +37,13 @@ def record_decision(
         )
         resolved_tracks = classification.tracks_json if classification else []
 
+    prior_ring = session.scalar(
+        select(RadarDecision.ring)
+        .where(RadarDecision.item_id == item_id)
+        .order_by(RadarDecision.created_at.desc(), RadarDecision.id.desc())
+        .limit(1)
+    )
+
     decision = RadarDecision(
         item_id=item_id,
         ring=ring.value,
@@ -45,10 +52,14 @@ def record_decision(
         action=action,
         decided_by=decided_by,
         uncertain=uncertain,
+        previous_ring=prior_ring,
         created_at=utc_now(),
     )
     session.add(decision)
     session.flush()
+    if item.first_decided_at is None:
+        item.first_decided_at = decision.created_at
+        session.flush()
     return decision
 
 

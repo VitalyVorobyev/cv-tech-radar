@@ -22,6 +22,17 @@ class ArxivFetchStats:
     stored: int = 0
     updated: int = 0
     skipped_old: int = 0
+    pages: int = 0
+    latest_published_at: datetime | None = None
+    rate_limited: bool = False
+    http_errors: tuple[int, ...] = ()
+
+
+def _default_client() -> httpx.Client:
+    # httpx.HTTPTransport(retries=N) only retries on connection-level errors, not 5xx,
+    # but that's the most common transient failure mode here (DNS, TCP reset).
+    transport = httpx.HTTPTransport(retries=2)
+    return httpx.Client(timeout=30, follow_redirects=True, transport=transport)
 
 
 def fetch_and_store_arxiv(
@@ -31,48 +42,83 @@ def fetch_and_store_arxiv(
     *,
     days: int,
     max_results: int = 100,
+    max_pages: int = 1,
     client: httpx.Client | None = None,
     now: datetime | None = None,
 ) -> ArxivFetchStats:
     now = now or utc_now()
     cutoff = now - timedelta(days=days)
-    fetched = stored = updated = skipped_old = 0
+    fetched = stored = updated = skipped_old = pages = 0
+    latest_published_at: datetime | None = None
+    rate_limited = False
+    http_errors: list[int] = []
 
     owns_client = client is None
     if client is None:
-        client = httpx.Client(timeout=30, follow_redirects=True)
+        client = _default_client()
 
     try:
         for category in source_config.categories:
-            entries = _fetch_category_entries(
-                client=client,
-                base_url=str(source_config.url),
-                category=category,
-                max_results=max_results,
-            )
-            fetched += len(entries)
-            for entry in entries:
-                normalized, raw_payload = normalize_arxiv_entry(
-                    entry, source_name=source_config.name, category=category
-                )
-                if normalized.published_at < cutoff:
-                    skipped_old += 1
-                    continue
-                was_stored = store_normalized_item(
-                    session=session,
-                    source=source,
-                    normalized=normalized,
-                    raw_payload=raw_payload,
-                )
-                if was_stored:
-                    stored += 1
-                else:
-                    updated += 1
+            for page in range(max_pages):
+                try:
+                    entries = _fetch_category_entries(
+                        client=client,
+                        base_url=str(source_config.url),
+                        category=category,
+                        start=page * max_results,
+                        max_results=max_results,
+                    )
+                except httpx.HTTPStatusError as exc:
+                    status = exc.response.status_code
+                    http_errors.append(status)
+                    if status == 429:
+                        rate_limited = True
+                    break
+                pages += 1
+                fetched += len(entries)
+                if not entries:
+                    break
+                hit_cutoff = False
+                for entry in entries:
+                    normalized, raw_payload = normalize_arxiv_entry(
+                        entry, source_name=source_config.name, category=category
+                    )
+                    if latest_published_at is None or normalized.published_at > latest_published_at:
+                        latest_published_at = normalized.published_at
+                    if normalized.published_at < cutoff:
+                        skipped_old += 1
+                        hit_cutoff = True
+                        continue
+                    was_stored = store_normalized_item(
+                        session=session,
+                        source=source,
+                        normalized=normalized,
+                        raw_payload=raw_payload,
+                    )
+                    if was_stored:
+                        stored += 1
+                    else:
+                        updated += 1
+                # Entries are sorted by submittedDate desc; once we cross the cutoff,
+                # any further pages will be even older. Stop early.
+                if hit_cutoff:
+                    break
+                if len(entries) < max_results:
+                    break
     finally:
         if owns_client:
             client.close()
 
-    return ArxivFetchStats(fetched=fetched, stored=stored, updated=updated, skipped_old=skipped_old)
+    return ArxivFetchStats(
+        fetched=fetched,
+        stored=stored,
+        updated=updated,
+        skipped_old=skipped_old,
+        pages=pages,
+        latest_published_at=latest_published_at,
+        rate_limited=rate_limited,
+        http_errors=tuple(http_errors),
+    )
 
 
 def _fetch_category_entries(
@@ -80,13 +126,14 @@ def _fetch_category_entries(
     client: httpx.Client,
     base_url: str,
     category: str,
+    start: int = 0,
     max_results: int,
 ) -> list[dict[str, Any]]:
     response = client.get(
         base_url,
         params={
             "search_query": f"cat:{category}",
-            "start": 0,
+            "start": start,
             "max_results": max_results,
             "sortBy": "submittedDate",
             "sortOrder": "descending",

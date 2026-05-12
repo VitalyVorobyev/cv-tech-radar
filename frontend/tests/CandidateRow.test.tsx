@@ -36,6 +36,7 @@ const BASE_CANDIDATE: Candidate = {
   ring_suggested: "Prototype",
   pipeline_rationale: "Matched tracks: Calibration, 3D Geometry.",
   current_decision: null,
+  llm_judgment: null,
 };
 
 describe("CandidateRow — collapsed", () => {
@@ -160,5 +161,37 @@ describe("CandidateRow — collapsed", () => {
     expect(screen.getByText(/watch/i)).toBeInTheDocument();
     // Prototype accent text should NOT be rendered since decision overrides
     // (Watch does not get accent color — verified in RingLabel tests)
+  });
+
+  it("renders the LLM badge when llm_judgment is present", () => {
+    const onToggle = vi.fn();
+    const candidate: Candidate = {
+      ...BASE_CANDIDATE,
+      llm_judgment: {
+        verdict: "yes",
+        model: "gemma-test",
+        reason: "Matches calibration topic",
+        judged_at: "2026-05-10T12:00:00Z",
+      },
+    };
+    render(
+      <CandidateRow candidate={candidate} expanded={false} focused={false} onToggle={onToggle} />,
+      { wrapper },
+    );
+    expect(screen.getByLabelText("Local LLM verdict: yes")).toBeInTheDocument();
+  });
+
+  it("hides the LLM badge when llm_judgment is null", () => {
+    const onToggle = vi.fn();
+    render(
+      <CandidateRow
+        candidate={BASE_CANDIDATE}
+        expanded={false}
+        focused={false}
+        onToggle={onToggle}
+      />,
+      { wrapper },
+    );
+    expect(screen.queryByLabelText(/Local LLM verdict/)).not.toBeInTheDocument();
   });
 });

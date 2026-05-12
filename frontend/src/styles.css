@@ -15,7 +15,7 @@
   --color-muted: #6b6b6b;
   --color-muted-dark: #9c9a93;
   --color-rule: rgba(26, 26, 26, 0.08); /* 8% ink for hairlines */
-  --color-rule-dark: rgba(237, 234, 224, 0.094);
+  --color-rule-dark: rgba(237, 234, 224, 0.16);
 
   /* Typography families */
   --font-display: "Newsreader Variable", ui-serif, Georgia, serif;
@@ -51,7 +51,11 @@
   /* Motion */
   --duration-expand: 180ms;
   --duration-focus: 80ms;
+  --duration-slide: 250ms;
+  --duration-pulse: 2400ms;
+  --duration-sweep: 10s;
   --easing-expand: ease-out;
+  --easing-slide: ease-out;
 }
 
 @layer base {
@@ -61,18 +65,24 @@
     font-display: swap;
   }
 
-  /* Dark mode: system preference */
-  @media (prefers-color-scheme: dark) {
-    html:not([data-theme="light"]) {
-      background: var(--color-paper-dark);
-      color: var(--color-ink-dark);
-    }
+  /* Dark mode: rebind the unsuffixed theme tokens to their *-dark variants.
+     Every var(--color-paper|ink|muted|rule) reference — CSS rules or inline
+     SVG fills/strokes in components like RadarPlot — picks up the dark value
+     automatically, so the SVG never needs theme-aware code. */
+  html[data-theme="dark"] {
+    --color-paper: var(--color-paper-dark);
+    --color-ink: var(--color-ink-dark);
+    --color-muted: var(--color-muted-dark);
+    --color-rule: var(--color-rule-dark);
   }
 
-  /* Dark mode: manual override */
-  html[data-theme="dark"] {
-    background: var(--color-paper-dark);
-    color: var(--color-ink-dark);
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme="light"]) {
+      --color-paper: var(--color-paper-dark);
+      --color-ink: var(--color-ink-dark);
+      --color-muted: var(--color-muted-dark);
+      --color-rule: var(--color-rule-dark);
+    }
   }
 
   body {
@@ -93,28 +103,11 @@
   .hairline {
     border-color: var(--color-rule);
   }
-
-  html[data-theme="dark"] .hairline,
-  @media (prefers-color-scheme: dark) {
-    html:not([data-theme="light"]) .hairline {
-      border-color: var(--color-rule-dark);
-    }
-  }
 }
 
-/* Utility: muted text for dark-mode-aware muted color */
+/* Muted text — follows theme via the rebound --color-muted token. */
 .text-muted {
   color: var(--color-muted);
-}
-
-html[data-theme="dark"] .text-muted {
-  color: var(--color-muted-dark);
-}
-
-@media (prefers-color-scheme: dark) {
-  html:not([data-theme="light"]) .text-muted {
-    color: var(--color-muted-dark);
-  }
 }
 
 /* Row expand/collapse animation */
@@ -149,6 +142,45 @@ html[data-theme="dark"] .text-muted {
   border: 1px solid var(--color-rule);
   border-radius: var(--radius-sm);
   background: transparent;
+}
+
+/* Side-panel slide-in (item detail) */
+@keyframes cvradar-slide-in {
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.cvradar-slide-in {
+  animation: cvradar-slide-in var(--duration-slide) var(--easing-slide);
+}
+
+/* Pulse ring for new/moved-in radar dots */
+@keyframes cvradar-pulse {
+  from {
+    r: var(--pulse-r-min, 7);
+    stroke-opacity: 0.55;
+  }
+  to {
+    r: var(--pulse-r-max, 14);
+    stroke-opacity: 0;
+  }
+}
+
+.cvradar-pulse-ring {
+  animation: cvradar-pulse var(--duration-pulse) ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cvradar-slide-in,
+  .cvradar-pulse-ring {
+    animation: none;
+  }
 }
 
 /* Abstract line-clamp */
@@ -198,14 +230,4 @@ html[data-theme="dark"] .text-muted {
   filter: invert(34%) sepia(82%) saturate(1014%) hue-rotate(13deg)
     brightness(94%) contrast(94%);
   margin-left: 0.25rem;
-}
-
-html[data-theme="dark"] .queue-input,
-html:not([data-theme="light"]) .queue-input {
-  border-bottom-color: var(--color-muted-dark);
-}
-
-html[data-theme="dark"] .queue-input:hover,
-html:not([data-theme="light"]) .queue-input:hover {
-  border-bottom-color: var(--color-ink-dark);
 }
