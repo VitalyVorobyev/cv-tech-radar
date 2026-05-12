@@ -15,3 +15,11 @@ negative_topics:
   - multimodal large language
   - image editing
   - omnimodal
+  # Autonomous-driving noise — item 354 (CARD) slipped into Use on the seed-script
+  # path with no negative penalty despite an abstract that opens with
+  # "Autonomous driving must operate...". The radar is industrial CV focused
+  # (calibration, feature detection, segmentation, inspection) — cars/lidars
+  # for AD are an unrelated stack. `lidar` stays a positive keyword because
+  # it's a legitimate industrial 3D sensor.
+  - autonomous driving
+  - self-driving

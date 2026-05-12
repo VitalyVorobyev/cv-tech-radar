@@ -168,6 +168,32 @@ def test_mllm_benchmark_gets_negative_penalty(app_config):
     assert result.negative_topic_penalty > 0
 
 
+def test_autonomous_driving_dataset_gets_negative_penalty(app_config):
+    """Anchor: item 354 CARD ("A Multi-Modal Automotive Dataset for Dense 3D
+    Reconstruction in Challenging Road Topography").
+
+    The seed-script promoted CARD to Use because the classifier read it as a
+    legitimate 3D-reconstruction / LiDAR / calibration paper. But the radar is
+    industrial-CV focused — cars/lidars for autonomous driving are out of
+    scope. The `autonomous driving` negative topic should fire on the abstract
+    so future CARD-shape papers do not float into the candidate queue's top.
+    `lidar` stays a positive keyword for industrial 3D sensing.
+    """
+    item = make_item(
+        "CARD: A Multi-Modal Automotive Dataset for Dense 3D Reconstruction "
+        "in Challenging Road Topography",
+        "Autonomous driving must operate across diverse surfaces to enable safe "
+        "mobility. CARD is a multi-modal driving dataset with synchronized "
+        "global-shutter stereo cameras, LiDARs, and full calibration. It spans "
+        "110 km across Germany and Italy and provides benchmarks for depth "
+        "estimation and completion against KITTI baselines.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source)
+    assert "autonomous driving" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+
+
 def test_industrial_inspection_dataset_still_matches_track(app_config):
     """Anchor: 2026-05-11 item 518 MMVIAD — a legitimate Watch/Evaluate item.
 
