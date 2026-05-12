@@ -87,6 +87,7 @@ def _run_fetch_arxiv(
     days: int,
     max_results: int,
     max_pages: int,
+    page_delay_seconds: float = 3.0,
 ) -> FetchArxivSummary:
     summary = FetchArxivSummary()
     ensure_sources(session, config.sources)
@@ -103,6 +104,7 @@ def _run_fetch_arxiv(
             days=days,
             max_results=max_results,
             max_pages=max_pages,
+            page_delay_seconds=page_delay_seconds,
         )
         summary.fetched += stats.fetched
         summary.stored += stats.stored
@@ -152,9 +154,19 @@ def fetch_arxiv_command(
         typer.Option(
             "--max-pages",
             min=1,
-            help="Walk additional pages until the cutoff is hit. Default 1.",
+            help="Walk up to N pages of --max-results each, stopping early "
+            "once entries cross the --days cutoff.",
         ),
-    ] = 1,
+    ] = 10,
+    page_delay_seconds: Annotated[
+        float,
+        typer.Option(
+            "--page-delay",
+            min=0.0,
+            help="Seconds to wait between successive page fetches. "
+            "Default 3.0 honors arXiv's API etiquette and avoids HTTP 429.",
+        ),
+    ] = 3.0,
     db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
     config_dir: Annotated[Path, typer.Option("--config-dir")] = DefaultConfigDir,
 ) -> None:
@@ -169,6 +181,7 @@ def fetch_arxiv_command(
             days=days,
             max_results=max_results,
             max_pages=max_pages,
+            page_delay_seconds=page_delay_seconds,
         )
     console.print(_format_fetch_summary(summary))
 
@@ -391,7 +404,8 @@ def digest_command(
 def daily_fetch_command(
     days: Annotated[int, typer.Option("--days", min=1)] = 1,
     max_results: Annotated[int, typer.Option("--max-results", min=1)] = 100,
-    max_pages: Annotated[int, typer.Option("--max-pages", min=1)] = 1,
+    max_pages: Annotated[int, typer.Option("--max-pages", min=1)] = 10,
+    page_delay_seconds: Annotated[float, typer.Option("--page-delay", min=0.0)] = 3.0,
     date: Annotated[str, typer.Option("--date")] = "today",
     db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
     config_dir: Annotated[Path, typer.Option("--config-dir")] = DefaultConfigDir,
@@ -414,6 +428,7 @@ def daily_fetch_command(
             days=days,
             max_results=max_results,
             max_pages=max_pages,
+            page_delay_seconds=page_delay_seconds,
         )
         classified = _run_classify(session, config, target_date)
         candidates_summary = _run_candidates(

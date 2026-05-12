@@ -153,7 +153,7 @@ def test_daily_fetch_runs_fetch_classify_candidates(tmp_path, monkeypatch):
 
     fetch_called: list[dict] = []
 
-    def fake_fetch(session, config, *, days, max_results, max_pages):  # noqa: ARG001
+    def fake_fetch(session, config, *, days, max_results, max_pages, page_delay_seconds=3.0):  # noqa: ARG001
         fetch_called.append({"days": days, "max_pages": max_pages})
         return cli_module.FetchArxivSummary(
             fetched=2,

@@ -126,6 +126,7 @@ def test_fetch_arxiv_pagination_walks_multiple_pages(db_engine, app_config):
             days=30,
             max_results=2,
             max_pages=5,
+            page_delay_seconds=0.0,
             client=client,
             now=datetime(2026, 5, 11, 0, 0, tzinfo=UTC),
         )
@@ -133,6 +134,46 @@ def test_fetch_arxiv_pagination_walks_multiple_pages(db_engine, app_config):
     assert stats.stored == 2
     assert stats.pages == 2
     assert stats.latest_published_at == datetime(2026, 5, 10, 10, 0, tzinfo=UTC)
+
+
+def test_fetch_arxiv_sleeps_between_pages(db_engine, app_config, monkeypatch):
+    """page_delay_seconds gates ``time.sleep`` between successive page fetches.
+
+    Regression for the 2026-05-12 incident: walking multiple pages without a
+    delay tripped arXiv's HTTP 429 rate-limit. The first page must not sleep;
+    every subsequent page must.
+    """
+    feed_text = Path("tests/fixtures/arxiv_feed.xml").read_text(encoding="utf-8")
+    empty_feed = (
+        '<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"></feed>'
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        start = int(request.url.params["start"])
+        if start == 0:
+            return httpx.Response(200, text=feed_text)
+        return httpx.Response(200, text=empty_feed)
+
+    sleeps: list[float] = []
+    monkeypatch.setattr("radar.collectors.arxiv.time.sleep", lambda s: sleeps.append(s))
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    source_config = app_config.sources.sources[0]
+    with session_scope(db_engine) as session:
+        source = session.scalar(select(Source).where(Source.key == source_config.id))
+        fetch_and_store_arxiv(
+            session,
+            source,
+            source_config,
+            days=30,
+            max_results=2,
+            max_pages=5,
+            page_delay_seconds=3.0,
+            client=client,
+            now=datetime(2026, 5, 11, 0, 0, tzinfo=UTC),
+        )
+    # Two pages were fetched → exactly one inter-page sleep, no sleep before page 0.
+    assert sleeps == [3.0]
 
 
 def test_store_normalized_item_dedupes_by_normalized_title(db_engine, app_config):

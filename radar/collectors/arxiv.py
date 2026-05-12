@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import calendar
 import re
+import time
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -43,9 +44,17 @@ def fetch_and_store_arxiv(
     days: int,
     max_results: int = 100,
     max_pages: int = 1,
+    page_delay_seconds: float = 3.0,
     client: httpx.Client | None = None,
     now: datetime | None = None,
 ) -> ArxivFetchStats:
+    """Walk arXiv pages until the cutoff is hit or results are exhausted.
+
+    ``page_delay_seconds`` sleeps between successive page fetches inside a
+    single category (skipped before the first page and after the last). Defaults
+    to 3 s to honor arXiv's API etiquette and avoid HTTP 429 rate-limiting. Pass
+    0.0 in tests to keep them fast.
+    """
     now = now or utc_now()
     cutoff = now - timedelta(days=days)
     fetched = stored = updated = skipped_old = pages = 0
@@ -60,6 +69,8 @@ def fetch_and_store_arxiv(
     try:
         for category in source_config.categories:
             for page in range(max_pages):
+                if page > 0 and page_delay_seconds > 0:
+                    time.sleep(page_delay_seconds)
                 try:
                     entries = _fetch_category_entries(
                         client=client,
