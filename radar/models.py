@@ -122,6 +122,34 @@ class RadarDecision(Base):
     item: Mapped[Item] = relationship(back_populates="decisions")
 
 
+class ItemEmbedding(Base):
+    __tablename__ = "item_embeddings"
+    __table_args__ = (UniqueConstraint("item_id", "model", name="uq_embedding_item_model"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    item_id: Mapped[int] = mapped_column(ForeignKey("items.id"), index=True)
+    model: Mapped[str] = mapped_column(String(120), index=True)
+    vector_json: Mapped[list[float]] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+    item: Mapped[Item] = relationship()
+
+
+class ItemLLMJudgment(Base):
+    __tablename__ = "item_llm_judgments"
+    __table_args__ = (UniqueConstraint("item_id", "model", name="uq_llm_item_model"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    item_id: Mapped[int] = mapped_column(ForeignKey("items.id"), index=True)
+    model: Mapped[str] = mapped_column(String(120), index=True)
+    decision: Mapped[str] = mapped_column(String(20), index=True)
+    reason: Mapped[str] = mapped_column(Text, default="")
+    raw_response: Mapped[str] = mapped_column(Text, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+    item: Mapped[Item] = relationship()
+
+
 class Digest(Base):
     __tablename__ = "digests"
     __table_args__ = (UniqueConstraint("kind", "date", name="uq_digest_kind_date"),)

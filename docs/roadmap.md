@@ -27,12 +27,22 @@ next phase: we can inspect real noise instead of guessing.
 
 Goal: make the candidate queue trustworthy before adding more sources.
 
-- Build a small labeled evaluation set from real candidate queues.
-- Add a review import format so Markdown TODOs are not the only bulk-review surface.
-- Extend score-debug output into a reusable scoring evaluation report.
-- Tune keywords, negative topics, and thresholds against observed false positives.
-- Add regression tests for known noise patterns such as broad VLM papers, video
-  generation, person re-identification, and generic dataset papers.
+- [x] Build a small labeled evaluation set from real candidate queues
+      (`tests/fixtures/labeled_items.yaml`, seeded from 2026-05-08).
+- [x] Add `radar eval` to report precision, recall, per-class false-positive counts,
+      and missing-relevant ids against the labeled set.
+- [ ] Add a review import format so Markdown TODOs are not the only bulk-review surface.
+- [ ] Tune keywords, negative topics, and thresholds against observed false positives;
+      use `radar eval --date <date>` as the yardstick before/after each change.
+- [ ] Grow the labeled set beyond the initial 25-item seed.
+
+Baseline (as of 2026-05-11, before any tuning, on the 2026-05-08 candidate queue):
+
+| metric | value |
+|---|---|
+| precision @ 25 | 0.050 |
+| recall @ 25 | 1.000 |
+| dominant false-positive classes | broad_vlm (8), generative_editing (2), medical_imaging (2), out_of_domain_3d (2) |
 
 Exit criteria:
 
@@ -41,6 +51,7 @@ Exit criteria:
 - A few genuinely relevant calibration, 3D geometry, edge, robotics, or
   industrial-vision items surface when present.
 - Explicit decisions can be persisted and listed from SQLite.
+- `radar eval` precision on the labeled set is materially above the 0.05 baseline.
 
 ## Phase 3 - RSS And Vendor Sources
 
@@ -94,16 +105,40 @@ Exit criteria:
 
 Goal: use local inference where it improves filtering without creating a cloud dependency.
 
-- Add optional Ollama embeddings for similarity to track descriptions and known
-  accepted/rejected items.
-- Keep deterministic mode as the default.
-- Add cached embedding storage only after the scoring value is demonstrated.
-- Add optional local chat summarization only when a suitable chat model is installed.
+Now that `radar eval` exists, this phase has a measurable gate. Currently planned
+roles, in honest priority order (see [docs/handoff.md](handoff.md) for the
+full value assessment):
+
+1. **Embedding-based near-duplicate detection — landed.** Wired through the
+   existing `OllamaEmbeddingClient` and a new `item_embeddings` table.
+   `radar embed --date YYYY-MM-DD` populates vectors (idempotent on
+   `(item_id, model)`); `radar near-duplicates --days N [--threshold X]`
+   reports cosine groupings above `embeddings.near_duplicate_threshold`
+   (default 0.92). Does not feed into `final_score`. Next: actually run
+   against real data to calibrate the threshold.
+2. **LLM second-opinion relevance filter — shadow mode landed.** `gemma4:e2b`
+   answers a strict yes/no per candidate via `radar relevance-check`;
+   judgments live in `item_llm_judgments` and are idempotent on
+   `(item_id, model)`. The candidate queue is untouched. Filter mode (demote
+   confidently-`no` items in the queue) ships only after `radar eval` shows
+   the LLM would lift precision on the labeled set with ≥0.9 noise-class
+   rejection precision and ≈1.0 relevant-class acceptance recall.
+
+Out of scope for this phase (re-evaluate later):
+
+- LLM-written digest narrative (low value on a private radar today).
+- LLM-drafted per-card gloss in the queue UI (modest value, high bias risk).
+- LLM-driven track reassignment.
+- Anything that changes `final_score` directly without eval evidence.
 
 Exit criteria:
 
-- Embeddings improve ranking on a labeled evaluation set.
-- Running without Ollama remains fully supported.
+- Embedding near-duplicate report flags real arXiv v2/follow-up pairs on the
+  on-disk candidate runs.
+- LLM second-opinion in shadow mode improves `radar eval` precision when
+  applied as a hypothetical filter, on the labeled set, by a meaningful margin.
+- Running without Ollama remains fully supported (no crashes, no missing UI
+  affordances, no slowdown).
 
 ## Phase 7 - Atlas And Public Output
 

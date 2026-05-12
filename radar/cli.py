@@ -7,6 +7,14 @@ from typing import Annotated
 
 import typer
 from rich.console import Console
+from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
+    Progress,
+    SpinnerColumn,
+    TextColumn,
+    TimeElapsedColumn,
+)
 from rich.table import Table
 from sqlalchemy import select
 
@@ -15,8 +23,11 @@ from radar.config import ConfigError, load_app_config
 from radar.curation import ProposalParseError, apply_proposals, parse_proposals_file
 from radar.db import ensure_sources, get_engine, init_db, session_scope
 from radar.decisions import DecisionError, list_decisions_for_date, parse_tracks, record_decision
+from radar.embeddings import embed_items_for_date, find_near_duplicates
+from radar.eval import DEFAULT_LABELED_ITEMS_PATH, render_eval_table, run_eval
 from radar.filters.keyword_filter import classify_items_for_date
-from radar.models import Source
+from radar.models import Item, Source
+from radar.relevance_check import check_relevance_for_date
 from radar.reports.candidate_queue import collect_candidates, write_candidate_outputs
 from radar.reports.digest import collect_digest_rows, write_digest_outputs
 from radar.reports.score_debug import collect_score_debug_rows
@@ -316,6 +327,238 @@ def serve_command(
 
     app_instance = create_app(db_path=db_path, config_dir=config_dir)
     uvicorn.run(app_instance, host=host, port=port)
+
+
+def _ollama_progress() -> Progress:
+    return Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        MofNCompleteColumn(),
+        TimeElapsedColumn(),
+        console=console,
+    )
+
+
+def _short_title(item: Item, *, width: int = 60) -> str:
+    title = item.title or ""
+    if len(title) <= width:
+        return title
+    return title[: width - 1].rstrip() + "…"
+
+
+@app.command("embed")
+def embed_command(
+    date: Annotated[str, typer.Option("--date")] = "today",
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+    config_dir: Annotated[Path, typer.Option("--config-dir")] = DefaultConfigDir,
+) -> None:
+    """Compute Ollama embeddings for items published on a date."""
+    config = _load(config_dir)
+    target_date = parse_date_arg(date)
+    engine = get_engine(db_path)
+    init_db(engine)
+    with _ollama_progress() as progress:
+        task_id = progress.add_task("Embedding items", total=None)
+        total_set = False
+
+        def on_progress(index: int, total: int, item: Item, outcome: str) -> None:
+            nonlocal total_set
+            if not total_set:
+                progress.update(task_id, total=total)
+                total_set = True
+            progress.update(
+                task_id,
+                advance=1,
+                description=f"[{outcome}] {_short_title(item)}",
+            )
+
+        with session_scope(engine) as session:
+            summary = embed_items_for_date(
+                session,
+                config.embeddings.embeddings,
+                target_date,
+                on_progress=on_progress,
+            )
+    console.print(
+        f"Embedded {summary.embedded} new item(s); skipped {summary.skipped} already-embedded; "
+        f"total in window: {summary.total}"
+    )
+
+
+@app.command("near-duplicates")
+def near_duplicates_command(
+    date: Annotated[str, typer.Option("--date")] = "today",
+    days: Annotated[int, typer.Option("--days", min=1)] = 14,
+    threshold: Annotated[
+        float | None,
+        typer.Option("--threshold", min=0.0, max=1.0, help="Override config threshold."),
+    ] = None,
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+    config_dir: Annotated[Path, typer.Option("--config-dir")] = DefaultConfigDir,
+) -> None:
+    """Report near-duplicate items based on stored embeddings."""
+    config = _load(config_dir)
+    target_date = parse_date_arg(date)
+    settings = config.embeddings.embeddings
+    cutoff = threshold if threshold is not None else settings.near_duplicate_threshold
+    engine = get_engine(db_path)
+    init_db(engine)
+    with session_scope(engine) as session:
+        pairs = find_near_duplicates(
+            session,
+            target_date,
+            days=days,
+            threshold=cutoff,
+            model=settings.model,
+        )
+    if not pairs:
+        console.print(f"No near-duplicates above cosine {cutoff:.3f} in the last {days} day(s).")
+        return
+    table = Table(title=f"Near-duplicates >= {cutoff:.3f} (last {days} day(s))")
+    table.add_column("Cosine", justify="right")
+    table.add_column("A id")
+    table.add_column("A ext")
+    table.add_column("A title", overflow="fold")
+    table.add_column("B id")
+    table.add_column("B ext")
+    table.add_column("B title", overflow="fold")
+    for pair in pairs:
+        table.add_row(
+            f"{pair.cosine:.4f}",
+            str(pair.item_a_id),
+            pair.item_a_external_id or "",
+            pair.item_a_title,
+            str(pair.item_b_id),
+            pair.item_b_external_id or "",
+            pair.item_b_title,
+        )
+    console.print(table)
+    console.print(f"{len(pairs)} pair(s) above threshold.")
+
+
+@app.command("relevance-check")
+def relevance_check_command(
+    date: Annotated[str, typer.Option("--date")] = "today",
+    limit: Annotated[
+        int | None,
+        typer.Option("--limit", min=1, help="Cap how many classified items to judge."),
+    ] = None,
+    rejudge: Annotated[
+        bool,
+        typer.Option(
+            "--rejudge",
+            help="Replace existing judgments for the configured model instead of skipping.",
+        ),
+    ] = False,
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+    config_dir: Annotated[Path, typer.Option("--config-dir")] = DefaultConfigDir,
+) -> None:
+    """Ask the local chat model for yes/no relevance on each classified candidate.
+
+    Shadow only: results are written to `item_llm_judgments` and never affect
+    the candidate queue. Re-runs with the same model skip already-judged items
+    unless `--rejudge` is passed.
+    """
+    config = _load(config_dir)
+    target_date = parse_date_arg(date)
+    engine = get_engine(db_path)
+    init_db(engine)
+    with _ollama_progress() as progress:
+        task_id = progress.add_task("Judging candidates", total=None)
+        total_set = False
+
+        def on_progress(index: int, total: int, item: Item, outcome: str) -> None:
+            nonlocal total_set
+            if not total_set:
+                progress.update(task_id, total=total)
+                total_set = True
+            progress.update(
+                task_id,
+                advance=1,
+                description=f"[{outcome}] {_short_title(item)}",
+            )
+
+        with session_scope(engine) as session:
+            summary = check_relevance_for_date(
+                session,
+                config.embeddings.chat,
+                target_date,
+                limit=limit,
+                on_progress=on_progress,
+                rejudge=rejudge,
+            )
+    console.print(
+        f"Judged {summary.judged} of {summary.total} item(s); "
+        f"skipped {summary.skipped} already-judged; failed {summary.failed}"
+    )
+    console.print(
+        f"Decisions: yes={summary.yes_count}, no={summary.no_count}, "
+        f"unknown={summary.unknown_count}"
+    )
+    if summary.failed > 0:
+        console.print(
+            f"[yellow]{summary.failed} item(s) failed.[/yellow] If using a "
+            "reasoning model (e.g. gemma4:e2b), check that chat.max_tokens "
+            "is large enough — the model may be burning the budget on internal "
+            "reasoning before producing visible output. Try `--rejudge` after "
+            "raising the value in config/embeddings.yaml."
+        )
+    if summary.unknown_count > 0 and summary.judged == summary.unknown_count:
+        console.print(
+            "[yellow]All judged items came back as 'unknown'.[/yellow] The "
+            "model may not be following the DECISION/REASON format. Inspect "
+            "raw_response in the item_llm_judgments table and adjust the "
+            "prompt or switch models."
+        )
+
+
+@app.command("eval")
+def eval_command(
+    date: Annotated[str, typer.Option("--date")] = "today",
+    limit: Annotated[int, typer.Option("--limit", min=1)] = 25,
+    fixture: Annotated[Path, typer.Option("--fixture")] = DEFAULT_LABELED_ITEMS_PATH,
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+    config_dir: Annotated[Path, typer.Option("--config-dir")] = DefaultConfigDir,
+) -> None:
+    """Score the candidate queue for a date against a labeled set."""
+    _load(config_dir)
+    target_date = parse_date_arg(date)
+    engine = get_engine(db_path)
+    init_db(engine)
+    with session_scope(engine) as session:
+        result = run_eval(
+            session,
+            target_date,
+            limit=limit,
+            labeled_items_path=fixture,
+        )
+
+    console.print(render_eval_table(result))
+    metrics = result.metrics
+    console.print()
+    console.print(
+        f"top-{result.limit}: {metrics.candidate_count} candidates, "
+        f"{metrics.labeled_count} labeled "
+        f"(relevant={metrics.relevant_in_top_k}, "
+        f"borderline={metrics.borderline_in_top_k}, "
+        f"noise={metrics.noise_in_top_k}, "
+        f"unlabeled={metrics.unlabeled_in_top_k})"
+    )
+    console.print(
+        f"precision: {metrics.precision:.3f}  recall: {metrics.recall:.3f}  "
+        f"(fixture totals: relevant={metrics.total_labeled_relevant}, "
+        f"noise={metrics.total_labeled_noise})"
+    )
+    if metrics.false_positive_classes:
+        console.print("false-positive classes in top-K:")
+        for cls, count in sorted(metrics.false_positive_classes.items()):
+            console.print(f"  {cls}: {count}")
+    if metrics.missing_relevant_external_ids:
+        console.print(
+            "labeled-relevant items missing from top-K: "
+            + ", ".join(metrics.missing_relevant_external_ids)
+        )
 
 
 @app.command("score-debug")
