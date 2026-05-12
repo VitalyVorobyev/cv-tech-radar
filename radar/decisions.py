@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from radar.models import Item, ItemClassification, RadarDecision
 from radar.schemas import RadarRing
-from radar.utils import date_bounds, utc_now
+from radar.utils import date_bounds, date_window_bounds, utc_now
 
 
 class DecisionError(RuntimeError):
@@ -23,6 +23,7 @@ def record_decision(
     reason: str,
     action: str,
     decided_by: str,
+    uncertain: bool = False,
 ) -> RadarDecision:
     item = session.get(Item, item_id)
     if item is None:
@@ -43,11 +44,35 @@ def record_decision(
         decision_reason=reason,
         action=action,
         decided_by=decided_by,
+        uncertain=uncertain,
         created_at=utc_now(),
     )
     session.add(decision)
     session.flush()
     return decision
+
+
+def list_decisions_in_window(
+    session: Session,
+    target_date: date,
+    days: int,
+) -> list[tuple[Item, RadarDecision]]:
+    start, end = date_window_bounds(target_date, days)
+    return list(
+        session.execute(
+            select(Item, RadarDecision)
+            .join(RadarDecision, RadarDecision.item_id == Item.id)
+            .where(Item.published_at >= start, Item.published_at <= end)
+            .order_by(RadarDecision.created_at.desc(), Item.title.asc())
+        ).all()
+    )
+
+
+def has_prior_decision(session: Session, item_id: int) -> bool:
+    return (
+        session.scalar(select(RadarDecision.id).where(RadarDecision.item_id == item_id).limit(1))
+        is not None
+    )
 
 
 def list_decisions_for_date(

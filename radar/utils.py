@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 
@@ -33,4 +33,14 @@ def parse_date_arg(value: str) -> date:
 def date_bounds(target: date) -> tuple[datetime, datetime]:
     start = datetime(target.year, target.month, target.day, tzinfo=UTC)
     end = start.replace(hour=23, minute=59, second=59, microsecond=999999)
+    return start, end
+
+
+def date_window_bounds(target: date, days: int) -> tuple[datetime, datetime]:
+    if days < 1:
+        msg = "days must be >= 1"
+        raise ValueError(msg)
+    window_start = target - timedelta(days=days - 1)
+    start, _ = date_bounds(window_start)
+    _, end = date_bounds(target)
     return start, end

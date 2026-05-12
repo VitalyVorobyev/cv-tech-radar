@@ -22,16 +22,20 @@ open items are meant to be small enough to turn into GitHub issues.
 - [x] Add `radar decide` to record ring, tracks, decision reason, and action in SQLite.
 - [x] Add `radar decisions` to list persisted decisions for a date.
 - [x] Add `radar score-debug --date YYYY-MM-DD` to inspect score components and keyword matches.
+- [x] Add `radar eval --date YYYY-MM-DD` comparing the candidate queue against a labeled
+      YAML set at `tests/fixtures/labeled_items.yaml`, with precision, recall, per-class
+      false-positive counts, and missing-relevant-id reporting.
 
 ## Immediate Tasks
 
 - [ ] Add candidate queue parsing or a separate review input format so Markdown TODOs
       are not the only review surface.
-- [ ] Add regression fixtures for the first real false positives:
-      event-camera tracking, generic video editing, broad multimodal benchmarks,
-      vehicle re-identification, and crop disease edge-AI papers.
-- [ ] Add an evaluation command that compares scored candidates against a labeled YAML
-      or JSON review set.
+- [ ] Grow `tests/fixtures/labeled_items.yaml` past the initial 2026-05-08 seed
+      (1 relevant / 5 borderline / 19 noise) so the eval reflects more than one day.
+- [ ] Tune topics.yaml, negative_topics.yaml, and scoring.yaml to lift `radar eval`
+      precision above the current 0.05 baseline on the seeded set. Dominant noise classes:
+      `broad_vlm` (8), `generative_editing` (2), `medical_imaging` (2), `out_of_domain_3d` (2).
+      Re-run `radar eval --date 2026-05-08` after each change to track movement.
 - [ ] Decide whether `Watch` should mean "review queue item" or "visible radar item";
       right now the queue is broader than the final radar view, which is useful but
       should be explicit in naming.
@@ -63,10 +67,40 @@ open items are meant to be small enough to turn into GitHub issues.
 
 ## Local LLM Tasks
 
-- [ ] Add optional embedding storage schema only after the scoring evaluation command exists.
-- [ ] Compare deterministic scoring against embedding-assisted ranking on labeled examples.
-- [ ] Add an Ollama chat summarizer only after a local chat model is installed.
-- [ ] Keep all local inference disabled by default.
+Eval harness now exists (`radar eval`), so these tasks have a measurable gate.
+Honest priority order:
+
+- [x] Add `ItemEmbedding` model + `radar embed --date YYYY-MM-DD` populating it via
+      the existing `OllamaEmbeddingClient`. `(item_id, model)` is unique so the
+      command is idempotent and can be re-run safely; `embeddings.enabled` stays
+      `false` by default (no auto-embedding from other commands).
+- [x] Add `radar near-duplicates --days 14 [--threshold X]` reporting cosine
+      groupings above `embeddings.near_duplicate_threshold` (default 0.92). Does
+      not feed into `final_score`.
+- [ ] Pick the actual `near_duplicate_threshold` value by hand on the on-disk
+      candidate runs once embeddings are populated.
+- [x] Add `OllamaChatClient` (`radar/enrichers/ollama_chat.py`) and a `chat:` stanza
+      in `config/embeddings.yaml` for `gemma4:e2b`. Default `enabled: false`.
+- [x] Add `radar relevance-check --date today` writing per-item LLM yes/no judgments
+      into the new `item_llm_judgments` table. Shadow only: judgments never affect
+      the candidate queue. Idempotent on `(item_id, model)`; per-item exceptions
+      are caught so a single LLM hiccup never breaks the run.
+- [ ] Run shadow mode for ~5 days on real candidates; then extend `radar eval`
+      with `--with-llm` to compute hypothetical precision/recall if we used the
+      LLM as a filter on top of the deterministic classifier.
+- [ ] Add a "filter" mode that demotes confidently-`no` items to Watch in the
+      candidate queue, AND surface them in a separate "LLM-rejected" section of
+      the candidate Markdown so the curator can audit. Ship only after the eval
+      shows ≥0.9 noise-class rejection precision and ≈1.0 relevant-class
+      acceptance recall.
+- [ ] Keep all local inference disabled by default; the pipeline must run end-to-end
+      with Ollama stopped.
+
+Explicitly deferred (re-evaluate when the above lands):
+
+- LLM-written digest narrative.
+- LLM-drafted per-card gloss in the queue UI.
+- LLM-driven track reassignment.
 
 ## Repo Hygiene Tasks
 

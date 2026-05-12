@@ -1,0 +1,135 @@
+# Labeled candidate set for the cv-radar Phase 2.5 eval harness.
+#
+# Source: hand-labeled subset of historical candidate queues. Keys are stable
+# arXiv ids (Item.external_id). The eval harness loads by external_id, not by
+# row index, so appending new entries is safe.
+#
+# Labels:
+#   relevant   - belongs in the top-K (curator would assign at least Watch)
+#   borderline - acceptable either way; does not count toward precision
+#   noise      - should NOT be in the top-K; when present it is a false
+#                positive. Set `false_positive_class` so the harness can
+#                break down which noise category is leaking through.
+#
+# Notes are short rationale strings. Tone is "why I labeled it this way",
+# not a summary of the paper.
+items:
+  - external_id: "2605.08084"
+    title: "123D: Unifying Multi-Modal Autonomous Driving Data at Scale"
+    label: borderline
+    note: "Multi-modal AV dataset framework. Cross-dataset calibration tooling is interesting; core focus is autonomous driving, not industrial vision."
+  - external_id: "2605.07550"
+    title: "Mind the Gap: Geometrically Accurate Generative Reconstruction from Disjoint Views"
+    label: borderline
+    note: "Generative 3D reconstruction with code. Novel approach to disjoint-view problem; not industrial metrology but worth a Watch."
+  - external_id: "2605.07978"
+    title: "Seeing Across Skies and Streets: Feedforward 3D Reconstruction from Satellite, Drone, and Street"
+    label: noise
+    false_positive_class: out_of_domain_3d
+    note: "Aerial/street-view reconstruction; outside industrial CV scope."
+  - external_id: "2605.07510"
+    title: "InterLV-Search: Benchmarking Interleaved Multimodal Agentic Search"
+    label: noise
+    false_positive_class: broad_vlm
+    note: "Multimodal agentic search benchmark; broad VLM territory."
+  - external_id: "2605.07642"
+    title: "EggHand: A Multimodal Foundation Model for Egocentric Hand Pose Forecasting"
+    label: noise
+    false_positive_class: broad_vlm
+    note: "Egocentric hand pose forecasting via foundation model; not industrial."
+  - external_id: "2605.07604"
+    title: "SAM 3D Animal: Promptable Animal 3D Reconstruction from Images in the Wild"
+    label: noise
+    false_positive_class: out_of_domain_3d
+    note: "In-the-wild animal 3D reconstruction; outside scope."
+  - external_id: "2605.08059"
+    title: "6D Pose Estimation via Keypoint Heatmap Regression with RGB-D Residual Neural Networks"
+    label: relevant
+    note: "RGB-D 6D pose is core to robot guidance and bin-picking. Right in scope."
+  - external_id: "2605.07749"
+    title: "Benchmarking Foundation Models for Renal Lesion Stratification in CT"
+    label: noise
+    false_positive_class: medical_imaging
+    note: "Medical CT classification; outside scope."
+  - external_id: "2605.07552"
+    title: "VIMCAN: Visual-Inertial 3D Human Pose Estimation with Hybrid Mamba-Cross-Attention Network"
+    label: noise
+    false_positive_class: human_pose
+    note: "Visual-inertial human pose with Mamba architecture; not industrial metrology."
+  - external_id: "2605.08025"
+    title: "TRAS: An Interactive Software for Tracing Tree Ring Cross Sections"
+    label: noise
+    false_positive_class: niche_application
+    note: "Tree-ring tracing software; niche application unrelated to industrial CV."
+  - external_id: "2605.07492"
+    title: "How Far Is Document Parsing from Solved? PureDocBench: A Source-Traceable Benchmark"
+    label: noise
+    false_positive_class: broad_vlm
+    note: "Document-parsing benchmark; broad VLM."
+  - external_id: "2605.07593"
+    title: "TraceAV-Bench: Benchmarking Multi-Hop Trajectory Reasoning over Long Audio-Visual Videos"
+    label: noise
+    false_positive_class: broad_vlm
+    note: "Audio-visual video reasoning benchmark; out of scope."
+  - external_id: "2605.07943"
+    title: "TAVIS: A Benchmark for Egocentric Active Vision and Anticipatory Gaze in Imitation Learning"
+    label: noise
+    false_positive_class: broad_vlm
+    note: "Egocentric gaze + imitation learning benchmark; out of scope."
+  - external_id: "2605.08003"
+    title: "SphereVAD: Training-Free Video Anomaly Detection via Geodesic Inference on the Unit Hypersphere"
+    label: borderline
+    note: "Video anomaly detection has industrial-inspection adjacency, but this is general-purpose video VAD."
+  - external_id: "2605.08030"
+    title: "PET-Adapter: Test-Time Domain Adaptation for Full and Limited-Angle PET Image Reconstruction"
+    label: noise
+    false_positive_class: medical_imaging
+    note: "Medical PET imaging; outside scope."
+  - external_id: "2605.07872"
+    title: "Video Understanding Reward Modeling: A Robust Benchmark and Performant Reward Models"
+    label: noise
+    false_positive_class: broad_vlm
+    note: "Reward modeling for video understanding; broad VLM."
+  - external_id: "2605.08073"
+    title: "EmambaIR: Efficient Visual State Space Model for Event-guided Image Reconstruction"
+    label: noise
+    false_positive_class: event_camera
+    note: "Event-camera image reconstruction; flagged in docs/tasks.md as a known FP class."
+  - external_id: "2605.07457"
+    title: "EditRefiner: A Human-Aligned Agentic Framework for Image Editing Refinement"
+    label: noise
+    false_positive_class: generative_editing
+    note: "Image editing refinement; generative, out of scope."
+  - external_id: "2605.07859"
+    title: "EyeCue: Driver Cognitive Distraction Detection via Gaze-Empowered Egocentric Video Understanding"
+    label: noise
+    false_positive_class: broad_vlm
+    note: "Driver gaze / cognitive load; out of scope."
+  - external_id: "2605.07477"
+    title: "ReasonEdit: Towards Interpretable Image Editing Evaluation via Reinforcement Learning"
+    label: noise
+    false_positive_class: generative_editing
+    note: "Image-editing evaluation; generative, out of scope."
+  - external_id: "2605.07495"
+    title: "Lightweight Unpaired Smartphone ISP Transfer with Semantic Pseudo-Pairing"
+    label: noise
+    false_positive_class: consumer_imaging
+    note: "Smartphone ISP transfer; consumer imaging, not industrial pipeline."
+  - external_id: "2605.07786"
+    title: "APEX: Assumption-free Projection-based Embedding eXamination Metric for Image Quality Assessment"
+    label: borderline
+    note: "IQA metric; could be useful for sensor QA but not load-bearing for the radar."
+  - external_id: "2605.08000"
+    title: "Rethinking Dense Optical Flow without Test-Time Scaling"
+    label: borderline
+    note: "Optical flow is a core CV primitive; could be relevant for motion-based industrial inspection."
+  - external_id: "2605.07807"
+    title: "Text-to-CAD Evaluation with CADTests"
+    label: noise
+    false_positive_class: generative_design
+    note: "Text-to-CAD evaluation; generative, out of scope."
+  - external_id: "2605.07655"
+    title: "Towards Billion-scale Multi-modal Biometric Search"
+    label: noise
+    false_positive_class: broad_vlm
+    note: "Large-scale biometric search; out of scope."

@@ -5,7 +5,7 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 
-from sqlalchemy import Engine, create_engine, select
+from sqlalchemy import Engine, create_engine, select, text
 from sqlalchemy.orm import Session
 
 from radar.models import Base, Source
@@ -28,11 +28,41 @@ def make_sqlite_url(db_path: Path | str | None = None) -> str:
 
 
 def get_engine(db_path: Path | str | None = None) -> Engine:
-    return create_engine(make_sqlite_url(db_path), future=True)
+    return create_engine(
+        make_sqlite_url(db_path),
+        future=True,
+        connect_args={"check_same_thread": False},
+    )
 
 
 def init_db(engine: Engine) -> None:
     Base.metadata.create_all(engine)
+    ensure_radar_decision_columns(engine)
+    ensure_digest_columns(engine)
+
+
+def ensure_radar_decision_columns(engine: Engine) -> None:
+    with engine.begin() as connection:
+        columns = {
+            row[1] for row in connection.execute(text("PRAGMA table_info('radar_decisions')"))
+        }
+        if "uncertain" not in columns:
+            connection.execute(
+                text("ALTER TABLE radar_decisions ADD COLUMN uncertain BOOLEAN NOT NULL DEFAULT 0")
+            )
+
+
+def ensure_digest_columns(engine: Engine) -> None:
+    with engine.begin() as connection:
+        columns = {row[1] for row in connection.execute(text("PRAGMA table_info('digests')"))}
+        if "updated_at" not in columns:
+            connection.execute(
+                text(
+                    "ALTER TABLE digests "
+                    "ADD COLUMN updated_at DATETIME NOT NULL "
+                    "DEFAULT CURRENT_TIMESTAMP"
+                )
+            )
 
 
 @contextmanager

@@ -4,3 +4,25 @@ embeddings:
   model: embeddinggemma:latest
   base_url: http://localhost:11434
   timeout_seconds: 30
+  # Cosine similarity above which two items are flagged as near-duplicates by
+  # `radar near-duplicates`. Tuned by hand on real candidate runs; raise it to
+  # require more textual overlap, lower it to surface looser look-alikes.
+  near_duplicate_threshold: 0.92
+
+# Local chat model used by `radar relevance-check` for an independent yes/no
+# relevance judgment per candidate. Shadow-only today: judgments are written
+# to `item_llm_judgments` but do not affect the candidate queue. Filter mode
+# (demote LLM-rejected items in the queue) lands only after the eval harness
+# shows the judgments would actually lift precision without losing relevant
+# items.
+chat:
+  enabled: false
+  provider: ollama
+  model: gemma4:e2b
+  base_url: http://localhost:11434
+  timeout_seconds: 60
+  temperature: 0.0
+  # Reasoning-style models burn most of num_predict on internal reasoning
+  # before emitting any visible output. gemma4:e2b consistently uses ~350
+  # reasoning tokens per judging call; 2048 leaves comfortable headroom.
+  max_tokens: 2048

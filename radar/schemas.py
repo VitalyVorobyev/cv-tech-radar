@@ -125,10 +125,27 @@ class EmbeddingsSettings(BaseModel):
     model: str = "embeddinggemma:latest"
     base_url: str = "http://localhost:11434"
     timeout_seconds: int = Field(default=30, ge=1)
+    near_duplicate_threshold: float = Field(default=0.92, ge=0.0, le=1.0)
+
+
+class ChatSettings(BaseModel):
+    enabled: bool = False
+    provider: Literal["ollama"] = "ollama"
+    model: str = "gemma4:e2b"
+    base_url: str = "http://localhost:11434"
+    timeout_seconds: int = Field(default=60, ge=1)
+    temperature: float = Field(default=0.0, ge=0.0, le=2.0)
+    # Reasoning-style models (e.g. gemma4:e2b) burn most of num_predict on
+    # internal reasoning before emitting any visible output. A single judging
+    # call with the strict yes/no prompt observed ~400 total output tokens on
+    # gemma4:e2b; 2048 leaves comfortable headroom. Lower this only for
+    # non-reasoning models.
+    max_tokens: int = Field(default=2048, ge=1)
 
 
 class EmbeddingsConfig(BaseModel):
     embeddings: EmbeddingsSettings = Field(default_factory=EmbeddingsSettings)
+    chat: ChatSettings = Field(default_factory=ChatSettings)
 
 
 class AppConfig(BaseModel):
@@ -200,3 +217,13 @@ class CandidateRecord(BaseModel):
     scores: CandidateScores
     summary: str
     pipeline_rationale: str
+
+
+class DecisionProposal(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    ring: RadarRing
+    reason: str = Field(min_length=1)
+    action: str = ""
+    tracks: list[str] | None = None
+    uncertain: bool = False
