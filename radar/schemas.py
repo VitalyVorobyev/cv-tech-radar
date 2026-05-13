@@ -31,7 +31,7 @@ class ItemType(StrEnum):
 class SourceConfig(BaseModel):
     id: str = Field(min_length=1)
     name: str = Field(min_length=1)
-    kind: Literal["arxiv", "rss"]
+    kind: Literal["arxiv", "rss", "manual"]
     url: HttpUrl
     enabled: bool = True
     priority: int = Field(default=0, ge=0, le=5)

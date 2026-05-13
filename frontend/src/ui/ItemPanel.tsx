@@ -4,7 +4,12 @@
 
 import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { ItemDetail, Movement, Ring } from "../lib/api";
+import type {
+  ItemDetail,
+  Movement,
+  NearDuplicatePair,
+  Ring,
+} from "../lib/api";
 import { api } from "../lib/api";
 import { RING_ORDER } from "../lib/constants";
 
@@ -12,6 +17,10 @@ interface ItemPanelProps {
   itemId: number;
   onClose(): void;
   onTrackClick?(track: string): void;
+  /** Optional: navigate to a different item from within the panel (e.g.
+   *  clicking a near-duplicate match). When omitted, the panel falls back to
+   *  a hash link the user can open in a new tab. */
+  onSelectItem?(itemId: number): void;
 }
 
 const MOVEMENT_LABEL: Record<Movement, string> = {
@@ -34,7 +43,12 @@ function formatHistoryAt(at: string): string {
   return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-export function ItemPanel({ itemId, onClose, onTrackClick }: ItemPanelProps) {
+export function ItemPanel({
+  itemId,
+  onClose,
+  onTrackClick,
+  onSelectItem,
+}: ItemPanelProps) {
   const queryClient = useQueryClient();
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["item", itemId],
@@ -141,7 +155,14 @@ export function ItemPanel({ itemId, onClose, onTrackClick }: ItemPanelProps) {
         </div>
       )}
 
-      {data && <ItemPanelBody data={data} onTrackClick={onTrackClick} onPromote={promote.mutate} />}
+      {data && (
+        <ItemPanelBody
+          data={data}
+          onTrackClick={onTrackClick}
+          onPromote={promote.mutate}
+          onSelectItem={onSelectItem}
+        />
+      )}
     </aside>
   );
 }
@@ -150,10 +171,12 @@ function ItemPanelBody({
   data,
   onTrackClick,
   onPromote,
+  onSelectItem,
 }: {
   data: ItemDetail;
   onTrackClick?(track: string): void;
   onPromote(target: Ring): void;
+  onSelectItem?(itemId: number): void;
 }) {
   const ringIsAccent = data.ring === "Use" || data.ring === "Prototype";
   const promoteTarget =
@@ -309,6 +332,12 @@ function ItemPanelBody({
         )}
       </section>
 
+      <NearDuplicatesSection
+        itemId={data.id}
+        anchorDate={data.published_at}
+        onSelectItem={onSelectItem}
+      />
+
       <footer style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginTop: "auto" }}>
         <a
           href={data.url}
@@ -330,6 +359,156 @@ function ItemPanelBody({
         )}
       </footer>
     </>
+  );
+}
+
+function toIsoDate(value: string): string {
+  // ItemDetail.published_at is an ISO datetime; the near-duplicates
+  // endpoint wants YYYY-MM-DD. Fall back to "today" if parsing fails so
+  // the panel never blows up on an unexpected payload.
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "today";
+  return d.toISOString().slice(0, 10);
+}
+
+function NearDuplicatesSection({
+  itemId,
+  anchorDate,
+  onSelectItem,
+}: {
+  itemId: number;
+  anchorDate: string;
+  onSelectItem?(itemId: number): void;
+}) {
+  const date = toIsoDate(anchorDate);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["near-duplicates", date, 30],
+    queryFn: () => api.getNearDuplicates(date, 30),
+    staleTime: 60_000,
+  });
+
+  // The endpoint returns every pair in the window; filter to the current item.
+  const matches: { pair: NearDuplicatePair; other: { id: number; title: string } }[] = [];
+  if (data) {
+    for (const pair of data.pairs) {
+      if (pair.item_a_id === itemId) {
+        matches.push({
+          pair,
+          other: { id: pair.item_b_id, title: pair.item_b_title },
+        });
+      } else if (pair.item_b_id === itemId) {
+        matches.push({
+          pair,
+          other: { id: pair.item_a_id, title: pair.item_a_title },
+        });
+      }
+    }
+  }
+
+  return (
+    <section aria-label="Near-duplicates">
+      <div
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: "var(--text-micro)",
+          color: "var(--color-muted)",
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          marginBottom: "0.5rem",
+        }}
+      >
+        Near-duplicates
+      </div>
+      {isLoading && (
+        <div
+          className="skeleton-block"
+          style={{ height: "1.5rem" }}
+          aria-hidden="true"
+        />
+      )}
+      {isError && (
+        <div
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-micro)",
+            color: "var(--color-muted)",
+          }}
+        >
+          Could not load near-duplicates.
+        </div>
+      )}
+      {data && matches.length === 0 && (
+        <div
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-micro)",
+            color: "var(--color-muted)",
+            lineHeight: 1.5,
+          }}
+        >
+          No near-duplicates found in the last 30 days. Run{" "}
+          <code style={{ fontFamily: "var(--font-mono)" }}>radar embed</code>{" "}
+          to populate.
+        </div>
+      )}
+      {data && matches.length > 0 && (
+        <ul
+          style={{
+            listStyle: "none",
+            padding: 0,
+            margin: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.375rem",
+          }}
+        >
+          {matches.map(({ pair, other }) => {
+            const href = `#/score-debug?item=${other.id}`;
+            const handleClick = onSelectItem
+              ? (e: React.MouseEvent) => {
+                  e.preventDefault();
+                  onSelectItem(other.id);
+                }
+              : undefined;
+            return (
+              <li
+                key={`${pair.item_a_id}-${pair.item_b_id}`}
+                style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: "0.5rem",
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--text-micro)",
+                    color: "var(--color-accent)",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {pair.cosine.toFixed(3)}
+                </span>
+                <a
+                  href={href}
+                  onClick={handleClick}
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "var(--text-small)",
+                    color: "inherit",
+                    textDecoration: "underline",
+                    textUnderlineOffset: "2px",
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {other.title}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
   );
 }
 

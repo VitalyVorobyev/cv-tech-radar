@@ -6,6 +6,7 @@ from pathlib import Path
 from typer.testing import CliRunner
 
 from radar import cli as cli_module
+from radar import pipeline as pipeline_module
 from radar.cli import app
 from radar.collectors.arxiv import ArxivFetchStats
 from radar.db import get_engine, session_scope
@@ -155,7 +156,7 @@ def test_daily_fetch_runs_fetch_classify_candidates(tmp_path, monkeypatch):
 
     def fake_fetch(session, config, *, days, max_results, max_pages, page_delay_seconds=3.0):  # noqa: ARG001
         fetch_called.append({"days": days, "max_pages": max_pages})
-        return cli_module.FetchArxivSummary(
+        return pipeline_module.FetchArxivSummary(
             fetched=2,
             stored=2,
             updated=0,
@@ -165,7 +166,7 @@ def test_daily_fetch_runs_fetch_classify_candidates(tmp_path, monkeypatch):
             per_source=[("arxiv-cs-cv", ArxivFetchStats(fetched=2, stored=2, pages=1))],
         )
 
-    monkeypatch.setattr(cli_module, "_run_fetch_arxiv", fake_fetch)
+    monkeypatch.setattr(cli_module, "run_fetch_arxiv", fake_fetch)
 
     result = runner.invoke(
         app,

@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import threading
 import webbrowser
-from dataclasses import dataclass, field
-from datetime import datetime
 from pathlib import Path
 from typing import Annotated
 
@@ -18,20 +16,24 @@ from rich.progress import (
     TimeElapsedColumn,
 )
 from rich.table import Table
-from sqlalchemy import select
 
-from radar.collectors.arxiv import ArxivFetchStats, fetch_and_store_arxiv
 from radar.config import ConfigError, load_app_config
-from radar.curation import ProposalParseError, apply_proposals, parse_proposals_file
+from radar.curation import ProposalParseError
 from radar.db import ensure_sources, get_engine, init_db, session_scope
 from radar.decisions import DecisionError, list_decisions_for_date, parse_tracks, record_decision
-from radar.embeddings import embed_items_for_date, find_near_duplicates
+from radar.embeddings import find_near_duplicates
 from radar.eval import DEFAULT_LABELED_ITEMS_PATH, render_eval_table, run_eval
-from radar.filters.keyword_filter import classify_items_for_date
-from radar.models import Item, Source
-from radar.relevance_check import check_relevance_for_date
-from radar.reports.candidate_queue import collect_candidates, write_candidate_outputs
-from radar.reports.digest import collect_digest_rows, write_digest_outputs
+from radar.models import Item
+from radar.pipeline import (
+    format_fetch_summary,
+    run_apply,
+    run_candidates,
+    run_classify,
+    run_digest,
+    run_embed,
+    run_fetch_arxiv,
+    run_relevance_check,
+)
 from radar.reports.score_debug import collect_score_debug_rows
 from radar.schemas import RadarRing
 from radar.utils import parse_date_arg
@@ -67,84 +69,6 @@ def init_db_command(
     console.print(f"Initialized database: {db_path}")
 
 
-@dataclass
-class FetchArxivSummary:
-    fetched: int = 0
-    stored: int = 0
-    updated: int = 0
-    skipped_old: int = 0
-    pages: int = 0
-    latest_published_at: datetime | None = None
-    rate_limited: bool = False
-    http_errors: list[int] = field(default_factory=list)
-    per_source: list[tuple[str, ArxivFetchStats]] = field(default_factory=list)
-
-
-def _run_fetch_arxiv(
-    session,
-    config,
-    *,
-    days: int,
-    max_results: int,
-    max_pages: int,
-    page_delay_seconds: float = 3.0,
-) -> FetchArxivSummary:
-    summary = FetchArxivSummary()
-    ensure_sources(session, config.sources)
-    for source_config in config.sources.sources:
-        if not source_config.enabled or source_config.kind != "arxiv":
-            continue
-        source = session.scalar(select(Source).where(Source.key == source_config.id))
-        if source is None:
-            continue
-        stats = fetch_and_store_arxiv(
-            session,
-            source,
-            source_config,
-            days=days,
-            max_results=max_results,
-            max_pages=max_pages,
-            page_delay_seconds=page_delay_seconds,
-        )
-        summary.fetched += stats.fetched
-        summary.stored += stats.stored
-        summary.updated += stats.updated
-        summary.skipped_old += stats.skipped_old
-        summary.pages += stats.pages
-        if stats.latest_published_at is not None and (
-            summary.latest_published_at is None
-            or stats.latest_published_at > summary.latest_published_at
-        ):
-            summary.latest_published_at = stats.latest_published_at
-        if stats.rate_limited:
-            summary.rate_limited = True
-        if stats.http_errors:
-            summary.http_errors.extend(stats.http_errors)
-        summary.per_source.append((source_config.id, stats))
-    return summary
-
-
-def _format_fetch_summary(summary: FetchArxivSummary) -> str:
-    latest = (
-        summary.latest_published_at.isoformat()
-        if summary.latest_published_at is not None
-        else "<none>"
-    )
-    msg = (
-        f"arXiv: {summary.fetched} fetched ({summary.pages} page(s)) "
-        f"— {summary.stored} new, {summary.updated} updated, "
-        f"{summary.skipped_old} older than cutoff. Latest published: {latest}."
-    )
-    if summary.rate_limited:
-        msg += (
-            " [yellow]Rate-limited by arXiv (HTTP 429); stopped early. "
-            "Retry in a few minutes.[/yellow]"
-        )
-    elif summary.http_errors:
-        msg += f" [yellow]HTTP errors: {summary.http_errors}[/yellow]"
-    return msg
-
-
 @app.command("fetch-arxiv")
 def fetch_arxiv_command(
     days: Annotated[int, typer.Option("--days", min=1)] = 1,
@@ -175,7 +99,7 @@ def fetch_arxiv_command(
     engine = get_engine(db_path)
     init_db(engine)
     with session_scope(engine) as session:
-        summary = _run_fetch_arxiv(
+        summary = run_fetch_arxiv(
             session,
             config,
             days=days,
@@ -183,11 +107,7 @@ def fetch_arxiv_command(
             max_pages=max_pages,
             page_delay_seconds=page_delay_seconds,
         )
-    console.print(_format_fetch_summary(summary))
-
-
-def _run_classify(session, config, target_date) -> int:
-    return classify_items_for_date(session, config, target_date)
+    console.print(format_fetch_summary(summary))
 
 
 @app.command("classify")
@@ -202,39 +122,8 @@ def classify_command(
     engine = get_engine(db_path)
     init_db(engine)
     with session_scope(engine) as session:
-        count = _run_classify(session, config, target_date)
+        count = run_classify(session, config, target_date)
     console.print(f"Classified {count} item(s) for {target_date.isoformat()}")
-
-
-@dataclass
-class CandidatesSummary:
-    count: int
-    report_path: Path
-    export_path: Path
-
-
-def _run_candidates(
-    session,
-    config,
-    target_date,
-    *,
-    reports_dir: Path,
-    exports_dir: Path,
-) -> CandidatesSummary:
-    candidates = collect_candidates(
-        session,
-        target_date,
-        limit=config.scoring.candidate_limit,
-    )
-    report_path, export_path = write_candidate_outputs(
-        candidates,
-        target_date,
-        reports_dir=reports_dir,
-        exports_dir=exports_dir,
-    )
-    return CandidatesSummary(
-        count=len(candidates), report_path=report_path, export_path=export_path
-    )
 
 
 @app.command("candidates")
@@ -251,7 +140,7 @@ def candidates_command(
     engine = get_engine(db_path)
     init_db(engine)
     with session_scope(engine) as session:
-        summary = _run_candidates(
+        summary = run_candidates(
             session,
             config,
             target_date,
@@ -297,21 +186,11 @@ def decide_command(
         console.print(f"Recorded decision {decision.id}: item {item_id} -> {decision.ring}")
 
 
-def _run_apply(
-    session,
-    markdown_path: Path,
-    *,
-    decided_by: str,
-    dry_run: bool,
-):
-    if not markdown_path.exists():
-        raise typer.BadParameter(f"Markdown file not found: {markdown_path}")
+def _cli_run_apply(session, markdown_path: Path, *, decided_by: str, dry_run: bool):
     try:
-        proposals = parse_proposals_file(markdown_path)
-    except ProposalParseError as exc:
+        return run_apply(session, markdown_path, decided_by=decided_by, dry_run=dry_run)
+    except FileNotFoundError as exc:
         raise typer.BadParameter(str(exc)) from exc
-    try:
-        return apply_proposals(session, proposals, decided_by=decided_by, dry_run=dry_run)
     except ProposalParseError as exc:
         raise typer.BadParameter(str(exc)) from exc
 
@@ -345,35 +224,8 @@ def apply_command(
     engine = get_engine(db_path)
     init_db(engine)
     with session_scope(engine) as session:
-        report = _run_apply(session, markdown_path, decided_by=decided_by, dry_run=dry_run)
+        report = _cli_run_apply(session, markdown_path, decided_by=decided_by, dry_run=dry_run)
     _print_apply_report(report, dry_run=dry_run)
-
-
-@dataclass
-class DigestSummary:
-    count: int
-    report_path: Path
-    export_path: Path
-
-
-def _run_digest(
-    session,
-    target_date,
-    days: int,
-    *,
-    reports_dir: Path,
-    exports_dir: Path,
-) -> DigestSummary:
-    rows = collect_digest_rows(session, target_date, days)
-    report_path, export_path = write_digest_outputs(
-        session,
-        rows,
-        target_date,
-        days,
-        reports_dir=reports_dir,
-        exports_dir=exports_dir,
-    )
-    return DigestSummary(count=len(rows), report_path=report_path, export_path=export_path)
 
 
 @app.command("digest")
@@ -389,7 +241,7 @@ def digest_command(
     engine = get_engine(db_path)
     init_db(engine)
     with session_scope(engine) as session:
-        summary = _run_digest(
+        summary = run_digest(
             session,
             target_date,
             days,
@@ -422,7 +274,7 @@ def daily_fetch_command(
     engine = get_engine(db_path)
     init_db(engine)
     with session_scope(engine) as session:
-        fetch_summary = _run_fetch_arxiv(
+        fetch_summary = run_fetch_arxiv(
             session,
             config,
             days=days,
@@ -430,15 +282,15 @@ def daily_fetch_command(
             max_pages=max_pages,
             page_delay_seconds=page_delay_seconds,
         )
-        classified = _run_classify(session, config, target_date)
-        candidates_summary = _run_candidates(
+        classified = run_classify(session, config, target_date)
+        candidates_summary = run_candidates(
             session,
             config,
             target_date,
             reports_dir=reports_dir,
             exports_dir=exports_dir,
         )
-    console.print(_format_fetch_summary(fetch_summary))
+    console.print(format_fetch_summary(fetch_summary))
     console.print(f"classify: {classified} item(s) for {target_date.isoformat()}")
     console.print(
         f"candidates: {candidates_summary.count} written to {candidates_summary.report_path}"
@@ -470,11 +322,11 @@ def daily_publish_command(
     engine = get_engine(db_path)
     init_db(engine)
     with session_scope(engine) as session:
-        report = _run_apply(session, markdown_path, decided_by=decided_by, dry_run=dry_run)
+        report = _cli_run_apply(session, markdown_path, decided_by=decided_by, dry_run=dry_run)
         if dry_run:
             digest_summary = None
         else:
-            digest_summary = _run_digest(
+            digest_summary = run_digest(
                 session,
                 target_date,
                 days,
@@ -612,7 +464,7 @@ def embed_command(
             )
 
         with session_scope(engine) as session:
-            summary = embed_items_for_date(
+            summary = run_embed(
                 session,
                 config.embeddings.embeddings,
                 target_date,
@@ -718,7 +570,7 @@ def relevance_check_command(
             )
 
         with session_scope(engine) as session:
-            summary = check_relevance_for_date(
+            summary = run_relevance_check(
                 session,
                 config.embeddings.chat,
                 target_date,

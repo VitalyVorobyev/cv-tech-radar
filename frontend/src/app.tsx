@@ -1,6 +1,7 @@
 // App root.
-// Hash routing — radar (default), queue, timeline, tracks. `#/board` is a legacy
-// alias for `#/radar` so old links keep working.
+// Hash routing — radar (default), queue, timeline, tracks, pipeline, settings,
+// score-debug, digest. `#/board` is a legacy alias for `#/radar` so old links
+// keep working.
 
 import { useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -8,8 +9,30 @@ import { QueueView } from "./views/QueueView";
 import { RadarView } from "./views/RadarView";
 import { TimelineView } from "./views/TimelineView";
 import { TracksView } from "./views/TracksView";
+import { PipelineView } from "./views/PipelineView";
+import { SettingsLandingView } from "./views/SettingsLandingView";
+import { SettingsSourcesView } from "./views/SettingsSourcesView";
+import { SettingsTopicsView } from "./views/SettingsTopicsView";
+import { SettingsNegativeTopicsView } from "./views/SettingsNegativeTopicsView";
+import { SettingsScoringView } from "./views/SettingsScoringView";
+import { ScoreDebugView } from "./views/ScoreDebugView";
+import { DigestView } from "./views/DigestView";
+import { ManualAddView } from "./views/ManualAddView";
 
-type Route = "radar" | "queue" | "timeline" | "tracks";
+type Route =
+  | "radar"
+  | "queue"
+  | "timeline"
+  | "tracks"
+  | "manual-add"
+  | "pipeline"
+  | "score-debug"
+  | "digest"
+  | "settings"
+  | "settings/sources"
+  | "settings/topics"
+  | "settings/negative-topics"
+  | "settings/scoring";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,13 +44,46 @@ const queryClient = new QueryClient({
 });
 
 function parseRoute(): Route {
-  const hash = window.location.hash.replace(/^#\/?/, "").split("?")[0];
-  if (hash === "queue") return "queue";
-  if (hash === "timeline") return "timeline";
-  if (hash === "tracks") return "tracks";
+  const raw = window.location.hash.replace(/^#\/?/, "").split("?")[0] ?? "";
+  // `digest/2026-05-13` → "digest"; we read the date inside DigestView.
+  if (raw.startsWith("digest")) return "digest";
+  if (raw === "settings/sources") return "settings/sources";
+  if (raw === "settings/topics") return "settings/topics";
+  if (raw === "settings/negative-topics") return "settings/negative-topics";
+  if (raw === "settings/scoring") return "settings/scoring";
+  if (raw === "settings") return "settings";
+  if (raw === "pipeline") return "pipeline";
+  if (raw === "score-debug") return "score-debug";
+  if (raw === "queue") return "queue";
+  if (raw === "timeline") return "timeline";
+  if (raw === "tracks") return "tracks";
+  if (raw === "manual-add") return "manual-add";
   // `board` is the legacy slug; treat any unknown route as the radar.
   return "radar";
 }
+
+interface TabSpec {
+  value: Route;
+  label: string;
+  /** Routes considered "active" for highlighting this tab. */
+  matches?: (route: Route) => boolean;
+}
+
+const PRIMARY_TABS: TabSpec[] = [
+  { value: "radar", label: "Radar" },
+  { value: "queue", label: "Queue" },
+  { value: "timeline", label: "Timeline" },
+  { value: "tracks", label: "Tracks" },
+  { value: "manual-add", label: "Add paper" },
+  { value: "pipeline", label: "Pipeline" },
+  { value: "score-debug", label: "Score debug" },
+  { value: "digest", label: "Digest" },
+  {
+    value: "settings",
+    label: "Settings",
+    matches: (route) => route === "settings" || route.startsWith("settings/"),
+  },
+];
 
 function NavTabs({
   route,
@@ -36,12 +92,6 @@ function NavTabs({
   route: Route;
   onNavigate: (next: Route) => void;
 }) {
-  const tabs: { value: Route; label: string }[] = [
-    { value: "radar", label: "Radar" },
-    { value: "queue", label: "Queue" },
-    { value: "timeline", label: "Timeline" },
-    { value: "tracks", label: "Tracks" },
-  ];
   return (
     <nav
       aria-label="Primary"
@@ -56,10 +106,11 @@ function NavTabs({
         gap: "1.25rem",
         maxWidth: "80rem",
         margin: "0 auto",
+        flexWrap: "wrap",
       }}
     >
-      {tabs.map((tab) => {
-        const active = tab.value === route;
+      {PRIMARY_TABS.map((tab) => {
+        const active = tab.matches ? tab.matches(route) : tab.value === route;
         return (
           <button
             key={tab.value}
@@ -95,6 +146,24 @@ function renderRoute(route: Route) {
       return <TimelineView />;
     case "tracks":
       return <TracksView />;
+    case "manual-add":
+      return <ManualAddView />;
+    case "pipeline":
+      return <PipelineView />;
+    case "score-debug":
+      return <ScoreDebugView />;
+    case "digest":
+      return <DigestView />;
+    case "settings":
+      return <SettingsLandingView />;
+    case "settings/sources":
+      return <SettingsSourcesView />;
+    case "settings/topics":
+      return <SettingsTopicsView />;
+    case "settings/negative-topics":
+      return <SettingsNegativeTopicsView />;
+    case "settings/scoring":
+      return <SettingsScoringView />;
     case "radar":
     default:
       return <RadarView />;

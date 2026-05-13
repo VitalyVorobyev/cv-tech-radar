@@ -208,6 +208,7 @@ class ItemDetailOut(BaseModel):
     reason: str
     uncertain: bool
     source: str
+    published_at: datetime
     decided_at: datetime
     decided_by: str | None
     history: list[HistoryEntryOut]
