@@ -5,6 +5,9 @@
 
 import { useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { isStaticMode } from "./lib/api";
+
+const IS_STATIC = isStaticMode();
 import { QueueView } from "./views/QueueView";
 import { RadarView } from "./views/RadarView";
 import { TimelineView } from "./views/TimelineView";
@@ -43,23 +46,35 @@ const queryClient = new QueryClient({
   },
 });
 
+// Routes available in the public static build — everything else falls back to radar.
+const STATIC_ROUTES: ReadonlySet<Route> = new Set([
+  "radar",
+  "timeline",
+  "tracks",
+]);
+
 function parseRoute(): Route {
   const raw = window.location.hash.replace(/^#\/?/, "").split("?")[0] ?? "";
-  // `digest/2026-05-13` → "digest"; we read the date inside DigestView.
-  if (raw.startsWith("digest")) return "digest";
-  if (raw === "settings/sources") return "settings/sources";
-  if (raw === "settings/topics") return "settings/topics";
-  if (raw === "settings/negative-topics") return "settings/negative-topics";
-  if (raw === "settings/scoring") return "settings/scoring";
-  if (raw === "settings") return "settings";
-  if (raw === "pipeline") return "pipeline";
-  if (raw === "score-debug") return "score-debug";
-  if (raw === "queue") return "queue";
-  if (raw === "timeline") return "timeline";
-  if (raw === "tracks") return "tracks";
-  if (raw === "manual-add") return "manual-add";
-  // `board` is the legacy slug; treat any unknown route as the radar.
-  return "radar";
+  const resolve = (): Route => {
+    // `digest/2026-05-13` → "digest"; we read the date inside DigestView.
+    if (raw.startsWith("digest")) return "digest";
+    if (raw === "settings/sources") return "settings/sources";
+    if (raw === "settings/topics") return "settings/topics";
+    if (raw === "settings/negative-topics") return "settings/negative-topics";
+    if (raw === "settings/scoring") return "settings/scoring";
+    if (raw === "settings") return "settings";
+    if (raw === "pipeline") return "pipeline";
+    if (raw === "score-debug") return "score-debug";
+    if (raw === "queue") return "queue";
+    if (raw === "timeline") return "timeline";
+    if (raw === "tracks") return "tracks";
+    if (raw === "manual-add") return "manual-add";
+    // `board` is the legacy slug; treat any unknown route as the radar.
+    return "radar";
+  };
+  const route = resolve();
+  if (IS_STATIC && !STATIC_ROUTES.has(route)) return "radar";
+  return route;
 }
 
 interface TabSpec {
@@ -69,7 +84,7 @@ interface TabSpec {
   matches?: (route: Route) => boolean;
 }
 
-const PRIMARY_TABS: TabSpec[] = [
+const FULL_TABS: TabSpec[] = [
   { value: "radar", label: "Radar" },
   { value: "queue", label: "Queue" },
   { value: "timeline", label: "Timeline" },
@@ -84,6 +99,14 @@ const PRIMARY_TABS: TabSpec[] = [
     matches: (route) => route === "settings" || route.startsWith("settings/"),
   },
 ];
+
+const STATIC_TABS: TabSpec[] = [
+  { value: "radar", label: "Radar" },
+  { value: "tracks", label: "Tracks" },
+  { value: "timeline", label: "Timeline" },
+];
+
+const PRIMARY_TABS: TabSpec[] = IS_STATIC ? STATIC_TABS : FULL_TABS;
 
 function NavTabs({
   route,

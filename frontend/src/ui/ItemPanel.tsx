@@ -10,7 +10,9 @@ import type {
   NearDuplicatePair,
   Ring,
 } from "../lib/api";
-import { api } from "../lib/api";
+import { api, isStaticMode } from "../lib/api";
+
+const IS_STATIC = isStaticMode();
 import { RING_ORDER } from "../lib/constants";
 
 interface ItemPanelProps {
@@ -332,11 +334,13 @@ function ItemPanelBody({
         )}
       </section>
 
-      <NearDuplicatesSection
-        itemId={data.id}
-        anchorDate={data.published_at}
-        onSelectItem={onSelectItem}
-      />
+      {!IS_STATIC && (
+        <NearDuplicatesSection
+          itemId={data.id}
+          anchorDate={data.published_at}
+          onSelectItem={onSelectItem}
+        />
+      )}
 
       <footer style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginTop: "auto" }}>
         <a
@@ -347,12 +351,12 @@ function ItemPanelBody({
         >
           Open paper ↗
         </a>
-        {promoteTarget && (
+        {!IS_STATIC && promoteTarget && (
           <button type="button" style={actionStyle} onClick={() => onPromote(promoteTarget)}>
             Promote to {promoteTarget}
           </button>
         )}
-        {demoteTarget && (
+        {!IS_STATIC && demoteTarget && (
           <button type="button" style={actionStyle} onClick={() => onPromote(demoteTarget)}>
             Demote to {demoteTarget}
           </button>

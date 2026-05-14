@@ -219,6 +219,37 @@ async function request<T>(
 }
 
 // ---------------------------------------------------------------------------
+// Static mode — for the public no-backend build.
+// ---------------------------------------------------------------------------
+
+// `import.meta.env.VITE_STATIC` is "1" when built with `vite --mode static`.
+// In that mode the public fetchers read from `${BASE_URL}data/*.json` and
+// every write/curator endpoint throws. Exposed as a function (not a const) so
+// tests can flip the env via `vi.stubEnv` at runtime.
+export function isStaticMode(): boolean {
+  return import.meta.env.VITE_STATIC === "1";
+}
+
+function staticDataUrl(path: string): string {
+  // `BASE_URL` is the Vite `base` config — e.g. "/" or "/cv-radar/" — and
+  // always ends with a slash.
+  return `${import.meta.env.BASE_URL}data/${path}`;
+}
+
+function readStatic<T>(path: string): Promise<T> {
+  return request<T>(staticDataUrl(path));
+}
+
+function refuseInStatic<T>(name: string): Promise<T> {
+  return Promise.reject(
+    new ApiError(
+      405,
+      `${name} is not available in the public static build`,
+    ),
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Phase 1 additions: jobs, config slices, score debug, candidate/digest files.
 // ---------------------------------------------------------------------------
 
@@ -514,6 +545,7 @@ export const api = {
   },
 
   postDecision(body: DecisionRequest): Promise<DecisionResponse> {
+    if (isStaticMode()) return refuseInStatic<DecisionResponse>("postDecision");
     return request<DecisionResponse>("/api/decisions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -522,6 +554,7 @@ export const api = {
   },
 
   board(query: BoardQuery = {}): Promise<BoardResponse> {
+    if (isStaticMode()) return readStatic<BoardResponse>("board.json");
     const params = new URLSearchParams();
     if (query.decided_since) params.set("decided_since", query.decided_since);
     if (query.include_ignore) params.set("include_ignore", "true");
@@ -530,10 +563,14 @@ export const api = {
   },
 
   item(id: number): Promise<ItemDetail> {
+    if (isStaticMode()) {
+      return readStatic<ItemDetail>(`items/${encodeURIComponent(String(id))}.json`);
+    }
     return request<ItemDetail>(`/api/items/${encodeURIComponent(String(id))}`);
   },
 
   timeline(weeks = 12): Promise<TimelineResponse> {
+    if (isStaticMode()) return readStatic<TimelineResponse>("timeline.json");
     const params = new URLSearchParams({ weeks: String(weeks) });
     return request<TimelineResponse>(`/api/timeline?${params}`);
   },

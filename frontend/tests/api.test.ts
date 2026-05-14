@@ -157,3 +157,51 @@ describe("ApiError", () => {
     expect(err.message).toBe("not found");
   });
 });
+
+describe("api static-mode branch", () => {
+  it("reads BASE_URL/data/board.json when VITE_STATIC=1", async () => {
+    vi.stubEnv("VITE_STATIC", "1");
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          rings: { Use: [], Prototype: [], Evaluate: [], Watch: [], Ignore: [] },
+          counts: { Use: 0, Prototype: 0, Evaluate: 0, Watch: 0, Ignore: 0 },
+          decided_since: null,
+          include_ignore: false,
+        }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    await api.board();
+    const url = fetchMock.mock.calls[0]?.[0] ?? "";
+    // Should fetch the static snapshot, not the API route.
+    expect(String(url)).toContain("data/board.json");
+    expect(String(url)).not.toContain("/api/");
+  });
+
+  it("static-mode postDecision throws ApiError", async () => {
+    vi.stubEnv("VITE_STATIC", "1");
+    await expect(
+      api.postDecision({ item_id: 1, ring: "Watch", reason: "x" }),
+    ).rejects.toMatchObject({ name: "ApiError", status: 405 });
+  });
+
+  it("falls back to /api in non-static mode", async () => {
+    vi.stubEnv("VITE_STATIC", "");
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          rings: { Use: [], Prototype: [], Evaluate: [], Watch: [], Ignore: [] },
+          counts: { Use: 0, Prototype: 0, Evaluate: 0, Watch: 0, Ignore: 0 },
+          decided_since: null,
+          include_ignore: false,
+        }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    await api.board();
+    expect(fetchMock).toHaveBeenCalledWith("/api/board", undefined);
+  });
+});

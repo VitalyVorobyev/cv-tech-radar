@@ -35,6 +35,7 @@ from radar.pipeline import (
     run_relevance_check,
 )
 from radar.reports.score_debug import collect_score_debug_rows
+from radar.reports.static_bundle import BUNDLE_FILES, build_static_bundle
 from radar.schemas import RadarRing
 from radar.utils import parse_date_arg
 
@@ -250,6 +251,31 @@ def digest_command(
         )
     console.print(f"Wrote digest ({summary.count} item(s)): {summary.report_path}")
     console.print(f"Wrote JSON export: {summary.export_path}")
+
+
+DefaultStaticTargetDir = Path("frontend/public/data")
+
+
+@app.command("build-static")
+def build_static_command(
+    target: Annotated[Path, typer.Option("--target")] = DefaultStaticTargetDir,
+    weeks: Annotated[int, typer.Option("--weeks", min=1, max=52)] = 26,
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+    config_dir: Annotated[Path, typer.Option("--config-dir")] = DefaultConfigDir,
+) -> None:
+    """Pre-render the public radar state into static JSON files.
+
+    Writes board.json / tracks.json / timeline.json / meta.json plus per-item
+    JSON under ``items/`` so a no-backend Vite build can serve the radar.
+    """
+    config = _load(config_dir)
+    engine = get_engine(db_path)
+    with session_scope(engine) as session:
+        paths = build_static_bundle(target, session=session, config=config, weeks=weeks)
+    for name in BUNDLE_FILES:
+        key = name.removesuffix(".json")
+        console.print(f"Wrote {paths[key]}")
+    console.print(f"Wrote per-item JSON under {target / 'items'}/")
 
 
 @app.command("daily-fetch")
