@@ -100,8 +100,13 @@ def _count_all_rings(
     *,
     decided_since: datetime | None,
 ) -> BoardCountsOut:
-    """Return per-ring counts of latest decisions (includes Ignore even when hidden)."""
-    latest_subq = (
+    """Return per-ring counts of latest decisions (includes Ignore even when hidden).
+
+    Picks exactly one decision per item — max(id) among rows tied at
+    max(created_at) — so counts match the deduped `rings` payload produced by
+    `collect_board_rows`.
+    """
+    latest_created_subq = (
         select(
             RadarDecision.item_id,
             func.max(RadarDecision.created_at).label("max_created"),
@@ -109,12 +114,21 @@ def _count_all_rings(
         .group_by(RadarDecision.item_id)
         .subquery()
     )
+    latest_decision_id_subq = (
+        select(func.max(RadarDecision.id).label("decision_id"))
+        .join(
+            latest_created_subq,
+            (RadarDecision.item_id == latest_created_subq.c.item_id)
+            & (RadarDecision.created_at == latest_created_subq.c.max_created),
+        )
+        .group_by(RadarDecision.item_id)
+        .subquery()
+    )
     stmt = (
         select(RadarDecision.ring, func.count())
         .join(
-            latest_subq,
-            (RadarDecision.item_id == latest_subq.c.item_id)
-            & (RadarDecision.created_at == latest_subq.c.max_created),
+            latest_decision_id_subq,
+            RadarDecision.id == latest_decision_id_subq.c.decision_id,
         )
         .group_by(RadarDecision.ring)
     )

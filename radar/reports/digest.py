@@ -74,7 +74,9 @@ def collect_board_rows(
             & (decision_alias.created_at == latest_decision_subq.c.max_created),
         )
         .outerjoin(ItemClassification, ItemClassification.item_id == Item.id)
-        .order_by(decision_alias.created_at.desc())
+        # id DESC tiebreaker keeps the winner deterministic when two decisions
+        # share the same created_at (a real case on SQLite's sub-second clock).
+        .order_by(decision_alias.created_at.desc(), decision_alias.id.desc())
     )
     if decided_since is not None:
         stmt = stmt.where(decision_alias.created_at >= decided_since)

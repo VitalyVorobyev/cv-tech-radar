@@ -497,6 +497,44 @@ def test_board_latest_decision_supersedes_earlier(client, api_db):
     assert rings["Use"][0]["reason"] == "promoted"
 
 
+def test_board_breaks_ties_on_decision_id(client, api_db):
+    """When two decisions share created_at, the higher-id row wins in rings AND counts."""
+    _db_path, engine = api_db
+    published = datetime(2026, 5, 1, 10, tzinfo=UTC)
+    tied_at = datetime(2026, 5, 9, 12, tzinfo=UTC)
+    with session_scope(engine) as session:
+        _seed_item(session, item_id=7, title="Tied Item", published=published)
+        session.flush()
+        # First insert → smaller id, ring=Watch.
+        _seed_decision(
+            session,
+            item_id=7,
+            ring=RadarRing.WATCH,
+            tracks=[],
+            reason="earlier",
+            created_at=tied_at,
+        )
+        session.flush()
+        # Second insert → larger id, same timestamp, ring=Use.
+        _seed_decision(
+            session,
+            item_id=7,
+            ring=RadarRing.USE,
+            tracks=[],
+            reason="later",
+            created_at=tied_at,
+        )
+
+    response = client.get("/api/board")
+    body = response.json()
+    assert body["rings"]["Watch"] == []
+    assert [row["item_id"] for row in body["rings"]["Use"]] == [7]
+    assert body["rings"]["Use"][0]["reason"] == "later"
+    # counts must match rings — no double-counting from the tied row.
+    assert body["counts"]["Use"] == 1
+    assert body["counts"]["Watch"] == 0
+
+
 def test_board_decided_since_filter(client, api_db):
     _db_path, engine = api_db
     published = datetime(2026, 5, 1, 10, tzinfo=UTC)
