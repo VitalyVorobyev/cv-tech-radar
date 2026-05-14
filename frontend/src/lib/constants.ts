@@ -13,16 +13,29 @@ export interface Quadrant {
   tracks: readonly string[];
 }
 
+// Keep this list in sync with `config/topics.yaml`. Items whose first track is
+// not listed here are silently dropped from the radar plot — `RadarPlot.placeDots`
+// will emit a dev-only `console.warn` to surface the omission.
 export const QUADRANTS: readonly Quadrant[] = [
   {
     id: "perception",
     label: "Perception & Sensing",
-    tracks: ["3D Sensors", "Sensors, Cameras & Standards", "Calibration & Camera Models"],
+    tracks: [
+      "3D Sensors",
+      "Sensors, Cameras & Standards",
+      "Calibration & Camera Models",
+      "Target Detection & Fiducials",
+    ],
   },
   {
     id: "scene",
     label: "Scene & World",
-    tracks: ["3D Geometry & Reconstruction", "Synthetic Data & Simulation", "Robotics Vision"],
+    tracks: [
+      "3D Geometry & Reconstruction",
+      "Synthetic Data & Simulation",
+      "Robotics Vision",
+      "Robot Guidance",
+    ],
   },
   {
     id: "models",

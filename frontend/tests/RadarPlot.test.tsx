@@ -80,11 +80,17 @@ describe("RadarPlot", () => {
     expect(onSelect).toHaveBeenCalledWith(42);
   });
 
-  it("skips items whose first track is not in any quadrant", () => {
+  it("skips items whose first track is not in any quadrant and warns in dev", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const items: BoardItem[] = [
       mkItem({ item_id: 1, ring: "Use", tracks: ["Unknown Track"] }),
+      mkItem({ item_id: 2, ring: "Use", tracks: ["Unknown Track"] }),
     ];
     const { container } = render(<RadarPlot items={items} {...baseProps} />);
     expect(container.querySelector('g[role="button"][aria-label^="#1 "]')).toBeNull();
+    expect(container.querySelector('g[role="button"][aria-label^="#2 "]')).toBeNull();
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0]![0]).toContain("Unknown Track");
+    warn.mockRestore();
   });
 });

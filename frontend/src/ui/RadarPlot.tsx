@@ -103,11 +103,20 @@ function quadIndexOfTrack(track: string): number {
 
 function placeDots(items: BoardItem[]): Placed[] {
   const cells = new Map<string, BoardItem[]>();
+  const warnedTracks = new Set<string>();
   for (const item of items) {
     const track = item.tracks[0];
     if (!track) continue;
     const qi = quadIndexOfTrack(track);
-    if (qi < 0) continue;
+    if (qi < 0) {
+      if (import.meta.env.DEV && !warnedTracks.has(track)) {
+        warnedTracks.add(track);
+        console.warn(
+          `[RadarPlot] Track "${track}" is not mapped to any quadrant — item #${item.item_id} (${item.title}) will not appear on the radar. Add it to QUADRANTS in frontend/src/lib/constants.ts.`,
+        );
+      }
+      continue;
+    }
     const ri = RING_ORDER.indexOf(item.ring);
     if (ri < 0) continue;
     const key = `${qi}-${ri}`;
