@@ -571,6 +571,12 @@ def test_tracks_reflects_config(client, app_config):
     config_ids = {track.id for track in app_config.topics.tracks}
     api_ids = {track["id"] for track in tracks}
     assert api_ids == config_ids
+    # quadrant must round-trip from topics.yaml so the frontend can build
+    # the radar layout without a parallel hardcoded mapping.
+    config_quadrants = {track.id: track.quadrant for track in app_config.topics.tracks}
+    api_quadrants = {track["id"]: track["quadrant"] for track in tracks}
+    assert api_quadrants == config_quadrants
+    assert set(api_quadrants.values()) <= {"perception", "scene", "models", "tooling"}
 
 
 def test_sources_endpoint(client, app_config):

@@ -1,6 +1,7 @@
 tracks:
   - id: calibration-camera-models
     name: Calibration & Camera Models
+    quadrant: perception
     # Bare `calibration` / `distortion` were dropped after they false-positived
     # on MLLM-evaluation papers ("Calibrated Accuracy", "distortion localization").
     # Use phrase keywords so the track only fires on real camera/geometry context.
@@ -28,6 +29,7 @@ tracks:
 
   - id: target-detection-fiducials
     name: Target Detection & Fiducials
+    quadrant: perception
     positive_keywords:
       - checkerboard
       - chessboard
@@ -42,6 +44,7 @@ tracks:
 
   - id: 3d-geometry-reconstruction
     name: 3D Geometry & Reconstruction
+    quadrant: scene
     positive_keywords:
       - 3d reconstruction
       - reconstruction
@@ -58,6 +61,7 @@ tracks:
 
   - id: 3d-sensors
     name: 3D Sensors
+    quadrant: perception
     positive_keywords:
       - lidar
       - time-of-flight
@@ -71,6 +75,7 @@ tracks:
 
   - id: robotics-vision
     name: Robotics Vision
+    quadrant: scene
     positive_keywords:
       - robotics
       - robot vision
@@ -83,6 +88,7 @@ tracks:
 
   - id: robot-guidance
     name: Robot Guidance
+    quadrant: scene
     positive_keywords:
       - robot guidance
       - grasping
@@ -95,6 +101,7 @@ tracks:
 
   - id: object-tracking
     name: Object Tracking
+    quadrant: models
     positive_keywords:
       - object tracking
       - multi-object tracking
@@ -107,6 +114,7 @@ tracks:
 
   - id: industrial-vision-inspection
     name: Industrial Vision Inspection
+    quadrant: tooling
     positive_keywords:
       - industrial inspection
       - visual inspection
@@ -120,6 +128,7 @@ tracks:
 
   - id: edge-ai-deployment
     name: Edge AI & Deployment
+    quadrant: tooling
     positive_keywords:
       - edge ai
       - deployment
@@ -134,6 +143,7 @@ tracks:
 
   - id: vision-foundation-models
     name: Vision Foundation Models
+    quadrant: models
     positive_keywords:
       - vision foundation model
       - segmentation anything
@@ -149,6 +159,7 @@ tracks:
 
   - id: open-source-cv-tooling
     name: Open-Source CV Tooling
+    quadrant: tooling
     positive_keywords:
       - opencv
       - open-source
@@ -162,6 +173,7 @@ tracks:
 
   - id: sensors-cameras-standards
     name: Sensors, Cameras & Standards
+    quadrant: perception
     positive_keywords:
       - genicam
       - gige vision
@@ -177,6 +189,7 @@ tracks:
 
   - id: synthetic-data-simulation
     name: Synthetic Data & Simulation
+    quadrant: scene
     positive_keywords:
       - synthetic data
       - simulation
@@ -190,6 +203,7 @@ tracks:
 
   - id: datasets-benchmarks
     name: Datasets & Benchmarks
+    quadrant: models
     positive_keywords:
       - dataset
       - benchmark

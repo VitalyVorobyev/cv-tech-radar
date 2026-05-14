@@ -174,6 +174,7 @@ class BoardResponse(BaseModel):
 class TrackOut(BaseModel):
     id: str
     name: str
+    quadrant: str
 
 
 class TracksResponse(BaseModel):
