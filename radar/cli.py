@@ -16,21 +16,26 @@ from rich.progress import (
     TimeElapsedColumn,
 )
 from rich.table import Table
-from sqlalchemy import select
 
-from radar.collectors.arxiv import fetch_and_store_arxiv
 from radar.config import ConfigError, load_app_config
-from radar.curation import ProposalParseError, apply_proposals, parse_proposals_file
+from radar.curation import ProposalParseError
 from radar.db import ensure_sources, get_engine, init_db, session_scope
 from radar.decisions import DecisionError, list_decisions_for_date, parse_tracks, record_decision
-from radar.embeddings import embed_items_for_date, find_near_duplicates
+from radar.embeddings import find_near_duplicates
 from radar.eval import DEFAULT_LABELED_ITEMS_PATH, render_eval_table, run_eval
-from radar.filters.keyword_filter import classify_items_for_date
-from radar.models import Item, Source
-from radar.relevance_check import check_relevance_for_date
-from radar.reports.candidate_queue import collect_candidates, write_candidate_outputs
-from radar.reports.digest import collect_digest_rows, write_digest_outputs
+from radar.models import Item
+from radar.pipeline import (
+    format_fetch_summary,
+    run_apply,
+    run_candidates,
+    run_classify,
+    run_digest,
+    run_embed,
+    run_fetch_arxiv,
+    run_relevance_check,
+)
 from radar.reports.score_debug import collect_score_debug_rows
+from radar.reports.static_bundle import BUNDLE_FILES, build_static_bundle
 from radar.schemas import RadarRing
 from radar.utils import parse_date_arg
 
@@ -69,6 +74,24 @@ def init_db_command(
 def fetch_arxiv_command(
     days: Annotated[int, typer.Option("--days", min=1)] = 1,
     max_results: Annotated[int, typer.Option("--max-results", min=1)] = 100,
+    max_pages: Annotated[
+        int,
+        typer.Option(
+            "--max-pages",
+            min=1,
+            help="Walk up to N pages of --max-results each, stopping early "
+            "once entries cross the --days cutoff.",
+        ),
+    ] = 10,
+    page_delay_seconds: Annotated[
+        float,
+        typer.Option(
+            "--page-delay",
+            min=0.0,
+            help="Seconds to wait between successive page fetches. "
+            "Default 3.0 honors arXiv's API etiquette and avoids HTTP 429.",
+        ),
+    ] = 3.0,
     db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
     config_dir: Annotated[Path, typer.Option("--config-dir")] = DefaultConfigDir,
 ) -> None:
@@ -76,31 +99,16 @@ def fetch_arxiv_command(
     config = _load(config_dir)
     engine = get_engine(db_path)
     init_db(engine)
-    total_fetched = total_stored = total_updated = total_skipped = 0
     with session_scope(engine) as session:
-        ensure_sources(session, config.sources)
-        for source_config in config.sources.sources:
-            if not source_config.enabled or source_config.kind != "arxiv":
-                continue
-            source = session.scalar(select(Source).where(Source.key == source_config.id))
-            if source is None:
-                continue
-            stats = fetch_and_store_arxiv(
-                session,
-                source,
-                source_config,
-                days=days,
-                max_results=max_results,
-            )
-            total_fetched += stats.fetched
-            total_stored += stats.stored
-            total_updated += stats.updated
-            total_skipped += stats.skipped_old
-    console.print(
-        "Fetched arXiv entries: "
-        f"{total_fetched}; stored: {total_stored}; updated: {total_updated}; "
-        f"skipped old: {total_skipped}"
-    )
+        summary = run_fetch_arxiv(
+            session,
+            config,
+            days=days,
+            max_results=max_results,
+            max_pages=max_pages,
+            page_delay_seconds=page_delay_seconds,
+        )
+    console.print(format_fetch_summary(summary))
 
 
 @app.command("classify")
@@ -115,7 +123,7 @@ def classify_command(
     engine = get_engine(db_path)
     init_db(engine)
     with session_scope(engine) as session:
-        count = classify_items_for_date(session, config, target_date)
+        count = run_classify(session, config, target_date)
     console.print(f"Classified {count} item(s) for {target_date.isoformat()}")
 
 
@@ -133,19 +141,15 @@ def candidates_command(
     engine = get_engine(db_path)
     init_db(engine)
     with session_scope(engine) as session:
-        candidates = collect_candidates(
+        summary = run_candidates(
             session,
+            config,
             target_date,
-            limit=config.scoring.candidate_limit,
+            reports_dir=reports_dir,
+            exports_dir=exports_dir,
         )
-    report_path, export_path = write_candidate_outputs(
-        candidates,
-        target_date,
-        reports_dir=reports_dir,
-        exports_dir=exports_dir,
-    )
-    console.print(f"Wrote {len(candidates)} candidate(s): {report_path}")
-    console.print(f"Wrote JSON export: {export_path}")
+    console.print(f"Wrote {summary.count} candidate(s): {summary.report_path}")
+    console.print(f"Wrote JSON export: {summary.export_path}")
 
 
 @app.command("decide")
@@ -183,29 +187,16 @@ def decide_command(
         console.print(f"Recorded decision {decision.id}: item {item_id} -> {decision.ring}")
 
 
-@app.command("apply")
-def apply_command(
-    markdown_path: Annotated[Path, typer.Argument(help="Candidate Markdown to apply.")],
-    decided_by: Annotated[str, typer.Option("--decided-by")] = "claude-curator",
-    dry_run: Annotated[bool, typer.Option("--dry-run")] = False,
-    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
-) -> None:
-    """Bulk-record decisions written into a candidate Markdown file."""
-    if not markdown_path.exists():
-        raise typer.BadParameter(f"Markdown file not found: {markdown_path}")
+def _cli_run_apply(session, markdown_path: Path, *, decided_by: str, dry_run: bool):
     try:
-        proposals = parse_proposals_file(markdown_path)
+        return run_apply(session, markdown_path, decided_by=decided_by, dry_run=dry_run)
+    except FileNotFoundError as exc:
+        raise typer.BadParameter(str(exc)) from exc
     except ProposalParseError as exc:
         raise typer.BadParameter(str(exc)) from exc
 
-    engine = get_engine(db_path)
-    init_db(engine)
-    with session_scope(engine) as session:
-        try:
-            report = apply_proposals(session, proposals, decided_by=decided_by, dry_run=dry_run)
-        except ProposalParseError as exc:
-            raise typer.BadParameter(str(exc)) from exc
 
+def _print_apply_report(report, *, dry_run: bool) -> None:
     label = "Would apply" if dry_run else "Applied"
     console.print(
         f"{label} {len(report.applied)} decision(s); "
@@ -223,6 +214,21 @@ def apply_command(
         console.print(f"  warning: {warning}")
 
 
+@app.command("apply")
+def apply_command(
+    markdown_path: Annotated[Path, typer.Argument(help="Candidate Markdown to apply.")],
+    decided_by: Annotated[str, typer.Option("--decided-by")] = "claude-curator",
+    dry_run: Annotated[bool, typer.Option("--dry-run")] = False,
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+) -> None:
+    """Bulk-record decisions written into a candidate Markdown file."""
+    engine = get_engine(db_path)
+    init_db(engine)
+    with session_scope(engine) as session:
+        report = _cli_run_apply(session, markdown_path, decided_by=decided_by, dry_run=dry_run)
+    _print_apply_report(report, dry_run=dry_run)
+
+
 @app.command("digest")
 def digest_command(
     date: Annotated[str, typer.Option("--date")] = "today",
@@ -236,17 +242,127 @@ def digest_command(
     engine = get_engine(db_path)
     init_db(engine)
     with session_scope(engine) as session:
-        rows = collect_digest_rows(session, target_date, days)
-        report_path, export_path = write_digest_outputs(
+        summary = run_digest(
             session,
-            rows,
             target_date,
             days,
             reports_dir=reports_dir,
             exports_dir=exports_dir,
         )
-    console.print(f"Wrote digest ({len(rows)} item(s)): {report_path}")
-    console.print(f"Wrote JSON export: {export_path}")
+    console.print(f"Wrote digest ({summary.count} item(s)): {summary.report_path}")
+    console.print(f"Wrote JSON export: {summary.export_path}")
+
+
+DefaultStaticTargetDir = Path("frontend/public/data")
+
+
+@app.command("build-static")
+def build_static_command(
+    target: Annotated[Path, typer.Option("--target")] = DefaultStaticTargetDir,
+    weeks: Annotated[int, typer.Option("--weeks", min=1, max=52)] = 26,
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+    config_dir: Annotated[Path, typer.Option("--config-dir")] = DefaultConfigDir,
+) -> None:
+    """Pre-render the public radar state into static JSON files.
+
+    Writes board.json / tracks.json / timeline.json / meta.json plus per-item
+    JSON under ``items/`` so a no-backend Vite build can serve the radar.
+    """
+    config = _load(config_dir)
+    engine = get_engine(db_path)
+    with session_scope(engine) as session:
+        paths = build_static_bundle(target, session=session, config=config, weeks=weeks)
+    for name in BUNDLE_FILES:
+        key = name.removesuffix(".json")
+        console.print(f"Wrote {paths[key]}")
+    console.print(f"Wrote per-item JSON under {target / 'items'}/")
+
+
+@app.command("daily-fetch")
+def daily_fetch_command(
+    days: Annotated[int, typer.Option("--days", min=1)] = 1,
+    max_results: Annotated[int, typer.Option("--max-results", min=1)] = 100,
+    max_pages: Annotated[int, typer.Option("--max-pages", min=1)] = 10,
+    page_delay_seconds: Annotated[float, typer.Option("--page-delay", min=0.0)] = 3.0,
+    date: Annotated[str, typer.Option("--date")] = "today",
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+    config_dir: Annotated[Path, typer.Option("--config-dir")] = DefaultConfigDir,
+    reports_dir: Annotated[Path, typer.Option("--reports-dir")] = DefaultReportsDir,
+    exports_dir: Annotated[Path, typer.Option("--exports-dir")] = DefaultExportsDir,
+) -> None:
+    """Run fetch → classify → candidates in a single transaction.
+
+    Stops before curation: the printed candidate Markdown path is where the
+    human picks up.
+    """
+    config = _load(config_dir)
+    target_date = parse_date_arg(date)
+    engine = get_engine(db_path)
+    init_db(engine)
+    with session_scope(engine) as session:
+        fetch_summary = run_fetch_arxiv(
+            session,
+            config,
+            days=days,
+            max_results=max_results,
+            max_pages=max_pages,
+            page_delay_seconds=page_delay_seconds,
+        )
+        classified = run_classify(session, config, target_date)
+        candidates_summary = run_candidates(
+            session,
+            config,
+            target_date,
+            reports_dir=reports_dir,
+            exports_dir=exports_dir,
+        )
+    console.print(format_fetch_summary(fetch_summary))
+    console.print(f"classify: {classified} item(s) for {target_date.isoformat()}")
+    console.print(
+        f"candidates: {candidates_summary.count} written to {candidates_summary.report_path}"
+    )
+    console.print(f"next: curate {candidates_summary.report_path}, then `radar daily-publish`.")
+
+
+@app.command("daily-publish")
+def daily_publish_command(
+    markdown_path: Annotated[
+        Path, typer.Argument(help="Candidate Markdown with filled decisions.")
+    ],
+    date: Annotated[str, typer.Option("--date")] = "today",
+    days: Annotated[int, typer.Option("--days", min=1)] = 1,
+    decided_by: Annotated[str, typer.Option("--decided-by")] = "claude-curator",
+    dry_run: Annotated[bool, typer.Option("--dry-run")] = False,
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+    config_dir: Annotated[Path, typer.Option("--config-dir")] = DefaultConfigDir,
+    digest_reports_dir: Annotated[
+        Path, typer.Option("--digest-reports-dir")
+    ] = DefaultDigestReportsDir,
+    digest_exports_dir: Annotated[
+        Path, typer.Option("--digest-exports-dir")
+    ] = DefaultDigestExportsDir,
+) -> None:
+    """Apply curator decisions from a candidate Markdown and write the digest."""
+    _load(config_dir)
+    target_date = parse_date_arg(date)
+    engine = get_engine(db_path)
+    init_db(engine)
+    with session_scope(engine) as session:
+        report = _cli_run_apply(session, markdown_path, decided_by=decided_by, dry_run=dry_run)
+        if dry_run:
+            digest_summary = None
+        else:
+            digest_summary = run_digest(
+                session,
+                target_date,
+                days,
+                reports_dir=digest_reports_dir,
+                exports_dir=digest_exports_dir,
+            )
+    _print_apply_report(report, dry_run=dry_run)
+    if digest_summary is not None:
+        console.print(f"digest: {digest_summary.count} item(s) -> {digest_summary.report_path}")
+        console.print(f"digest JSON: {digest_summary.export_path}")
 
 
 @app.command("decisions")
@@ -374,7 +490,7 @@ def embed_command(
             )
 
         with session_scope(engine) as session:
-            summary = embed_items_for_date(
+            summary = run_embed(
                 session,
                 config.embeddings.embeddings,
                 target_date,
@@ -480,7 +596,7 @@ def relevance_check_command(
             )
 
         with session_scope(engine) as session:
-            summary = check_relevance_for_date(
+            summary = run_relevance_check(
                 session,
                 config.embeddings.chat,
                 target_date,

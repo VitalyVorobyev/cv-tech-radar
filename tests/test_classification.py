@@ -30,7 +30,8 @@ def make_item(title: str, summary: str) -> Item:
 def test_classification_maps_calibration_geometry(app_config):
     item = make_item(
         "Camera Calibration for Multi-View 3D Reconstruction",
-        "Bundle adjustment improves distortion and pose estimation for industrial cameras.",
+        "Bundle adjustment refines intrinsic calibration, lens distortion, and pose estimation "
+        "for industrial cameras using a pinhole model.",
     )
     source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
     result = classify_item(item, config=app_config, source=source)
@@ -42,12 +43,13 @@ def test_classification_maps_calibration_geometry(app_config):
 def test_negative_topics_reduce_score_without_hard_delete(app_config):
     clean = make_item(
         "Camera Calibration for Industrial Inspection",
-        "Calibration, camera model, distortion, bundle adjustment, and machine vision metrology.",
+        "Camera calibration, camera model, lens distortion, bundle adjustment, "
+        "and machine vision metrology.",
     )
     noisy = make_item(
         "Camera Calibration for Industrial Inspection and Face Recognition",
-        "Calibration, camera model, distortion, bundle adjustment, machine vision metrology, "
-        "and face recognition.",
+        "Camera calibration, camera model, lens distortion, bundle adjustment, machine vision "
+        "metrology, and face recognition.",
     )
     source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
     clean_result = classify_item(clean, config=app_config, source=source)
@@ -73,7 +75,8 @@ def test_classify_items_for_date_persists_results(db_engine, app_config):
                     "type": "paper",
                     "title": "Camera Calibration with Bundle Adjustment",
                     "normalized_title": "camera calibration with bundle adjustment",
-                    "abstract_or_summary": "Subpixel calibration target detection.",
+                    "abstract_or_summary": "Subpixel calibration target detection with radial "
+                    "distortion correction and intrinsic calibration.",
                     "url": "https://example.test/a",
                     "pdf_url": None,
                     "published_at": datetime(2026, 5, 10, 10, 0, tzinfo=UTC),
@@ -99,3 +102,116 @@ def test_classify_items_for_date_persists_results(db_engine, app_config):
         stored = session.scalar(select(ItemClassification))
         assert stored is not None
         assert stored.recommended_ring != "Ignore"
+
+
+# Regression fixtures for the 2026-05-08 / 2026-05-11 noise patterns.
+# Each test pins a concrete false-positive anchor so a future scoring change
+# that re-introduces the issue would fail loudly.
+
+
+def test_calibration_track_ignores_mllm_calibrated_accuracy(app_config):
+    """Anchor: 2026-05-11 item 632 Omni-Persona.
+
+    The paper introduces "Calibrated Accuracy" as an MLLM evaluation metric.
+    The bare-word `calibration` keyword used to match it, putting an
+    omnimodal-personalization paper on the Calibration & Camera Models track.
+    """
+    item = make_item(
+        "Omni-Persona: Systematic Benchmarking and Improving Omnimodal Personalization",
+        "We propose Calibrated Accuracy (Cal), which jointly rewards correct grounding "
+        "and appropriate abstention. Strong recall can coexist with absent-persona "
+        "hallucination, exposing calibration as a separate evaluation axis.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source)
+    assert "Calibration & Camera Models" not in result.tracks
+    # Negative topic (`omnimodal`) should also fire.
+    assert "omnimodal" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+
+
+def test_calibration_track_ignores_image_editing_distortion(app_config):
+    """Anchor: 2026-05-08 item 97 EditRefiner.
+
+    "Distortion localization" in an image-editing context used to false-positive
+    the Calibration & Camera Models track via bare-word `distortion`.
+    """
+    item = make_item(
+        "EditRefiner: A Human-Aligned Agentic Framework for Image Editing Refinement",
+        "Recent text-guided image editing models still suffer from artifacts. "
+        "EditRefiner outperforms state-of-the-art methods in distortion localization "
+        "and human perception alignment for edited images.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source)
+    assert "Calibration & Camera Models" not in result.tracks
+    assert "image editing" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+
+
+def test_mllm_benchmark_gets_negative_penalty(app_config):
+    """Anchor: 2026-05-11 item 598 SciVQR.
+
+    Generic MLLM evaluation benchmarks score 24–50 final and slip into the
+    candidate queue with no industrial CV path. The `multimodal large language`
+    negative topic should fire on the canonical phrasing.
+    """
+    item = make_item(
+        "SciVQR: A Multidisciplinary Multimodal Benchmark for Advanced Scientific Reasoning",
+        "Existing benchmarks for multimodal large language models (MLLMs) often fail to "
+        "capture the complexity of reasoning processes. SciVQR covers 54 subfields in "
+        "mathematics, physics, chemistry, geography, astronomy, and biology.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source)
+    assert "multimodal large language" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+
+
+def test_autonomous_driving_dataset_gets_negative_penalty(app_config):
+    """Anchor: item 354 CARD ("A Multi-Modal Automotive Dataset for Dense 3D
+    Reconstruction in Challenging Road Topography").
+
+    The seed-script promoted CARD to Use because the classifier read it as a
+    legitimate 3D-reconstruction / LiDAR / calibration paper. But the radar is
+    industrial-CV focused — cars/lidars for autonomous driving are out of
+    scope. The `autonomous driving` negative topic should fire on the abstract
+    so future CARD-shape papers do not float into the candidate queue's top.
+    `lidar` stays a positive keyword for industrial 3D sensing.
+    """
+    item = make_item(
+        "CARD: A Multi-Modal Automotive Dataset for Dense 3D Reconstruction "
+        "in Challenging Road Topography",
+        "Autonomous driving must operate across diverse surfaces to enable safe "
+        "mobility. CARD is a multi-modal driving dataset with synchronized "
+        "global-shutter stereo cameras, LiDARs, and full calibration. It spans "
+        "110 km across Germany and Italy and provides benchmarks for depth "
+        "estimation and completion against KITTI baselines.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source)
+    assert "autonomous driving" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+
+
+def test_industrial_inspection_dataset_still_matches_track(app_config):
+    """Anchor: 2026-05-11 item 518 MMVIAD — a legitimate Watch/Evaluate item.
+
+    MMVIAD mentions "video MLLMs" in its abstract but its primary signal is
+    multi-view industrial anomaly detection. Make sure the noise-pattern fixes
+    do not demote the legitimate Industrial Vision Inspection track match or
+    push final_score below the Watch threshold.
+    """
+    item = make_item(
+        "MMVIAD: Multi-view Multi-task Video Understanding for Industrial Anomaly Detection",
+        "Industrial anomaly detection is critical for manufacturing quality control. "
+        "MMVIAD contains object-centric 2-second inspection clips with approximately "
+        "120 degrees of camera motion, covering 48 object categories and 6 structural "
+        "anomaly types. Systematic evaluations on MMVIAD show that current commercial "
+        "and open-source video MLLMs remain far below human performance. "
+        "Source code is available at https://github.com/example/MMVIAD.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source)
+    assert "Industrial Vision Inspection" in result.tracks
+    assert result.final_score >= app_config.scoring.thresholds.watch

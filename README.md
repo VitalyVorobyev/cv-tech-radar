@@ -66,6 +66,36 @@ uv run radar decisions --date YYYY-MM-DD
 
 Use `--date today` for the current local date.
 
+## Run the UI locally
+
+The radar ships a FastAPI backend (`radar serve`) and a Vite + React frontend.
+Bring them up in two terminals — the Vite dev server proxies `/api/*` to the
+backend, so no `VITE_API_URL` is needed for local dev.
+
+**Terminal 1 — backend (http://127.0.0.1:7878):**
+
+```bash
+uv run radar init-db                  # one-time: create the SQLite schema
+uv run radar fetch-arxiv --days 14    # populate with recent papers
+uv run radar classify --date today    # score + assign suggested rings
+uv run radar serve                    # FastAPI on 127.0.0.1:7878
+```
+
+`radar serve` accepts `--host`, `--port`, `--reload`, and `-o/--open`.
+
+**Terminal 2 — frontend (http://localhost:5173):**
+
+```bash
+cd frontend
+npm install                           # one-time
+npm run dev
+```
+
+The board only shows dots once at least one curator decision has been
+recorded — see [docs/daily-workflow.md](docs/daily-workflow.md) for the
+`apply` / `decide` workflow. Until then the radar renders empty rings with
+"0 items on the board".
+
 ## Configuration
 
 Configuration lives in `config/`:

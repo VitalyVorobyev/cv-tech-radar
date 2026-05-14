@@ -7,3 +7,19 @@ negative_topics:
   - diffusion art generation
   - video generation
   - image generation
+  # MLLM/VLM-evaluation noise — added after 2026-05-11 and 2026-05-08 curation
+  # showed 14 false positives in 50 candidates. Phrases are chosen to fire on
+  # MLLM-eval papers without breaking legitimate vision-foundation-model work
+  # (DINOv2 / SAM / CLIP papers don't use these phrases verbatim).
+  - vision-language
+  - multimodal large language
+  - image editing
+  - omnimodal
+  # Autonomous-driving noise — item 354 (CARD) slipped into Use on the seed-script
+  # path with no negative penalty despite an abstract that opens with
+  # "Autonomous driving must operate...". The radar is industrial CV focused
+  # (calibration, feature detection, segmentation, inspection) — cars/lidars
+  # for AD are an unrelated stack. `lidar` stays a positive keyword because
+  # it's a legitimate industrial 3D sensor.
+  - autonomous driving
+  - self-driving

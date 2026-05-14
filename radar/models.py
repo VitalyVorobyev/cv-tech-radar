@@ -75,6 +75,7 @@ class Item(Base):
     organizations_json: Mapped[list[str]] = mapped_column(JSON, default=list)
     metadata_json: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    first_decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
 
     classification: Mapped[ItemClassification | None] = relationship(
         back_populates="item", uselist=False, cascade="all, delete-orphan"
@@ -117,6 +118,7 @@ class RadarDecision(Base):
     action: Mapped[str] = mapped_column(Text, default="")
     decided_by: Mapped[str] = mapped_column(String(120), default="")
     uncertain: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    previous_ring: Mapped[str | None] = mapped_column(String(40))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
     item: Mapped[Item] = relationship(back_populates="decisions")

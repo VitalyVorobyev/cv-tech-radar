@@ -4,13 +4,34 @@ The radar is built around one short daily ritual: read a candidate queue, fill i
 apply them in bulk, and produce a short digest. Claude (via the `cv-radar-curator` skill) is
 the proposer; you are the editor. The deterministic Python pipeline does the rest.
 
+> Running the radar UI? See [Run the UI locally](../README.md#run-the-ui-locally)
+> for the two-terminal `radar serve` + `npm run dev` recipe.
+
 ## Daily flow
+
+Two umbrella commands wrap the deterministic stages around a single curation step:
+
+```bash
+uv run radar daily-fetch                 # fetch-arxiv → classify → candidates
+# Curate via the cv-radar-curator skill — fill in TODO blocks in the candidate Markdown.
+uv run radar daily-publish reports/candidates/$(date -I).md   # apply → digest
+```
+
+`daily-fetch` runs everything inside one SQLite transaction and prints a summary of
+fetched / new / updated / skipped-old counts plus the candidate Markdown path. Pass
+`--max-pages N` if you need to walk past the default 100-result arXiv cap.
+
+`daily-publish` applies the YAML blocks from the candidate Markdown and immediately
+writes the digest. Use `--dry-run` to validate parsing without recording decisions
+(the digest step is skipped in dry-run mode).
+
+The individual stages remain available — `fetch-arxiv`, `classify`, `candidates`,
+`apply`, `digest` — if you need to re-run a single step:
 
 ```bash
 uv run radar fetch-arxiv --days 1
 uv run radar classify --date today
 uv run radar candidates --date today
-# Curate via the cv-radar-curator skill — fill in TODO blocks in the candidate Markdown.
 uv run radar apply reports/candidates/$(date -I).md --dry-run
 uv run radar apply reports/candidates/$(date -I).md
 uv run radar digest --date today

@@ -39,6 +39,7 @@ def init_db(engine: Engine) -> None:
     Base.metadata.create_all(engine)
     ensure_radar_decision_columns(engine)
     ensure_digest_columns(engine)
+    ensure_movement_columns(engine)
 
 
 def ensure_radar_decision_columns(engine: Engine) -> None:
@@ -61,6 +62,52 @@ def ensure_digest_columns(engine: Engine) -> None:
                     "ALTER TABLE digests "
                     "ADD COLUMN updated_at DATETIME NOT NULL "
                     "DEFAULT CURRENT_TIMESTAMP"
+                )
+            )
+
+
+def ensure_movement_columns(engine: Engine) -> None:
+    """Add previous_ring on radar_decisions and first_decided_at on items; backfill once."""
+    with engine.begin() as connection:
+        decision_columns = {
+            row[1] for row in connection.execute(text("PRAGMA table_info('radar_decisions')"))
+        }
+        item_columns = {row[1] for row in connection.execute(text("PRAGMA table_info('items')"))}
+
+        if "previous_ring" not in decision_columns:
+            connection.execute(text("ALTER TABLE radar_decisions ADD COLUMN previous_ring TEXT"))
+            connection.execute(
+                text(
+                    """
+                    WITH ranked AS (
+                        SELECT id,
+                               LAG(ring) OVER (
+                                   PARTITION BY item_id ORDER BY created_at, id
+                               ) AS prev_ring
+                        FROM radar_decisions
+                    )
+                    UPDATE radar_decisions
+                    SET previous_ring = (
+                        SELECT prev_ring FROM ranked WHERE ranked.id = radar_decisions.id
+                    )
+                    WHERE previous_ring IS NULL
+                    """
+                )
+            )
+
+        if "first_decided_at" not in item_columns:
+            connection.execute(text("ALTER TABLE items ADD COLUMN first_decided_at DATETIME"))
+            connection.execute(
+                text(
+                    """
+                    UPDATE items
+                    SET first_decided_at = (
+                        SELECT MIN(created_at)
+                        FROM radar_decisions
+                        WHERE radar_decisions.item_id = items.id
+                    )
+                    WHERE first_decided_at IS NULL
+                    """
                 )
             )
 

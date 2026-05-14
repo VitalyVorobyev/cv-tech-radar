@@ -8,3 +8,11 @@ sources:
     notes: Computer vision papers from arXiv.
     categories:
       - cs.CV
+  - id: manual
+    name: Manual
+    kind: manual
+    url: https://manual.cv-radar.local/
+    enabled: true
+    priority: 1
+    notes: Permanent source row for papers added by hand via the UI.
+    categories: []

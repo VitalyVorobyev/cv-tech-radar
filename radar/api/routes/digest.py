@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from collections import OrderedDict
+from datetime import UTC, datetime
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -14,6 +16,15 @@ from radar.schemas import RadarRing
 from radar.utils import parse_date_arg
 
 router = APIRouter(tags=["digest"])
+
+DIGEST_REPORTS_DIR = Path("reports/digests")
+
+
+def _mtime_iso(path: Path) -> str | None:
+    try:
+        return datetime.fromtimestamp(path.stat().st_mtime, tz=UTC).isoformat()
+    except OSError:
+        return None
 
 
 def _to_digest_item(item: Item, decision: RadarDecision) -> DigestItemOut:
@@ -63,3 +74,26 @@ def get_digest(
         Uncertainty=uncertainty,
     )
     return DigestResponse(date=target_date.isoformat(), days=days, sections=sections)
+
+
+@router.get("/digest/markdown")
+def get_digest_markdown(date: Annotated[str, Query()] = "today") -> dict:
+    try:
+        target_date = parse_date_arg(date)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=f"invalid date: {exc}") from exc
+
+    path = DIGEST_REPORTS_DIR / f"{target_date.isoformat()}.md"
+    if not path.exists():
+        return {
+            "date": target_date.isoformat(),
+            "markdown": "",
+            "mtime": None,
+            "exists": False,
+        }
+    return {
+        "date": target_date.isoformat(),
+        "markdown": path.read_text(encoding="utf-8"),
+        "mtime": _mtime_iso(path),
+        "exists": True,
+    }

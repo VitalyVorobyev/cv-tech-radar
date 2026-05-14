@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import json
 from collections import OrderedDict
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
-from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session, aliased
 
-from radar.models import Digest, Item, RadarDecision
+from radar.models import Digest, Item, ItemClassification, RadarDecision
 from radar.schemas import RadarRing
 from radar.utils import date_window_bounds, ensure_dir, utc_now
 
@@ -39,6 +39,60 @@ def collect_digest_rows(
         if item.id not in latest_per_item:
             latest_per_item[item.id] = (item, decision)
     return list(latest_per_item.values())
+
+
+def collect_board_rows(
+    session: Session,
+    *,
+    decided_since: datetime | None = None,
+    include_ignore: bool = False,
+) -> list[tuple[Item, RadarDecision, float | None]]:
+    """Return (item, latest decision, latest final_score) for items currently on the radar.
+
+    "Currently on the radar" means: each item is represented by its most-recent
+    decision regardless of when the item was published. This is the persistent
+    view — items decided weeks ago still appear here.
+
+    - decided_since: if set, drop items whose latest decision is older than this.
+    - include_ignore: defaults False — the board is about attention, not the slush pile.
+    """
+    latest_decision_subq = (
+        select(
+            RadarDecision.item_id,
+            func.max(RadarDecision.created_at).label("max_created"),
+        )
+        .group_by(RadarDecision.item_id)
+        .subquery()
+    )
+    decision_alias = aliased(RadarDecision)
+    stmt = (
+        select(Item, decision_alias, ItemClassification.final_score)
+        .join(latest_decision_subq, latest_decision_subq.c.item_id == Item.id)
+        .join(
+            decision_alias,
+            (decision_alias.item_id == latest_decision_subq.c.item_id)
+            & (decision_alias.created_at == latest_decision_subq.c.max_created),
+        )
+        .outerjoin(ItemClassification, ItemClassification.item_id == Item.id)
+        # id DESC tiebreaker keeps the winner deterministic when two decisions
+        # share the same created_at (a real case on SQLite's sub-second clock).
+        .order_by(decision_alias.created_at.desc(), decision_alias.id.desc())
+    )
+    if decided_since is not None:
+        stmt = stmt.where(decision_alias.created_at >= decided_since)
+    if not include_ignore:
+        stmt = stmt.where(decision_alias.ring != RadarRing.IGNORE.value)
+
+    # Multiple decisions can share the exact same created_at timestamp on test SQLite
+    # (sub-second resolution issues). Dedupe by item_id with first-wins.
+    seen: set[int] = set()
+    out: list[tuple[Item, RadarDecision, float | None]] = []
+    for item, decision, score in session.execute(stmt).all():
+        if item.id in seen:
+            continue
+        seen.add(item.id)
+        out.append((item, decision, score))
+    return out
 
 
 def render_digest_markdown(

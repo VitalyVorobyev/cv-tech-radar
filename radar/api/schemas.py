@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from radar.schemas import RadarRing
+
+Movement = Literal["new", "in", "out"]
 
 
 class HealthResponse(BaseModel):
@@ -33,6 +36,13 @@ class CurrentDecisionOut(BaseModel):
     created_at: datetime
 
 
+class LLMJudgmentOut(BaseModel):
+    verdict: str  # "yes" | "no" | "unknown"
+    model: str
+    reason: str
+    judged_at: datetime
+
+
 class CandidateOut(BaseModel):
     id: int
     type: str
@@ -47,6 +57,7 @@ class CandidateOut(BaseModel):
     ring_suggested: RadarRing
     pipeline_rationale: str
     current_decision: CurrentDecisionOut | None = None
+    llm_judgment: LLMJudgmentOut | None = None
 
 
 class QueueResponse(BaseModel):
@@ -121,16 +132,43 @@ class DigestResponse(BaseModel):
     sections: DigestSectionsOut
 
 
+class BoardItemOut(BaseModel):
+    item_id: int
+    title: str
+    url: str
+    tracks: list[str]
+    reason: str
+    action: str
+    uncertain: bool
+    ring: str
+    decided_by: str
+    decided_at: datetime
+    score: float | None = None
+    llm_judgment: LLMJudgmentOut | None = None
+    movement: Movement | None = None
+
+
 class BoardRingsOut(BaseModel):
-    Use: list[DigestItemOut] = Field(default_factory=list)
-    Prototype: list[DigestItemOut] = Field(default_factory=list)
-    Evaluate: list[DigestItemOut] = Field(default_factory=list)
-    Watch: list[DigestItemOut] = Field(default_factory=list)
-    Ignore: list[DigestItemOut] = Field(default_factory=list)
+    Use: list[BoardItemOut] = Field(default_factory=list)
+    Prototype: list[BoardItemOut] = Field(default_factory=list)
+    Evaluate: list[BoardItemOut] = Field(default_factory=list)
+    Watch: list[BoardItemOut] = Field(default_factory=list)
+    Ignore: list[BoardItemOut] = Field(default_factory=list)
+
+
+class BoardCountsOut(BaseModel):
+    Use: int = 0
+    Prototype: int = 0
+    Evaluate: int = 0
+    Watch: int = 0
+    Ignore: int = 0
 
 
 class BoardResponse(BaseModel):
     rings: BoardRingsOut
+    counts: BoardCountsOut
+    decided_since: datetime | None = None
+    include_ignore: bool = False
 
 
 class TrackOut(BaseModel):
@@ -152,3 +190,40 @@ class SourceOut(BaseModel):
 
 class SourcesResponse(BaseModel):
     sources: list[SourceOut]
+
+
+class HistoryEntryOut(BaseModel):
+    ring: str
+    at: datetime
+
+
+class ItemDetailOut(BaseModel):
+    id: int
+    title: str
+    abstract: str
+    url: str
+    ring: str
+    track: str
+    tracks: list[str]
+    reason: str
+    uncertain: bool
+    source: str
+    published_at: datetime
+    decided_at: datetime
+    decided_by: str | None
+    history: list[HistoryEntryOut]
+    movement: Movement | None
+
+
+class TimelineWeekOut(BaseModel):
+    iso: str
+    label: str
+    Use: int = 0
+    Prototype: int = 0
+    Evaluate: int = 0
+    Watch: int = 0
+    Ignore: int = 0
+
+
+class TimelineResponse(BaseModel):
+    weeks: list[TimelineWeekOut]

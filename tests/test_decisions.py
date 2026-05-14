@@ -12,6 +12,13 @@ from radar.models import Item, RadarDecision
 from radar.schemas import RadarRing
 
 
+def _as_utc(moment: datetime) -> datetime:
+    """SQLite drops tzinfo on read; normalise for equality checks."""
+    if moment.tzinfo is None:
+        return moment.replace(tzinfo=UTC)
+    return moment
+
+
 def add_decision_item(db_engine, app_config) -> int:
     with session_scope(db_engine) as session:
         item = Item(
@@ -81,3 +88,65 @@ def test_parse_tracks():
         "Object Tracking",
         "Edge AI & Deployment",
     ]
+
+
+def test_record_decision_first_decision_sets_previous_ring_and_first_decided_at(
+    db_engine, app_config
+):
+    item_id = add_decision_item(db_engine, app_config)
+    with session_scope(db_engine) as session:
+        decision = record_decision(
+            session,
+            item_id=item_id,
+            ring=RadarRing.WATCH,
+            tracks=[],
+            reason="first decision",
+            action="",
+            decided_by="tester",
+        )
+        decision_id = decision.id
+        decision_created_at = decision.created_at
+        assert decision.previous_ring is None
+
+    with session_scope(db_engine) as session:
+        item = session.get(Item, item_id)
+        stored = session.get(RadarDecision, decision_id)
+        assert item is not None
+        assert stored is not None
+        assert stored.previous_ring is None
+        assert item.first_decided_at is not None
+        assert _as_utc(item.first_decided_at) == decision_created_at
+
+
+def test_record_decision_second_decision_sets_previous_ring_and_keeps_first(db_engine, app_config):
+    item_id = add_decision_item(db_engine, app_config)
+    with session_scope(db_engine) as session:
+        first = record_decision(
+            session,
+            item_id=item_id,
+            ring=RadarRing.WATCH,
+            tracks=[],
+            reason="first",
+            action="",
+            decided_by="tester",
+        )
+        first_ring = first.ring
+        first_created = first.created_at
+
+    with session_scope(db_engine) as session:
+        second = record_decision(
+            session,
+            item_id=item_id,
+            ring=RadarRing.USE,
+            tracks=[],
+            reason="promote",
+            action="",
+            decided_by="tester",
+        )
+        assert second.previous_ring == first_ring
+
+    with session_scope(db_engine) as session:
+        item = session.get(Item, item_id)
+        assert item is not None
+        # first_decided_at must be unchanged after the second decision.
+        assert _as_utc(item.first_decided_at) == first_created
