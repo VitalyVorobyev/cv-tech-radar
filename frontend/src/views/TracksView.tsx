@@ -8,8 +8,9 @@ import type { BoardItem, Ring } from "../lib/api";
 import { api } from "../lib/api";
 import { Chrome } from "../ui/Chrome";
 import { ItemPanel } from "../ui/ItemPanel";
-import { QUADRANTS, RING_ORDER } from "../lib/constants";
+import { quadrantOfTrack, RING_ORDER } from "../lib/constants";
 import { readUrlParams, writeUrlParams } from "../lib/urlState";
+import { useQuadrants } from "../lib/useQuadrants";
 
 const RING_BAND: Record<Ring, { color: string; opacity: number }> = {
   Use: { color: "var(--color-accent)", opacity: 1.0 },
@@ -19,27 +20,34 @@ const RING_BAND: Record<Ring, { color: string; opacity: number }> = {
   Ignore: { color: "var(--color-muted)", opacity: 0.2 },
 };
 
-function quadrantOfTrack(track: string): (typeof QUADRANTS)[number] | null {
-  for (const q of QUADRANTS) {
-    if (q.tracks.includes(track)) return q;
-  }
-  return null;
-}
-
-function defaultTrack(): string {
-  const fromUrl = readUrlParams().get("track");
-  if (fromUrl && quadrantOfTrack(fromUrl)) return fromUrl;
-  return QUADRANTS[0]!.tracks[0]!;
+// On first mount we don't know the track set yet (api/tracks is in flight) —
+// keep whatever the URL says verbatim, then snap to a valid track once the
+// quadrants resolve. Avoids a flicker between an empty default and the URL
+// value, and keeps deep-links honoured.
+function readInitialTrack(): string {
+  return readUrlParams().get("track") ?? "";
 }
 
 export function TracksView() {
-  const [track, setTrack] = useState<string>(defaultTrack);
+  const [track, setTrack] = useState<string>(readInitialTrack);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const { quadrants } = useQuadrants();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["board"],
     queryFn: () => api.board(),
   });
+
+  // Once the track list arrives, settle on a valid track. Empty / unknown
+  // values get replaced with the first track in the first non-empty quadrant.
+  useEffect(() => {
+    if (quadrants.length === 0) return;
+    const isKnown = quadrantOfTrack(track, quadrants) !== null;
+    if (isKnown) return;
+    const fallback =
+      quadrants.find((q) => q.tracks.length > 0)?.tracks[0] ?? "";
+    if (fallback && fallback !== track) setTrack(fallback);
+  }, [quadrants, track]);
 
   useEffect(() => {
     writeUrlParams({ track });
@@ -86,7 +94,7 @@ export function TracksView() {
   }, [trackItems]);
 
   const total = trackItems.length;
-  const quad = quadrantOfTrack(track);
+  const quad = quadrantOfTrack(track, quadrants);
 
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column" }}>
@@ -125,7 +133,7 @@ export function TracksView() {
             Tracks
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-            {QUADRANTS.map((q) => (
+            {quadrants.map((q) => (
               <div key={q.id}>
                 <div
                   style={{

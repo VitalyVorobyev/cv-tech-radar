@@ -11,12 +11,14 @@ import { Chrome } from "../ui/Chrome";
 import { ItemPanel } from "../ui/ItemPanel";
 import { RadarPlot } from "../ui/RadarPlot";
 import {
-  QUADRANTS,
+  type Quadrant,
+  QUADRANT_DEFS,
   RING_COPY,
   RING_ORDER,
   radarVolume,
 } from "../lib/constants";
 import { readUrlParams, writeUrlParams } from "../lib/urlState";
+import { useQuadrants } from "../lib/useQuadrants";
 import { useTweaks } from "../lib/tweaks";
 
 function usePrefersReducedMotion(): boolean {
@@ -39,7 +41,7 @@ function readInitialFilters() {
   const track = params.get("track");
   const q = params.get("q") ?? "";
   return {
-    quad: QUADRANTS.some((qd) => qd.id === quad) ? quad : null,
+    quad: QUADRANT_DEFS.some((qd) => qd.id === quad) ? quad : null,
     ring: RING_ORDER.includes(ring as Ring) ? (ring as Ring) : null,
     track: track ?? null,
     q,
@@ -71,6 +73,7 @@ export function RadarView() {
     queryKey: ["board"],
     queryFn: () => api.board(),
   });
+  const { quadrants } = useQuadrants();
 
   // Mirror state to URL.
   useEffect(() => {
@@ -223,6 +226,7 @@ export function RadarView() {
           >
             <RadarPlot
               items={visibleItems}
+              quadrants={quadrants}
               focusedQuad={focusedQuad}
               focusedRing={focusedRing}
               trackFilter={trackFilter}
@@ -245,6 +249,7 @@ export function RadarView() {
         </section>
 
         <Sidebar
+          quadrants={quadrants}
           ringCounts={ringCounts}
           trackCounts={trackCounts}
           focusedQuad={focusedQuad}
@@ -342,6 +347,7 @@ function LegendDot({
 }
 
 function Sidebar({
+  quadrants,
   ringCounts,
   trackCounts,
   focusedQuad,
@@ -351,6 +357,7 @@ function Sidebar({
   onFocusRing,
   onTrackFilter,
 }: {
+  quadrants: readonly Quadrant[];
   ringCounts: Record<Ring, number>;
   trackCounts: Map<string, number>;
   focusedQuad: string | null;
@@ -440,7 +447,7 @@ function Sidebar({
       <section>
         <SidebarHeading>Tracks</SidebarHeading>
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          {QUADRANTS.map((q) => {
+          {quadrants.map((q) => {
             const quadFocused = focusedQuad === q.id;
             return (
               <div key={q.id}>

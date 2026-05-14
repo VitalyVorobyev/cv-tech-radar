@@ -74,6 +74,7 @@ def test_write_topics_adds_new_keyword(tmp_path):
                 TrackConfig(
                     id=track.id,
                     name=track.name,
+                    quadrant=track.quadrant,
                     positive_keywords=[*track.positive_keywords, "vignetting calibration"],
                     negative_keywords=track.negative_keywords,
                 )
@@ -99,8 +100,8 @@ def test_invalid_topics_payload_is_rejected_before_io(tmp_path):
         # Duplicate track ids violate the model validator.
         TopicsConfig(
             tracks=[
-                TrackConfig(id="dup", name="A", positive_keywords=["x"]),
-                TrackConfig(id="dup", name="B", positive_keywords=["y"]),
+                TrackConfig(id="dup", name="A", quadrant="perception", positive_keywords=["x"]),
+                TrackConfig(id="dup", name="B", quadrant="perception", positive_keywords=["y"]),
             ]
         )
 

@@ -101,6 +101,7 @@ def _serialize_tracks(
             {
                 "id": track.id,
                 "name": track.name,
+                "quadrant": track.quadrant,
                 "item_ids": members.get(track.name, []),
             }
             for track in config.topics.tracks
@@ -229,7 +230,9 @@ def build_static_bundle(
         "generated_at": now.isoformat(),
         "weeks": weeks,
         "ring_counts": board.counts.model_dump(mode="json"),
-        "tracks": [{"id": t.id, "name": t.name} for t in config.topics.tracks],
+        "tracks": [
+            {"id": t.id, "name": t.name, "quadrant": t.quadrant} for t in config.topics.tracks
+        ],
         "items_dir": "items",
         "item_count": len(item_paths),
     }

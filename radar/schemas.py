@@ -59,9 +59,13 @@ class SourcesConfig(BaseModel):
         return self
 
 
+QuadrantId = Literal["perception", "scene", "models", "tooling"]
+
+
 class TrackConfig(BaseModel):
     id: str = Field(min_length=1)
     name: str = Field(min_length=1)
+    quadrant: QuadrantId
     positive_keywords: list[str] = Field(min_length=1)
     negative_keywords: list[str] = Field(default_factory=list)
 

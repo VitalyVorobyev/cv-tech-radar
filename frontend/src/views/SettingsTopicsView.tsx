@@ -5,7 +5,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ApiError, api } from "../lib/api";
-import type { TopicsConfig, TrackConfig } from "../lib/api";
+import type { QuadrantId, TopicsConfig, TrackConfig } from "../lib/api";
+import { QUADRANT_DEFS } from "../lib/constants";
 import { Button } from "../ui/Button";
 import { Chrome } from "../ui/Chrome";
 import { ConfigSection } from "../ui/ConfigSection";
@@ -15,6 +16,7 @@ function newTrack(): TrackConfig {
   return {
     id: "",
     name: "",
+    quadrant: "perception",
     positive_keywords: [],
     negative_keywords: [],
   };
@@ -241,6 +243,22 @@ export function SettingsTopicsView() {
                         onChange={(e) => updateSelected({ name: e.target.value })}
                         style={inputStyle}
                       />
+                    </label>
+                    <label style={fieldStyle}>
+                      <span style={labelStyle}>quadrant</span>
+                      <select
+                        value={selected.quadrant}
+                        onChange={(e) =>
+                          updateSelected({ quadrant: e.target.value as QuadrantId })
+                        }
+                        style={inputStyle}
+                      >
+                        {QUADRANT_DEFS.map((q) => (
+                          <option key={q.id} value={q.id}>
+                            {q.label}
+                          </option>
+                        ))}
+                      </select>
                     </label>
                   </div>
                   <KeywordList

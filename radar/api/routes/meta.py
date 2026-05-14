@@ -36,7 +36,10 @@ def get_health() -> HealthResponse:
 @router.get("/tracks", response_model=TracksResponse)
 def get_tracks(config: Annotated[AppConfig, Depends(get_config)]) -> TracksResponse:
     return TracksResponse(
-        tracks=[TrackOut(id=track.id, name=track.name) for track in config.topics.tracks]
+        tracks=[
+            TrackOut(id=track.id, name=track.name, quadrant=track.quadrant)
+            for track in config.topics.tracks
+        ]
     )
 
 
