@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
 import { RadarPlot } from "../src/ui/RadarPlot";
-import type { BoardItem } from "../src/lib/api";
+import type { BoardItem, TrackInfo } from "../src/lib/api";
+import { assembleQuadrants } from "../src/lib/constants";
 
 function mkItem(overrides: Partial<BoardItem>): BoardItem {
   return {
@@ -22,9 +23,19 @@ function mkItem(overrides: Partial<BoardItem>): BoardItem {
   };
 }
 
+// Minimal fixture mirroring the production track→quadrant mapping for the
+// tracks the tests actually exercise.
+const TEST_TRACKS: TrackInfo[] = [
+  { id: "3d-sensors", name: "3D Sensors", quadrant: "perception" },
+  { id: "calibration", name: "Calibration & Camera Models", quadrant: "perception" },
+  { id: "robotics-vision", name: "Robotics Vision", quadrant: "scene" },
+];
+const TEST_QUADRANTS = assembleQuadrants(TEST_TRACKS);
+
 const noop = () => {};
 
 const baseProps = {
+  quadrants: TEST_QUADRANTS,
   focusedQuad: null,
   focusedRing: null,
   trackFilter: null,

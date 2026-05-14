@@ -27,7 +27,7 @@ import type { BoardItem, Ring } from "../lib/api";
 import {
   GOLDEN_ANGLE_DEG,
   GOLDEN_RATIO,
-  QUADRANTS,
+  type Quadrant,
   RING_ORDER,
   RING_RADII_NORMALIZED,
 } from "../lib/constants";
@@ -55,6 +55,8 @@ interface Placed {
 
 export interface RadarPlotProps {
   items: BoardItem[];
+  // Built once from /api/tracks by useQuadrants() — see lib/useQuadrants.ts.
+  quadrants: readonly Quadrant[];
   focusedQuad: string | null;
   focusedRing: Ring | null;
   trackFilter: string | null;
@@ -97,22 +99,25 @@ function ringBand(index: number): { inner: number; outer: number; ring: Ring } {
   };
 }
 
-function quadIndexOfTrack(track: string): number {
-  return QUADRANTS.findIndex((q) => q.tracks.includes(track));
+function quadIndexOfTrack(track: string, quadrants: readonly Quadrant[]): number {
+  return quadrants.findIndex((q) => q.tracks.includes(track));
 }
 
-function placeDots(items: BoardItem[]): Placed[] {
+function placeDots(items: BoardItem[], quadrants: readonly Quadrant[]): Placed[] {
   const cells = new Map<string, BoardItem[]>();
   const warnedTracks = new Set<string>();
+  // While the /api/tracks request is in-flight, quadrants is empty — skip the
+  // warning so we don't shout for every item on first render.
+  const ready = quadrants.length > 0;
   for (const item of items) {
     const track = item.tracks[0];
     if (!track) continue;
-    const qi = quadIndexOfTrack(track);
+    const qi = quadIndexOfTrack(track, quadrants);
     if (qi < 0) {
-      if (import.meta.env.DEV && !warnedTracks.has(track)) {
+      if (ready && import.meta.env.DEV && !warnedTracks.has(track)) {
         warnedTracks.add(track);
         console.warn(
-          `[RadarPlot] Track "${track}" is not mapped to any quadrant — item #${item.item_id} (${item.title}) will not appear on the radar. Add it to QUADRANTS in frontend/src/lib/constants.ts.`,
+          `[RadarPlot] Track "${track}" is not mapped to any quadrant — item #${item.item_id} (${item.title}) will not appear on the radar. Add a "quadrant:" field to that track in config/topics.yaml.`,
         );
       }
       continue;
@@ -162,6 +167,7 @@ function handleActivate(
 
 export function RadarPlot({
   items,
+  quadrants,
   focusedQuad,
   focusedRing,
   trackFilter,
@@ -177,7 +183,7 @@ export function RadarPlot({
 }: RadarPlotProps) {
   const [hoveredTrack, setHoveredTrack] = useState<string | null>(null);
 
-  const dots = useMemo(() => placeDots(items), [items]);
+  const dots = useMemo(() => placeDots(items, quadrants), [items, quadrants]);
 
   const ringBands = useMemo(
     () => RING_ORDER.map((_, i) => ringBand(i)),
@@ -221,7 +227,7 @@ export function RadarPlot({
       </defs>
 
       {/* 1) Quadrant background fills — subtle tint, deepens on focus, dims siblings. */}
-      {QUADRANTS.map((q, qi) => {
+      {quadrants.map((q, qi) => {
         const isFocus = focusedQuad === q.id;
         const isDim = focusedQuad !== null && !isFocus;
         const opacity = isFocus ? 0.04 : isDim ? 0 : 0.015;
@@ -243,7 +249,7 @@ export function RadarPlot({
       <line x1={CX - MAX_R} y1={CY} x2={CX + MAX_R} y2={CY} stroke="var(--color-rule)" strokeWidth="1" />
 
       {/* 3) Track sector hit-areas. fill="transparent" is intentional — it receives pointer events. */}
-      {QUADRANTS.map((q, qi) => {
+      {quadrants.map((q, qi) => {
         const ang = QUAD_ANGLES[qi]!;
         const sliceDeg = (ang.end - ang.start) / q.tracks.length;
         return q.tracks.map((track, ti) => {
@@ -338,7 +344,7 @@ export function RadarPlot({
       })}
 
       {/* 6) Quadrant corner labels + their stacked track sublabels. */}
-      {QUADRANTS.map((q, qi) => {
+      {quadrants.map((q, qi) => {
         const positions = [
           { x: 20, y: 24, anchor: "start" as const, isTop: true },
           { x: SIZE - 20, y: 24, anchor: "end" as const, isTop: true },
@@ -395,7 +401,7 @@ export function RadarPlot({
         const isHover = hoveredId === d.item.item_id;
         const isSelected = selectedId === d.item.item_id;
         const dimmed =
-          (focusedQuad !== null && QUADRANTS[d.quadIndex]!.id !== focusedQuad) ||
+          (focusedQuad !== null && quadrants[d.quadIndex]!.id !== focusedQuad) ||
           (focusedRing !== null && d.item.ring !== focusedRing) ||
           (trackFilter !== null && !d.item.tracks.includes(trackFilter));
         const ringIsAccent = d.item.ring === "Use" || d.item.ring === "Prototype";
@@ -421,6 +427,13 @@ export function RadarPlot({
             onClick={() => onSelectDot(d.item.item_id)}
             onKeyDown={(e) => handleActivate(e, () => onSelectDot(d.item.item_id))}
           >
+            {/* Native SVG tooltip — surfaces title, ring, and first track on hover
+                without forcing a click to open the side panel. */}
+            <title>
+              {`${d.item.title}\n${d.item.ring}${
+                d.item.tracks[0] ? ` · ${d.item.tracks[0]}` : ""
+              }`}
+            </title>
             {isPulsing && (
               <circle
                 className="cvradar-pulse-ring"
@@ -463,9 +476,9 @@ export function RadarPlot({
       {/* 8) Sector tooltip (overlays everything). */}
       {hoveredTrack &&
         (() => {
-          const qi = quadIndexOfTrack(hoveredTrack);
+          const qi = quadIndexOfTrack(hoveredTrack, quadrants);
           if (qi < 0) return null;
-          const q = QUADRANTS[qi]!;
+          const q = quadrants[qi]!;
           const ti = q.tracks.indexOf(hoveredTrack);
           const ang = QUAD_ANGLES[qi]!;
           const sliceDeg = (ang.end - ang.start) / q.tracks.length;

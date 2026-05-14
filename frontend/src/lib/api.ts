@@ -3,6 +3,20 @@
 
 export type Ring = "Use" | "Prototype" | "Evaluate" | "Watch" | "Ignore";
 
+export type QuadrantId = "perception" | "scene" | "models" | "tooling";
+
+// Lightweight track record returned by /api/tracks. The settings editor uses
+// the heavier TrackConfig type (with keywords) — keep them distinct.
+export interface TrackInfo {
+  id: string;
+  name: string;
+  quadrant: QuadrantId;
+}
+
+export interface TracksResponse {
+  tracks: TrackInfo[];
+}
+
 export interface Scores {
   relevance: number;
   source_priority: number;
@@ -336,6 +350,7 @@ export interface SourcesConfig {
 export interface TrackConfig {
   id: string;
   name: string;
+  quadrant: QuadrantId;
   positive_keywords: string[];
   negative_keywords: string[];
 }
@@ -573,6 +588,14 @@ export const api = {
     if (isStaticMode()) return readStatic<TimelineResponse>("timeline.json");
     const params = new URLSearchParams({ weeks: String(weeks) });
     return request<TimelineResponse>(`/api/timeline?${params}`);
+  },
+
+  // Track list (id, name, quadrant). In static mode tracks.json carries extra
+  // fields (item_ids); the structural subset that matches TracksResponse is
+  // what we keep — the extra fields are ignored.
+  tracks(): Promise<TracksResponse> {
+    if (isStaticMode()) return readStatic<TracksResponse>("tracks.json");
+    return request<TracksResponse>("/api/tracks");
   },
 
   // ---- jobs ---------------------------------------------------------------

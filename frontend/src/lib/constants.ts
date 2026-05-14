@@ -1,4 +1,4 @@
-import type { Ring } from "./api";
+import type { QuadrantId, Ring, TrackInfo } from "./api";
 
 export const RING_ORDER: Ring[] = ["Use", "Prototype", "Evaluate", "Watch"];
 export const RING_ORDER_WITH_IGNORE: Ring[] = [...RING_ORDER, "Ignore"];
@@ -8,46 +8,38 @@ export const GOLDEN_ANGLE_DEG = 137.508;
 export const GOLDEN_RATIO = 0.6180339;
 
 export interface Quadrant {
-  id: string;
+  id: QuadrantId;
   label: string;
   tracks: readonly string[];
 }
 
-// Keep this list in sync with `config/topics.yaml`. Items whose first track is
-// not listed here are silently dropped from the radar plot — `RadarPlot.placeDots`
-// will emit a dev-only `console.warn` to surface the omission.
-export const QUADRANTS: readonly Quadrant[] = [
-  {
-    id: "perception",
-    label: "Perception & Sensing",
-    tracks: [
-      "3D Sensors",
-      "Sensors, Cameras & Standards",
-      "Calibration & Camera Models",
-      "Target Detection & Fiducials",
-    ],
-  },
-  {
-    id: "scene",
-    label: "Scene & World",
-    tracks: [
-      "3D Geometry & Reconstruction",
-      "Synthetic Data & Simulation",
-      "Robotics Vision",
-      "Robot Guidance",
-    ],
-  },
-  {
-    id: "models",
-    label: "Models & Data",
-    tracks: ["Vision Foundation Models", "Datasets & Benchmarks", "Object Tracking"],
-  },
-  {
-    id: "tooling",
-    label: "Tooling & Deployment",
-    tracks: ["Edge AI & Deployment", "Open-Source CV Tooling", "Industrial Vision Inspection"],
-  },
+// Visual ordering + display labels for the four quadrants. The set of tracks
+// inside each is built at runtime from /api/tracks via assembleQuadrants(),
+// so adding a track to config/topics.yaml is enough — no parallel list here.
+export const QUADRANT_DEFS: ReadonlyArray<{ id: QuadrantId; label: string }> = [
+  { id: "perception", label: "Perception & Sensing" },
+  { id: "scene", label: "Scene & World" },
+  { id: "models", label: "Models & Data" },
+  { id: "tooling", label: "Tooling & Deployment" },
 ] as const;
+
+export function assembleQuadrants(tracks: readonly TrackInfo[]): Quadrant[] {
+  return QUADRANT_DEFS.map((def) => ({
+    id: def.id,
+    label: def.label,
+    tracks: tracks.filter((t) => t.quadrant === def.id).map((t) => t.name),
+  }));
+}
+
+export function quadrantOfTrack(
+  track: string,
+  quadrants: readonly Quadrant[],
+): Quadrant | null {
+  for (const q of quadrants) {
+    if (q.tracks.includes(track)) return q;
+  }
+  return null;
+}
 
 export const RING_COPY: Record<Exclude<Ring, "Ignore">, string> = {
   Use: "In production. Validated, trusted, default choice.",
@@ -55,13 +47,6 @@ export const RING_COPY: Record<Exclude<Ring, "Ignore">, string> = {
   Evaluate: "Worth a closer look. Benchmark or read-through.",
   Watch: "Adjacent. Track upstream development.",
 };
-
-export function quadrantOfTrack(track: string): Quadrant | null {
-  for (const q of QUADRANTS) {
-    if (q.tracks.includes(track)) return q;
-  }
-  return null;
-}
 
 export const LAUNCH_DATE = new Date("2025-12-01T00:00:00Z");
 

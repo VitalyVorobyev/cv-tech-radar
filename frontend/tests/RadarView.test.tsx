@@ -6,22 +6,40 @@ import { RadarView } from "../src/views/RadarView";
 function stubBoard() {
   vi.stubGlobal(
     "fetch",
-    vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: () =>
-        Promise.resolve({
-          rings: {
-            Use: [],
-            Prototype: [],
-            Evaluate: [],
-            Watch: [],
-            Ignore: [],
-          },
-          counts: { Use: 0, Prototype: 0, Evaluate: 0, Watch: 0, Ignore: 0 },
-          decided_since: null,
-          include_ignore: false,
-        }),
+    vi.fn().mockImplementation((input: RequestInfo | URL) => {
+      const url = typeof input === "string" ? input : input.toString();
+      if (url.startsWith("/api/tracks")) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () =>
+            Promise.resolve({
+              tracks: [
+                { id: "3d-sensors", name: "3D Sensors", quadrant: "perception" },
+                { id: "robotics-vision", name: "Robotics Vision", quadrant: "scene" },
+                { id: "object-tracking", name: "Object Tracking", quadrant: "models" },
+                { id: "edge-ai", name: "Edge AI & Deployment", quadrant: "tooling" },
+              ],
+            }),
+        });
+      }
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: () =>
+          Promise.resolve({
+            rings: {
+              Use: [],
+              Prototype: [],
+              Evaluate: [],
+              Watch: [],
+              Ignore: [],
+            },
+            counts: { Use: 0, Prototype: 0, Evaluate: 0, Watch: 0, Ignore: 0 },
+            decided_since: null,
+            include_ignore: false,
+          }),
+      });
     }),
   );
 }
