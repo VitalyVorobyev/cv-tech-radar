@@ -41,7 +41,7 @@ artifacts:
     tracks:
       - Open-Source CV Tooling
     refs:
-      - { ecosystem: github, ref: twistedfall/opencv-rust }
+      # github omitted: twistedfall/opencv-rust ships via tags, no GitHub Releases.
       - { ecosystem: crates, ref: opencv }
 
   - key: nalgebra
@@ -54,7 +54,7 @@ artifacts:
       - 3D Geometry & Reconstruction
       - Open-Source CV Tooling
     refs:
-      - { ecosystem: github, ref: dimforge/nalgebra }
+      # github omitted: dimforge/nalgebra ships via tags, no GitHub Releases.
       - { ecosystem: crates, ref: nalgebra }
 
   - key: ndarray
@@ -76,7 +76,7 @@ artifacts:
     tracks:
       - Open-Source CV Tooling
     refs:
-      - { ecosystem: github, ref: image-rs/image }
+      # github omitted: image-rs/image ships via tags, no GitHub Releases.
       - { ecosystem: crates, ref: image }
 
   - key: pytorch
@@ -136,7 +136,8 @@ artifacts:
     tracks:
       - Open-Source CV Tooling
     refs:
-      - { ecosystem: github, ref: vitejs/vite }
+      # github omitted: vitejs/vite is a monorepo; its newest Release is a
+      # sibling sub-package (plugin-legacy), not vite core. npm is authoritative.
       - { ecosystem: npm, ref: vite }
 
   - key: tauri
@@ -147,7 +148,8 @@ artifacts:
     tracks:
       - Open-Source CV Tooling
     refs:
-      - { ecosystem: github, ref: tauri-apps/tauri }
+      # github omitted: tauri-apps/tauri is a monorepo; its newest Release is a
+      # sibling sub-package (tauri-cli), not the tauri crate. crates is authoritative.
       - { ecosystem: crates, ref: tauri }
 
   # --- Watchlist -----------------------------------------------------------
@@ -171,7 +173,7 @@ artifacts:
       - Edge AI & Deployment
       - Vision Foundation Models
     refs:
-      - { ecosystem: github, ref: huggingface/candle }
+      # github omitted: huggingface/candle ships via tags, no GitHub Releases.
       - { ecosystem: crates, ref: candle-core }
 
   - key: burn

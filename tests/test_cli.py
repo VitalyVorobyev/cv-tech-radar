@@ -10,7 +10,7 @@ from radar import pipeline as pipeline_module
 from radar.cli import app
 from radar.collectors.arxiv import ArxivFetchStats
 from radar.db import get_engine, session_scope
-from radar.models import Item, RadarDecision
+from radar.models import Artifact, ArtifactDecision, Item, RadarDecision
 
 
 def test_cli_smoke_init_classify_candidates(tmp_path):
@@ -168,6 +168,16 @@ def test_daily_fetch_runs_fetch_classify_candidates(tmp_path, monkeypatch):
 
     monkeypatch.setattr(cli_module, "run_fetch_arxiv", fake_fetch)
 
+    # Stub the ecosystem fetch too — daily-fetch now runs it, and we must not
+    # touch the network in tests.
+    ecosystem_called: list[bool] = []
+
+    def fake_fetch_ecosystem(session, config, **_kwargs):  # noqa: ARG001
+        ecosystem_called.append(True)
+        return pipeline_module.FetchEcosystemSummary(artifacts_synced=3, refs_polled=5, refs_ok=5)
+
+    monkeypatch.setattr(cli_module, "run_fetch_ecosystem", fake_fetch_ecosystem)
+
     result = runner.invoke(
         app,
         [
@@ -188,7 +198,9 @@ def test_daily_fetch_runs_fetch_classify_candidates(tmp_path, monkeypatch):
     )
     assert result.exit_code == 0, result.output
     assert fetch_called == [{"days": 2, "max_pages": 3}]
+    assert ecosystem_called == [True]
     assert "arXiv:" in result.output
+    assert "ecosystem:" in result.output
     assert "classify:" in result.output
     assert "candidates:" in result.output
     assert (reports_dir / "2026-05-11.md").exists()
@@ -265,3 +277,66 @@ def test_daily_publish_dry_run_skips_digest(tmp_path):
     assert "Would apply" in result.output
     assert "digest:" not in result.output
     assert not digest_reports.exists()
+
+
+def _seed_artifact(engine, key: str = "opencv") -> None:
+    with session_scope(engine) as session:
+        session.add(
+            Artifact(
+                key=key,
+                name="OpenCV",
+                status="adopted",
+                capability="cv-imaging",
+                tracks_json=["Open-Source CV Tooling"],
+            )
+        )
+
+
+def test_artifact_decide_records_decision(tmp_path):
+    runner = CliRunner()
+    db_path = tmp_path / "radar.sqlite"
+    assert runner.invoke(app, ["init-db", "--db-path", str(db_path)]).exit_code == 0
+    engine = get_engine(db_path)
+    _seed_artifact(engine)
+
+    result = runner.invoke(
+        app,
+        [
+            "artifact-decide",
+            "opencv",
+            "--ring",
+            "Prototype",
+            "--reason",
+            "Worth a rig pass.",
+            "--db-path",
+            str(db_path),
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    assert "Recorded artifact decision" in result.output
+
+    with session_scope(engine) as session:
+        stored = session.query(ArtifactDecision).one()
+        assert stored.ring == "Prototype"
+        # --tracks omitted → defaults to the artifact's own tracks.
+        assert stored.tracks_json == ["Open-Source CV Tooling"]
+
+
+def test_artifact_decide_unknown_key_errors(tmp_path):
+    runner = CliRunner()
+    db_path = tmp_path / "radar.sqlite"
+    runner.invoke(app, ["init-db", "--db-path", str(db_path)])
+    result = runner.invoke(
+        app,
+        [
+            "artifact-decide",
+            "does-not-exist",
+            "--ring",
+            "Watch",
+            "--reason",
+            "x",
+            "--db-path",
+            str(db_path),
+        ],
+    )
+    assert result.exit_code != 0

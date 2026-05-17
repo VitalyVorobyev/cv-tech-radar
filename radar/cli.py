@@ -18,6 +18,7 @@ from rich.progress import (
 from rich.table import Table
 from sqlalchemy import select
 
+from radar.artifact_decisions import record_artifact_decision
 from radar.config import ConfigError, load_app_config
 from radar.curation import ProposalParseError
 from radar.db import ensure_sources, get_engine, init_db, session_scope
@@ -253,6 +254,43 @@ def decide_command(
         console.print(f"Recorded decision {decision.id}: item {item_id} -> {decision.ring}")
 
 
+@app.command("artifact-decide")
+def artifact_decide_command(
+    key: Annotated[str, typer.Argument(help="Artifact key (config/artifacts.yaml) to decide.")],
+    ring: Annotated[RadarRing, typer.Option("--ring", case_sensitive=False)],
+    reason: Annotated[str, typer.Option("--reason", help="Short decision rationale.")],
+    action: Annotated[str, typer.Option("--action", help="Next action or disposition.")] = "",
+    tracks: Annotated[
+        str | None,
+        typer.Option("--tracks", help="Comma-separated tracks. Defaults to the artifact's tracks."),
+    ] = None,
+    uncertain: Annotated[bool, typer.Option("--uncertain")] = False,
+    decided_by: Annotated[str, typer.Option("--decided-by")] = "codex",
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+) -> None:
+    """Record a durable radar decision for an ecosystem artifact."""
+    engine = get_engine(db_path)
+    init_db(engine)
+    with session_scope(engine) as session:
+        artifact = session.scalar(select(Artifact).where(Artifact.key == key))
+        if artifact is None:
+            raise typer.BadParameter(f"No artifact with key '{key}'")
+        try:
+            decision = record_artifact_decision(
+                session,
+                artifact_id=artifact.id,
+                ring=ring,
+                tracks=parse_tracks(tracks),
+                reason=reason,
+                action=action,
+                decided_by=decided_by,
+                uncertain=uncertain,
+            )
+        except DecisionError as exc:
+            raise typer.BadParameter(str(exc)) from exc
+        console.print(f"Recorded artifact decision {decision.id}: {key} -> {decision.ring}")
+
+
 def _cli_run_apply(session, markdown_path: Path, *, decided_by: str, dry_run: bool):
     try:
         return run_apply(session, markdown_path, decided_by=decided_by, dry_run=dry_run)
@@ -382,11 +420,13 @@ def daily_fetch_command(
             reports_dir=reports_dir,
             exports_dir=exports_dir,
         )
+        ecosystem_summary = run_fetch_ecosystem(session, config)
     console.print(format_fetch_summary(fetch_summary))
     console.print(f"classify: {classified} item(s) for {target_date.isoformat()}")
     console.print(
         f"candidates: {candidates_summary.count} written to {candidates_summary.report_path}"
     )
+    console.print(format_ecosystem_summary(ecosystem_summary))
     console.print(f"next: curate {candidates_summary.report_path}, then `radar daily-publish`.")
 
 

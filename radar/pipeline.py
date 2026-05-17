@@ -31,6 +31,7 @@ from radar.models import Item, Source
 from radar.relevance_check import JudgmentSummary, check_relevance_for_date
 from radar.reports.candidate_queue import collect_candidates, write_candidate_outputs
 from radar.reports.digest import collect_digest_rows, write_digest_outputs
+from radar.reports.ecosystem import collect_ecosystem_events
 from radar.schemas import AppConfig, ChatSettings, EmbeddingsSettings
 
 
@@ -234,6 +235,12 @@ def run_digest(
     exports_dir: Path,
 ) -> DigestSummary:
     rows = collect_digest_rows(session, target_date, days)
+    ecosystem_events = collect_ecosystem_events(
+        session,
+        target_date=target_date,
+        days=days,
+        relevant_only=True,
+    )
     report_path, export_path = write_digest_outputs(
         session,
         rows,
@@ -241,6 +248,7 @@ def run_digest(
         days,
         reports_dir=reports_dir,
         exports_dir=exports_dir,
+        ecosystem_events=ecosystem_events,
     )
     return DigestSummary(count=len(rows), report_path=report_path, export_path=export_path)
 

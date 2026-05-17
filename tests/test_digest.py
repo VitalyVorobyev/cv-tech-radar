@@ -6,13 +6,72 @@ from datetime import UTC, date, datetime
 from sqlalchemy import select
 
 from radar.db import session_scope
-from radar.models import Digest, Item, RadarDecision
+from radar.models import Artifact, ArtifactEvent, ArtifactRef, Digest, Item, RadarDecision
 from radar.reports.digest import (
     collect_digest_rows,
     render_digest_markdown,
     write_digest_outputs,
 )
 from radar.schemas import RadarRing
+
+
+def _ecosystem_row(
+    *,
+    event_id: int = 1,
+    name: str = "OpenCV",
+    ecosystem: str = "github",
+    version: str = "5.0.0",
+    event_type: str = "major_release",
+    summary: str = "OpenCV 5 released.",
+) -> tuple[ArtifactEvent, Artifact, ArtifactRef]:
+    artifact = Artifact(key=name.lower(), name=name, status="adopted", capability="cv-imaging")
+    ref = ArtifactRef(ecosystem=ecosystem, ref=f"{name.lower()}/{name.lower()}")
+    event = ArtifactEvent(
+        id=event_id,
+        event_type=event_type,
+        event_date=datetime(2026, 5, 16, tzinfo=UTC),
+        version=version,
+        summary=summary,
+        url=f"https://example.test/{name.lower()}-{version}",
+        severity="high",
+    )
+    return event, artifact, ref
+
+
+def test_digest_renders_ecosystem_section_with_no_paper_decisions():
+    markdown = render_digest_markdown(
+        [], date(2026, 5, 17), days=1, ecosystem_events=[_ecosystem_row()]
+    )
+    assert "## Ecosystem" in markdown
+    assert "**OpenCV** 5.0.0 — major release (github)" in markdown
+    assert "OpenCV 5 released." in markdown
+
+
+def test_digest_ecosystem_section_empty_when_no_events():
+    markdown = render_digest_markdown([], date(2026, 5, 17), days=1)
+    assert "## Ecosystem" in markdown
+    assert "_No release events for window._" in markdown
+
+
+def test_write_digest_outputs_includes_ecosystem_events_in_json(db_engine, tmp_path):
+    target = date(2026, 5, 17)
+    with session_scope(db_engine) as session:
+        report_path, export_path = write_digest_outputs(
+            session,
+            [],
+            target,
+            days=1,
+            reports_dir=tmp_path / "d",
+            exports_dir=tmp_path / "e",
+            ecosystem_events=[_ecosystem_row()],
+        )
+    payload = json.loads(export_path.read_text())
+    assert len(payload["ecosystem_events"]) == 1
+    entry = payload["ecosystem_events"][0]
+    assert entry["artifact_key"] == "opencv"
+    assert entry["version"] == "5.0.0"
+    assert entry["ecosystem"] == "github"
+    assert "## Ecosystem" in report_path.read_text()
 
 
 def _add_item(session, *, item_id: int, title: str, published: datetime) -> None:

@@ -12,7 +12,7 @@ the proposer; you are the editor. The deterministic Python pipeline does the res
 Two umbrella commands wrap the deterministic stages around a single curation step:
 
 ```bash
-uv run radar daily-fetch                 # fetch-arxiv → classify → candidates
+uv run radar daily-fetch                 # fetch-arxiv → classify → candidates → fetch-ecosystem
 # Curate via the cv-radar-curator skill — fill in TODO blocks in the candidate Markdown.
 uv run radar daily-publish reports/candidates/$(date -I).md   # apply → digest
 ```
@@ -20,6 +20,10 @@ uv run radar daily-publish reports/candidates/$(date -I).md   # apply → digest
 `daily-fetch` runs everything inside one SQLite transaction and prints a summary of
 fetched / new / updated / skipped-old counts plus the candidate Markdown path. Pass
 `--max-pages N` if you need to walk past the default 100-result arXiv cap.
+
+It also polls the **ecosystem radar** — software artifacts (libraries) tracked
+across GitHub / PyPI / crates.io / npm — and prints an `ecosystem:` line with the
+new release-event count. See the [Ecosystem lane](#ecosystem-lane) below.
 
 `daily-publish` applies the YAML blocks from the candidate Markdown and immediately
 writes the digest. Use `--dry-run` to validate parsing without recording decisions
@@ -89,6 +93,38 @@ historical record stays anchored to the source date.
 ```bash
 uv run radar digest --date today --days 7
 ```
+
+## Ecosystem lane
+
+Alongside the arXiv papers radar, `daily-fetch` polls a second lane: the
+**ecosystem radar**, a hand-maintained inventory of software artifacts the user
+adopts or watches (`config/artifacts.yaml`). It diffs each artifact's latest
+version across GitHub / PyPI / crates.io / npm and records new release events.
+See [ecosystem.md](ecosystem.md) for the architecture.
+
+Curation here is deliberately lighter than the papers queue — there is no
+per-event YAML decision block:
+
+- New **relevant** release events appear automatically in the digest's
+  `## Ecosystem` section; the relevance filter does the triage.
+- The curator glances at that section. Most days nothing is needed.
+- When a release warrants a ring change — e.g. a watchlist library cuts a major
+  release worth prototyping — record it directly against the artifact:
+
+  ```bash
+  uv run radar artifact-decide candle --ring Prototype \
+    --reason "Major release with a stable inference API; worth a test rig pass."
+  ```
+
+Standalone commands, outside the daily run:
+
+```bash
+uv run radar fetch-ecosystem          # poll all artifacts now
+uv run radar ecosystem --days 7       # list recent release events (--all for non-relevant)
+```
+
+Editing the inventory — adding or removing a tracked library — is a config edit
+to `config/artifacts.yaml`, not a daily action.
 
 ## Re-running and idempotency
 
