@@ -16,6 +16,7 @@ from rich.progress import (
     TimeElapsedColumn,
 )
 from rich.table import Table
+from sqlalchemy import select
 
 from radar.config import ConfigError, load_app_config
 from radar.curation import ProposalParseError
@@ -23,8 +24,9 @@ from radar.db import ensure_sources, get_engine, init_db, session_scope
 from radar.decisions import DecisionError, list_decisions_for_date, parse_tracks, record_decision
 from radar.embeddings import find_near_duplicates
 from radar.eval import DEFAULT_LABELED_ITEMS_PATH, render_eval_table, run_eval
-from radar.models import Item
+from radar.models import Artifact, ArtifactEvent, Item
 from radar.pipeline import (
+    format_ecosystem_summary,
     format_fetch_summary,
     run_apply,
     run_candidates,
@@ -32,12 +34,13 @@ from radar.pipeline import (
     run_digest,
     run_embed,
     run_fetch_arxiv,
+    run_fetch_ecosystem,
     run_relevance_check,
 )
 from radar.reports.score_debug import collect_score_debug_rows
 from radar.reports.static_bundle import BUNDLE_FILES, build_static_bundle
 from radar.schemas import RadarRing
-from radar.utils import parse_date_arg
+from radar.utils import date_window_bounds, parse_date_arg, utc_now
 
 app = typer.Typer(help="CV Radar command line interface.")
 console = Console()
@@ -109,6 +112,69 @@ def fetch_arxiv_command(
             page_delay_seconds=page_delay_seconds,
         )
     console.print(format_fetch_summary(summary))
+
+
+@app.command("fetch-ecosystem")
+def fetch_ecosystem_command(
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+    config_dir: Annotated[Path, typer.Option("--config-dir")] = DefaultConfigDir,
+) -> None:
+    """Poll configured artifacts across GitHub/PyPI/crates.io/npm for new releases."""
+    config = _load(config_dir)
+    engine = get_engine(db_path)
+    init_db(engine)
+    with session_scope(engine) as session:
+        summary = run_fetch_ecosystem(session, config)
+    console.print(format_ecosystem_summary(summary))
+
+
+@app.command("ecosystem")
+def ecosystem_command(
+    days: Annotated[int, typer.Option("--days", min=1)] = 7,
+    show_all: Annotated[
+        bool,
+        typer.Option("--all", help="Include non-relevant events (default: relevant only)."),
+    ] = False,
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+) -> None:
+    """List recent artifact release events as a Rich table."""
+    today = utc_now().date()
+    start, end = date_window_bounds(today, days)
+    engine = get_engine(db_path)
+    init_db(engine)
+    title = f"Ecosystem events - last {days} day(s)"
+    if not show_all:
+        title += " (relevant only)"
+    table = Table(title=title)
+    table.add_column("Artifact")
+    table.add_column("Ecosystem")
+    table.add_column("Type")
+    table.add_column("Version")
+    table.add_column("Severity")
+    table.add_column("Date")
+    table.add_column("Summary", overflow="fold")
+    with session_scope(engine) as session:
+        query = (
+            select(ArtifactEvent, Artifact)
+            .join(Artifact, Artifact.id == ArtifactEvent.artifact_id)
+            .where(ArtifactEvent.event_date >= start, ArtifactEvent.event_date <= end)
+            .order_by(ArtifactEvent.event_date.desc(), Artifact.name.asc())
+        )
+        if not show_all:
+            query = query.where(ArtifactEvent.relevant.is_(True))
+        rows = list(session.execute(query).all())
+        for event, artifact in rows:
+            table.add_row(
+                artifact.name,
+                event.artifact_ref.ecosystem if event.artifact_ref else "",
+                event.event_type,
+                event.version or "",
+                event.severity,
+                event.event_date.date().isoformat(),
+                event.summary,
+            )
+    console.print(table)
+    console.print(f"{len(rows)} event(s)")
 
 
 @app.command("classify")

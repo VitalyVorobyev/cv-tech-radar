@@ -10,6 +10,7 @@ import { isStaticMode } from "./lib/api";
 const IS_STATIC = isStaticMode();
 import { QueueView } from "./views/QueueView";
 import { RadarView } from "./views/RadarView";
+import { EcosystemView } from "./views/EcosystemView";
 import { TimelineView } from "./views/TimelineView";
 import { TracksView } from "./views/TracksView";
 import { PipelineView } from "./views/PipelineView";
@@ -24,6 +25,7 @@ import { ManualAddView } from "./views/ManualAddView";
 
 type Route =
   | "radar"
+  | "ecosystem"
   | "queue"
   | "timeline"
   | "tracks"
@@ -49,6 +51,7 @@ const queryClient = new QueryClient({
 // Routes available in the public static build — everything else falls back to radar.
 const STATIC_ROUTES: ReadonlySet<Route> = new Set([
   "radar",
+  "ecosystem",
   "timeline",
   "tracks",
 ]);
@@ -66,6 +69,7 @@ function parseRoute(): Route {
     if (raw === "pipeline") return "pipeline";
     if (raw === "score-debug") return "score-debug";
     if (raw === "queue") return "queue";
+    if (raw === "ecosystem") return "ecosystem";
     if (raw === "timeline") return "timeline";
     if (raw === "tracks") return "tracks";
     if (raw === "manual-add") return "manual-add";
@@ -86,6 +90,7 @@ interface TabSpec {
 
 const FULL_TABS: TabSpec[] = [
   { value: "radar", label: "Radar" },
+  { value: "ecosystem", label: "Ecosystem" },
   { value: "queue", label: "Queue" },
   { value: "timeline", label: "Timeline" },
   { value: "tracks", label: "Tracks" },
@@ -102,6 +107,7 @@ const FULL_TABS: TabSpec[] = [
 
 const STATIC_TABS: TabSpec[] = [
   { value: "radar", label: "Radar" },
+  { value: "ecosystem", label: "Ecosystem" },
   { value: "tracks", label: "Tracks" },
   { value: "timeline", label: "Timeline" },
 ];
@@ -163,6 +169,8 @@ function NavTabs({
 
 function renderRoute(route: Route) {
   switch (route) {
+    case "ecosystem":
+      return <EcosystemView />;
     case "queue":
       return <QueueView />;
     case "timeline":

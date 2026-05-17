@@ -21,9 +21,13 @@
 //     (quadrant, ring) cell, then golden-angle phyllotaxis distributes them
 //     inside the cell. The same item lands in the same pixel across renders.
 
-import type { CSSProperties, KeyboardEvent as ReactKeyboardEvent } from "react";
-import { useMemo, useState } from "react";
-import type { BoardItem, Ring } from "../lib/api";
+import type {
+  CSSProperties,
+  KeyboardEvent as ReactKeyboardEvent,
+  PointerEvent as ReactPointerEvent,
+} from "react";
+import { useMemo, useRef, useState } from "react";
+import type { Movement, Ring } from "../lib/api";
 import {
   GOLDEN_ANGLE_DEG,
   GOLDEN_RATIO,
@@ -32,11 +36,52 @@ import {
   RING_RADII_NORMALIZED,
 } from "../lib/constants";
 
+// Minimal structural shape a radar dot must satisfy. Both the papers
+// `BoardItem` and an adapted ecosystem `ArtifactBoardItem` (see EcosystemView)
+// fit this interface — `RadarPlot` is shared, not forked. The `tracks` array
+// is the default quadrant-placement key; override it with the `quadrantOf`
+// prop (e.g. the ecosystem radar places by `capability`).
+export interface RadarDot {
+  item_id: number;
+  title: string;
+  ring: Ring;
+  tracks: string[];
+  decided_at: string;
+  movement: Movement | null;
+}
+
 const SIZE = 760;
 const PAD = 28;
 const CX = SIZE / 2;
 const CY = SIZE / 2;
 const MAX_R = SIZE / 2 - PAD;
+
+// Pointer travel (in SVG units) past which a press becomes a drag rather than
+// a click. Below it, pointerup falls through to the normal select-on-click.
+const DRAG_THRESHOLD = 6;
+
+// Map a radius (SVG units, from centre) to the ring whose band contains it.
+// Beyond the outer ring → "Ignore" (drop = remove from the board).
+function ringAtRadius(r: number): Ring {
+  const norm = r / MAX_R;
+  for (let i = 0; i < RING_ORDER.length; i += 1) {
+    if (norm <= RING_RADII_NORMALIZED[i + 1]!) return RING_ORDER[i]!;
+  }
+  return "Ignore";
+}
+
+// Convert a viewport pointer position into the SVG's internal coordinate space
+// (the 760×760 viewBox), accounting for the element's on-screen scale.
+function toSvgPoint(
+  svg: SVGSVGElement,
+  clientX: number,
+  clientY: number,
+): { x: number; y: number } | null {
+  const ctm = svg.getScreenCTM();
+  if (!ctm) return null;
+  const p = new DOMPoint(clientX, clientY).matrixTransform(ctm.inverse());
+  return { x: p.x, y: p.y };
+}
 
 const QUAD_ANGLES: Array<{ start: number; end: number }> = [
   { start: 180, end: 270 }, // TL — perception
@@ -46,16 +91,21 @@ const QUAD_ANGLES: Array<{ start: number; end: number }> = [
 ];
 
 interface Placed {
-  item: BoardItem;
+  item: RadarDot;
   x: number;
   y: number;
   quadIndex: number;
   ringIndex: number;
 }
 
+// Default placement key: a dot's primary track. The ecosystem radar passes a
+// `quadrantOf` that returns the artifact `capability` instead.
+const defaultQuadrantOf = (dot: RadarDot): string | undefined => dot.tracks[0];
+
 export interface RadarPlotProps {
-  items: BoardItem[];
-  // Built once from /api/tracks by useQuadrants() — see lib/useQuadrants.ts.
+  items: RadarDot[];
+  // Papers radar: built once from /api/tracks by useQuadrants(). Ecosystem
+  // radar: the fixed CAPABILITY quadrants — see lib/constants.ts.
   quadrants: readonly Quadrant[];
   focusedQuad: string | null;
   focusedRing: Ring | null;
@@ -64,11 +114,31 @@ export interface RadarPlotProps {
   selectedId: number | null;
   showLabels: boolean;
   reducedMotion?: boolean;
+  // When true, dots can be dragged radially to record a new-ring decision.
+  // False in the public static build (no write API).
+  canEdit?: boolean;
+  // Picks the quadrant-membership key for each dot. Defaults to the dot's
+  // first track (papers radar); the ecosystem radar supplies `capability`.
+  quadrantOf?: (dot: RadarDot) => string | undefined;
+  // Dev-only message logged once per unmapped quadrant key. Defaults to the
+  // papers-radar topics.yaml hint; the ecosystem radar overrides it.
+  unmappedKeyWarning?: (key: string, dot: RadarDot) => string;
   onHoverDot(id: number | null): void;
   onSelectDot(id: number): void;
   onFocusQuad(quadId: string | null): void;
   onFocusRing(ring: Ring | null): void;
   onTrackFilter(track: string | null): void;
+  // Fired when a dot is dropped in a different ring band. `ring` may be
+  // "Ignore" (dropped beyond the outer ring), which removes it from the board.
+  onChangeRing?(itemId: number, ring: Ring): void;
+}
+
+function defaultUnmappedKeyWarning(key: string, dot: RadarDot): string {
+  return (
+    `[RadarPlot] Track "${key}" is not mapped to any quadrant — ` +
+    `item #${dot.item_id} (${dot.title}) will not appear on the radar. ` +
+    `Add a "quadrant:" field to that track in config/topics.yaml.`
+  );
 }
 
 function polar(r: number, deg: number): { x: number; y: number } {
@@ -103,22 +173,25 @@ function quadIndexOfTrack(track: string, quadrants: readonly Quadrant[]): number
   return quadrants.findIndex((q) => q.tracks.includes(track));
 }
 
-function placeDots(items: BoardItem[], quadrants: readonly Quadrant[]): Placed[] {
-  const cells = new Map<string, BoardItem[]>();
+function placeDots(
+  items: RadarDot[],
+  quadrants: readonly Quadrant[],
+  quadrantOf: (dot: RadarDot) => string | undefined,
+  unmappedKeyWarning: (key: string, dot: RadarDot) => string,
+): Placed[] {
+  const cells = new Map<string, RadarDot[]>();
   const warnedTracks = new Set<string>();
   // While the /api/tracks request is in-flight, quadrants is empty — skip the
   // warning so we don't shout for every item on first render.
   const ready = quadrants.length > 0;
   for (const item of items) {
-    const track = item.tracks[0];
+    const track = quadrantOf(item);
     if (!track) continue;
     const qi = quadIndexOfTrack(track, quadrants);
     if (qi < 0) {
       if (ready && import.meta.env.DEV && !warnedTracks.has(track)) {
         warnedTracks.add(track);
-        console.warn(
-          `[RadarPlot] Track "${track}" is not mapped to any quadrant — item #${item.item_id} (${item.title}) will not appear on the radar. Add a "quadrant:" field to that track in config/topics.yaml.`,
-        );
+        console.warn(unmappedKeyWarning(track, item));
       }
       continue;
     }
@@ -175,15 +248,39 @@ export function RadarPlot({
   selectedId,
   showLabels,
   reducedMotion = false,
+  canEdit = false,
+  quadrantOf = defaultQuadrantOf,
+  unmappedKeyWarning = defaultUnmappedKeyWarning,
   onHoverDot,
   onSelectDot,
   onFocusQuad,
   onFocusRing,
   onTrackFilter,
+  onChangeRing,
 }: RadarPlotProps) {
   const [hoveredTrack, setHoveredTrack] = useState<string | null>(null);
 
-  const dots = useMemo(() => placeDots(items, quadrants), [items, quadrants]);
+  // Drag state. `drag` (React state) holds the live pointer position so the
+  // dragged dot re-renders as it moves; `dragRef` is the source of truth read
+  // inside pointer handlers without waiting for a render. `didDragRef` lets the
+  // click handler that fires after pointerup tell a drag from a plain click.
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const dragRef = useRef<{
+    id: number;
+    pointerId: number;
+    startX: number;
+    startY: number;
+    moved: boolean;
+  } | null>(null);
+  const didDragRef = useRef(false);
+  const [drag, setDrag] = useState<{ id: number; x: number; y: number } | null>(
+    null,
+  );
+
+  const dots = useMemo(
+    () => placeDots(items, quadrants, quadrantOf, unmappedKeyWarning),
+    [items, quadrants, quadrantOf, unmappedKeyWarning],
+  );
 
   const ringBands = useMemo(
     () => RING_ORDER.map((_, i) => ringBand(i)),
@@ -193,11 +290,12 @@ export function RadarPlot({
   const dotR = 5.5;
   const hoverR = dotR + 3;
 
-  // Per-track counts (for tooltip + a11y).
+  // Per-sector counts (for tooltip + a11y), keyed by the same quadrant key
+  // used to place each dot.
   const trackCounts = useMemo(() => {
     const counts = new Map<string, { total: number; byRing: Record<string, number> }>();
     for (const it of items) {
-      const track = it.tracks[0];
+      const track = quadrantOf(it);
       if (!track) continue;
       const entry = counts.get(track) ?? { total: 0, byRing: {} };
       entry.total += 1;
@@ -205,10 +303,16 @@ export function RadarPlot({
       counts.set(track, entry);
     }
     return counts;
-  }, [items]);
+  }, [items, quadrantOf]);
+
+  // Ring the dragged dot would land in, recomputed each render from `drag`.
+  const dragTargetRing: Ring | null = drag
+    ? ringAtRadius(Math.hypot(drag.x - CX, drag.y - CY))
+    : null;
 
   return (
     <svg
+      ref={svgRef}
       viewBox={`0 0 ${SIZE} ${SIZE}`}
       width="100%"
       height="100%"
@@ -396,35 +500,129 @@ export function RadarPlot({
         );
       })}
 
+      {/* 6.5) Drag-target band — highlights the ring the dragged dot will land
+          in. Drawn under the dots so the dot stays legible on top. */}
+      {drag &&
+        dragTargetRing &&
+        dragTargetRing !== "Ignore" &&
+        (() => {
+          const band = ringBands[RING_ORDER.indexOf(dragTargetRing)]!;
+          const mid = (band.inner + band.outer) / 2;
+          return (
+            <circle
+              cx={CX}
+              cy={CY}
+              r={mid}
+              fill="none"
+              stroke="var(--color-accent)"
+              strokeOpacity={0.1}
+              strokeWidth={band.outer - band.inner}
+              pointerEvents="none"
+            />
+          );
+        })()}
+
       {/* 7) Dots — drawn last so they win the hit-test. */}
       {dots.map((d) => {
         const isHover = hoveredId === d.item.item_id;
         const isSelected = selectedId === d.item.item_id;
+        const isDragging = drag?.id === d.item.item_id;
+        // While dragging, the dot follows the pointer; otherwise it sits at its
+        // deterministic placed position.
+        const cx = isDragging ? drag!.x : d.x;
+        const cy = isDragging ? drag!.y : d.y;
         const dimmed =
-          (focusedQuad !== null && quadrants[d.quadIndex]!.id !== focusedQuad) ||
-          (focusedRing !== null && d.item.ring !== focusedRing) ||
-          (trackFilter !== null && !d.item.tracks.includes(trackFilter));
+          !isDragging &&
+          ((focusedQuad !== null && quadrants[d.quadIndex]!.id !== focusedQuad) ||
+            (focusedRing !== null && d.item.ring !== focusedRing) ||
+            (trackFilter !== null && !d.item.tracks.includes(trackFilter)));
         const ringIsAccent = d.item.ring === "Use" || d.item.ring === "Prototype";
         const isPulsing =
-          !reducedMotion && (d.item.movement === "new" || d.item.movement === "in");
+          !reducedMotion &&
+          !isDragging &&
+          (d.item.movement === "new" || d.item.movement === "in");
         const pulseStyle = isPulsing
           ? ({
               "--pulse-r-min": `${dotR + 2}`,
               "--pulse-r-max": `${dotR + 9}`,
             } as CSSProperties)
           : undefined;
+
+        function onPointerDown(e: ReactPointerEvent<SVGGElement>) {
+          if (!canEdit || !onChangeRing) return;
+          const svg = svgRef.current;
+          if (!svg) return;
+          const p = toSvgPoint(svg, e.clientX, e.clientY);
+          if (!p) return;
+          didDragRef.current = false;
+          dragRef.current = {
+            id: d.item.item_id,
+            pointerId: e.pointerId,
+            startX: p.x,
+            startY: p.y,
+            moved: false,
+          };
+          e.currentTarget.setPointerCapture(e.pointerId);
+        }
+
+        function onPointerMove(e: ReactPointerEvent<SVGGElement>) {
+          const st = dragRef.current;
+          if (!st || st.id !== d.item.item_id) return;
+          const svg = svgRef.current;
+          if (!svg) return;
+          const p = toSvgPoint(svg, e.clientX, e.clientY);
+          if (!p) return;
+          if (
+            !st.moved &&
+            Math.hypot(p.x - st.startX, p.y - st.startY) > DRAG_THRESHOLD
+          ) {
+            st.moved = true;
+          }
+          if (st.moved) setDrag({ id: st.id, x: p.x, y: p.y });
+        }
+
+        function onPointerUp(e: ReactPointerEvent<SVGGElement>) {
+          const st = dragRef.current;
+          if (!st || st.id !== d.item.item_id) return;
+          dragRef.current = null;
+          e.currentTarget.releasePointerCapture?.(e.pointerId);
+          if (!st.moved) return; // a plain click — let onClick select it.
+          // Suppress the click event that fires right after this pointerup.
+          didDragRef.current = true;
+          const svg = svgRef.current;
+          const p = svg ? toSvgPoint(svg, e.clientX, e.clientY) : null;
+          setDrag(null);
+          if (!p) return;
+          const target = ringAtRadius(Math.hypot(p.x - CX, p.y - CY));
+          if (target !== d.item.ring) onChangeRing?.(d.item.item_id, target);
+        }
+
         return (
           <g
             key={d.item.item_id}
             role="button"
             tabIndex={0}
             aria-label={`#${d.item.item_id} ${d.item.title} in ${d.item.ring}`}
-            style={{ cursor: "pointer" }}
+            style={{
+              cursor: isDragging ? "grabbing" : canEdit ? "grab" : "pointer",
+              touchAction: canEdit ? "none" : undefined,
+            }}
             onMouseEnter={() => onHoverDot(d.item.item_id)}
             onMouseLeave={() => onHoverDot(null)}
             onFocus={() => onHoverDot(d.item.item_id)}
             onBlur={() => onHoverDot(null)}
-            onClick={() => onSelectDot(d.item.item_id)}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onClick={() => {
+              // A drag just ended — swallow the trailing click so it doesn't
+              // also open the detail panel.
+              if (didDragRef.current) {
+                didDragRef.current = false;
+                return;
+              }
+              onSelectDot(d.item.item_id);
+            }}
             onKeyDown={(e) => handleActivate(e, () => onSelectDot(d.item.item_id))}
           >
             {/* Native SVG tooltip — surfaces title, ring, and first track on hover
@@ -437,8 +635,8 @@ export function RadarPlot({
             {isPulsing && (
               <circle
                 className="cvradar-pulse-ring"
-                cx={d.x}
-                cy={d.y}
+                cx={cx}
+                cy={cy}
                 r={dotR + 4}
                 fill="none"
                 stroke="var(--color-accent)"
@@ -449,24 +647,54 @@ export function RadarPlot({
               />
             )}
             <circle
-              cx={d.x}
-              cy={d.y}
-              r={isHover || isSelected ? hoverR : dotR}
+              cx={cx}
+              cy={cy}
+              r={isHover || isSelected || isDragging ? hoverR : dotR}
               fill={ringIsAccent ? "var(--color-accent)" : "currentColor"}
               fillOpacity={dimmed ? 0.18 : 1}
-              stroke={isSelected ? "var(--color-accent)" : "none"}
-              strokeWidth={isSelected ? 2 : 0}
-              filter={isHover || isSelected ? "url(#cvradar-dot-glow)" : undefined}
+              stroke={isSelected || isDragging ? "var(--color-accent)" : "none"}
+              strokeWidth={isSelected || isDragging ? 2 : 0}
+              filter={
+                isHover || isSelected || isDragging
+                  ? "url(#cvradar-dot-glow)"
+                  : undefined
+              }
             />
             {showLabels && !dimmed && (
               <text
-                x={d.x + dotR + 4}
-                y={d.y + 3}
+                x={cx + dotR + 4}
+                y={cy + 3}
                 fontSize="9"
                 fill={isHover || isSelected ? "currentColor" : "var(--color-muted)"}
                 style={{ pointerEvents: "none", userSelect: "none" }}
               >
                 {d.item.item_id}
+              </text>
+            )}
+            {/* Target-ring caption that tracks the dot while it is dragged. */}
+            {isDragging && dragTargetRing && (
+              <text
+                x={cx + dotR + 6}
+                y={cy - dotR - 4}
+                fontSize="10"
+                fontWeight="500"
+                fill={
+                  dragTargetRing === "Ignore"
+                    ? "var(--color-muted)"
+                    : "var(--color-accent)"
+                }
+                letterSpacing="0.08em"
+                style={{
+                  textTransform: "uppercase",
+                  pointerEvents: "none",
+                  userSelect: "none",
+                }}
+              >
+                {dragTargetRing === "Ignore"
+                  ? "remove"
+                  : dragTargetRing === d.item.ring
+                    ? `${dragTargetRing} ·`
+                    : `→ ${dragTargetRing}`}
               </text>
             )}
           </g>

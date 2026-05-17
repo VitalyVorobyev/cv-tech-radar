@@ -136,6 +136,14 @@
   transition: outline-offset var(--duration-focus);
 }
 
+/* Suppress the browser's default focus ring for pointer interactions; the
+   accent :focus-visible ring above still serves keyboard users. Without this,
+   clicking an SVG track sector or radar dot draws a blue rectangle around its
+   bounding box. */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /* Skeleton loading blocks — flat, rule-bordered */
 .skeleton-block {
   opacity: 0.4;

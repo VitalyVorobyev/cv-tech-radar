@@ -7,6 +7,7 @@ from radar.api.routes.candidates import router as candidates_router
 from radar.api.routes.config import router as config_router
 from radar.api.routes.decisions import router as decisions_router
 from radar.api.routes.digest import router as digest_router
+from radar.api.routes.ecosystem import router as ecosystem_router
 from radar.api.routes.items import router as items_router
 from radar.api.routes.jobs import router as jobs_router
 from radar.api.routes.manual import router as manual_router
@@ -22,6 +23,7 @@ router.include_router(queue_router)
 router.include_router(decisions_router)
 router.include_router(digest_router)
 router.include_router(board_router)
+router.include_router(ecosystem_router)
 router.include_router(meta_router)
 router.include_router(items_router)
 router.include_router(manual_router)

@@ -152,6 +152,57 @@ class EmbeddingsConfig(BaseModel):
     chat: ChatSettings = Field(default_factory=ChatSettings)
 
 
+EcosystemId = Literal["github", "pypi", "crates", "npm"]
+ArtifactStatus = Literal["adopted", "watchlist"]
+CapabilityId = Literal["cv-imaging", "ml-runtimes", "viz-3d-sensors", "build-tooling"]
+
+
+class ArtifactRefConfig(BaseModel):
+    ecosystem: EcosystemId
+    ref: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def github_ref_has_owner(self) -> ArtifactRefConfig:
+        if self.ecosystem == "github" and "/" not in self.ref:
+            msg = "github refs must be in 'owner/repo' form"
+            raise ValueError(msg)
+        return self
+
+
+class ArtifactConfig(BaseModel):
+    key: str = Field(min_length=1, pattern=r"^[a-z0-9][a-z0-9._-]*$")
+    name: str = Field(min_length=1)
+    description: str = ""
+    status: ArtifactStatus = "watchlist"
+    capability: CapabilityId
+    tracks: list[str] = Field(default_factory=list)
+    homepage_url: str = ""
+    enabled: bool = True
+    refs: list[ArtifactRefConfig] = Field(min_length=1)
+    track_major_only: bool = False
+    extra_keywords: list[str] = Field(default_factory=list)
+
+
+class ArtifactsConfig(BaseModel):
+    artifacts: list[ArtifactConfig] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def keys_and_refs_are_unique(self) -> ArtifactsConfig:
+        keys = [artifact.key for artifact in self.artifacts]
+        if len(keys) != len(set(keys)):
+            msg = "artifact keys must be unique"
+            raise ValueError(msg)
+        seen: set[tuple[str, str]] = set()
+        for artifact in self.artifacts:
+            for ref in artifact.refs:
+                pair = (ref.ecosystem, ref.ref)
+                if pair in seen:
+                    msg = f"duplicate ecosystem ref: {ref.ecosystem}:{ref.ref}"
+                    raise ValueError(msg)
+                seen.add(pair)
+        return self
+
+
 class AppConfig(BaseModel):
     sources: SourcesConfig
     topics: TopicsConfig
@@ -159,6 +210,17 @@ class AppConfig(BaseModel):
     priority_sources: PrioritySourcesConfig
     scoring: ScoringConfig
     embeddings: EmbeddingsConfig
+    artifacts: ArtifactsConfig = Field(default_factory=ArtifactsConfig)
+
+    @model_validator(mode="after")
+    def artifact_tracks_exist(self) -> AppConfig:
+        track_names = {track.name for track in self.topics.tracks}
+        for artifact in self.artifacts.artifacts:
+            for name in artifact.tracks:
+                if name not in track_names:
+                    msg = f"artifact '{artifact.key}' references unknown track '{name}'"
+                    raise ValueError(msg)
+        return self
 
 
 class NormalizedItem(BaseModel):
