@@ -343,3 +343,23 @@ class ArtifactDecisionCreate(BaseModel):
 class ArtifactDecisionCreatedOut(BaseModel):
     decision_id: int
     created_at: datetime
+
+
+# --- Content-date listings (Queue / Digest date-grid landing) ---------------
+
+
+class QueueDateOut(BaseModel):
+    date: str
+    candidate_count: int
+    decided_count: int
+
+
+class DigestDateOut(BaseModel):
+    date: str
+    title: str
+    item_count: int
+
+
+class ContentDatesResponse(BaseModel):
+    queue: list[QueueDateOut] = Field(default_factory=list)
+    digest: list[DigestDateOut] = Field(default_factory=list)

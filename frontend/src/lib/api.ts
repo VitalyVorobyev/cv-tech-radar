@@ -69,6 +69,24 @@ export interface QueueResponse {
   candidates: Candidate[];
 }
 
+// Non-empty content days — backs the Queue/Digest date-grid landing.
+export interface QueueDate {
+  date: string;
+  candidate_count: number;
+  decided_count: number;
+}
+
+export interface DigestDate {
+  date: string;
+  title: string;
+  item_count: number;
+}
+
+export interface ContentDatesResponse {
+  queue: QueueDate[];
+  digest: DigestDate[];
+}
+
 export interface HealthResponse {
   ok: boolean;
   version: string;
@@ -684,6 +702,16 @@ export const api = {
   queue(date: string = "today", limit = 25): Promise<QueueResponse> {
     const params = new URLSearchParams({ date, limit: String(limit) });
     return request<QueueResponse>(`/api/queue?${params}`);
+  },
+
+  // Non-empty content days, for the Queue/Digest date-grid landing. The Queue
+  // and Digest views exist only in the served (non-static) build, so static
+  // mode just yields an empty listing.
+  contentDates(): Promise<ContentDatesResponse> {
+    if (isStaticMode()) {
+      return Promise.resolve({ queue: [], digest: [] });
+    }
+    return request<ContentDatesResponse>("/api/content-dates");
   },
 
   postDecision(body: DecisionRequest): Promise<DecisionResponse> {

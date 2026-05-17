@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from radar.api.routes.board import router as board_router
 from radar.api.routes.candidates import router as candidates_router
 from radar.api.routes.config import router as config_router
+from radar.api.routes.content_dates import router as content_dates_router
 from radar.api.routes.decisions import router as decisions_router
 from radar.api.routes.digest import router as digest_router
 from radar.api.routes.ecosystem import router as ecosystem_router
@@ -34,5 +35,6 @@ router.include_router(jobs_router)
 router.include_router(score_debug_router)
 router.include_router(near_duplicates_router)
 router.include_router(ollama_router)
+router.include_router(content_dates_router)
 
 __all__ = ["router"]
