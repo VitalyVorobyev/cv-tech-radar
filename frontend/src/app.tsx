@@ -1,7 +1,9 @@
 // App root.
-// Hash routing — radar (default), queue, timeline, tracks, pipeline, settings,
-// score-debug, digest. `#/board` is a legacy alias for `#/radar` so old links
-// keep working.
+// Hash routing with two lanes. The papers lane (radar, queue, timeline,
+// tracks, pipeline, settings, score-debug, digest, add-paper) and the
+// ecosystem lane (radar, releases, artifacts) each have their own tab set,
+// switched by a top-level lane control. `#/board` is a legacy alias for
+// `#/radar`.
 
 import { useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -26,6 +28,8 @@ import { ManualAddView } from "./views/ManualAddView";
 type Route =
   | "radar"
   | "ecosystem"
+  | "ecosystem/releases"
+  | "ecosystem/artifacts"
   | "queue"
   | "timeline"
   | "tracks"
@@ -39,6 +43,23 @@ type Route =
   | "settings/negative-topics"
   | "settings/scoring";
 
+// The two parallel monitoring lanes. A route belongs to the ecosystem lane iff
+// it is one of the ecosystem routes; everything else is the papers lane.
+type Lane = "papers" | "ecosystem";
+
+const ECOSYSTEM_ROUTES: ReadonlySet<Route> = new Set([
+  "ecosystem",
+  "ecosystem/releases",
+  "ecosystem/artifacts",
+]);
+
+function laneOf(route: Route): Lane {
+  return ECOSYSTEM_ROUTES.has(route) ? "ecosystem" : "papers";
+}
+
+// The route a lane lands on when you switch into it.
+const LANE_HOME: Record<Lane, Route> = { papers: "radar", ecosystem: "ecosystem" };
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -51,9 +72,11 @@ const queryClient = new QueryClient({
 // Routes available in the public static build — everything else falls back to radar.
 const STATIC_ROUTES: ReadonlySet<Route> = new Set([
   "radar",
-  "ecosystem",
   "timeline",
   "tracks",
+  "ecosystem",
+  "ecosystem/releases",
+  "ecosystem/artifacts",
 ]);
 
 function parseRoute(): Route {
@@ -69,6 +92,8 @@ function parseRoute(): Route {
     if (raw === "pipeline") return "pipeline";
     if (raw === "score-debug") return "score-debug";
     if (raw === "queue") return "queue";
+    if (raw === "ecosystem/releases") return "ecosystem/releases";
+    if (raw === "ecosystem/artifacts") return "ecosystem/artifacts";
     if (raw === "ecosystem") return "ecosystem";
     if (raw === "timeline") return "timeline";
     if (raw === "tracks") return "tracks";
@@ -88,9 +113,8 @@ interface TabSpec {
   matches?: (route: Route) => boolean;
 }
 
-const FULL_TABS: TabSpec[] = [
+const PAPERS_TABS_FULL: TabSpec[] = [
   { value: "radar", label: "Radar" },
-  { value: "ecosystem", label: "Ecosystem" },
   { value: "queue", label: "Queue" },
   { value: "timeline", label: "Timeline" },
   { value: "tracks", label: "Tracks" },
@@ -105,22 +129,34 @@ const FULL_TABS: TabSpec[] = [
   },
 ];
 
-const STATIC_TABS: TabSpec[] = [
+const PAPERS_TABS_STATIC: TabSpec[] = [
   { value: "radar", label: "Radar" },
-  { value: "ecosystem", label: "Ecosystem" },
   { value: "tracks", label: "Tracks" },
   { value: "timeline", label: "Timeline" },
 ];
 
-const PRIMARY_TABS: TabSpec[] = IS_STATIC ? STATIC_TABS : FULL_TABS;
+// The ecosystem lane's three surfaces. All three work in the static build —
+// they read ecosystem-board.json / ecosystem-events.json from the bundle.
+const ECOSYSTEM_TABS: TabSpec[] = [
+  { value: "ecosystem", label: "Radar" },
+  { value: "ecosystem/releases", label: "Releases" },
+  { value: "ecosystem/artifacts", label: "Artifacts" },
+];
 
-function NavTabs({
+function tabsForLane(lane: Lane): TabSpec[] {
+  if (lane === "ecosystem") return ECOSYSTEM_TABS;
+  return IS_STATIC ? PAPERS_TABS_STATIC : PAPERS_TABS_FULL;
+}
+
+function LaneNav({
   route,
   onNavigate,
 }: {
   route: Route;
   onNavigate: (next: Route) => void;
 }) {
+  const lane = laneOf(route);
+  const tabs = tabsForLane(lane);
   return (
     <nav
       aria-label="Primary"
@@ -132,45 +168,104 @@ function NavTabs({
         borderBottom: "1px solid var(--color-rule)",
         padding: "0.5rem 1.5rem",
         display: "flex",
-        gap: "1.25rem",
+        flexDirection: "column",
+        gap: "0.5rem",
         maxWidth: "80rem",
         margin: "0 auto",
-        flexWrap: "wrap",
       }}
     >
-      {PRIMARY_TABS.map((tab) => {
-        const active = tab.matches ? tab.matches(route) : tab.value === route;
+      <LaneSwitch lane={lane} onSwitch={(next) => onNavigate(LANE_HOME[next])} />
+      <div style={{ display: "flex", gap: "1.25rem", flexWrap: "wrap" }}>
+        {tabs.map((tab) => {
+          const active = tab.matches ? tab.matches(route) : tab.value === route;
+          return (
+            <button
+              key={tab.value}
+              type="button"
+              onClick={() => onNavigate(tab.value)}
+              aria-current={active ? "page" : undefined}
+              style={{
+                background: "transparent",
+                border: "none",
+                padding: 0,
+                cursor: "pointer",
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-small)",
+                color: active ? "var(--color-ink)" : "var(--color-muted)",
+                borderBottom: active ? "1px solid currentColor" : "1px solid transparent",
+                letterSpacing: "var(--tracking-caps)",
+                textTransform: "lowercase",
+              }}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+
+function LaneSwitch({
+  lane,
+  onSwitch,
+}: {
+  lane: Lane;
+  onSwitch: (next: Lane) => void;
+}) {
+  const lanes: { value: Lane; label: string }[] = [
+    { value: "papers", label: "Papers" },
+    { value: "ecosystem", label: "Ecosystem" },
+  ];
+  return (
+    <div
+      role="tablist"
+      aria-label="Radar lane"
+      style={{
+        display: "inline-flex",
+        alignSelf: "flex-start",
+        border: "1px solid var(--color-rule)",
+        borderRadius: "var(--radius-sm)",
+        overflow: "hidden",
+      }}
+    >
+      {lanes.map((entry) => {
+        const active = lane === entry.value;
         return (
           <button
-            key={tab.value}
+            key={entry.value}
             type="button"
-            onClick={() => onNavigate(tab.value)}
-            aria-current={active ? "page" : undefined}
+            role="tab"
+            aria-selected={active}
+            onClick={() => onSwitch(entry.value)}
             style={{
-              background: "transparent",
+              background: active ? "var(--color-ink)" : "transparent",
+              color: active ? "var(--color-paper)" : "var(--color-muted)",
               border: "none",
-              padding: 0,
+              padding: "0.25rem 0.85rem",
               cursor: "pointer",
               fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-small)",
-              color: active ? "var(--color-ink)" : "var(--color-muted)",
-              borderBottom: active ? "1px solid currentColor" : "1px solid transparent",
+              fontSize: "var(--text-micro)",
               letterSpacing: "var(--tracking-caps)",
-              textTransform: "lowercase",
+              textTransform: "uppercase",
             }}
           >
-            {tab.label}
+            {entry.label}
           </button>
         );
       })}
-    </nav>
+    </div>
   );
 }
 
 function renderRoute(route: Route) {
   switch (route) {
     case "ecosystem":
-      return <EcosystemView />;
+      return <EcosystemView surface="radar" />;
+    case "ecosystem/releases":
+      return <EcosystemView surface="releases" />;
+    case "ecosystem/artifacts":
+      return <EcosystemView surface="artifacts" />;
     case "queue":
       return <QueueView />;
     case "timeline":
@@ -217,7 +312,7 @@ export function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <NavTabs route={route} onNavigate={navigate} />
+      <LaneNav route={route} onNavigate={navigate} />
       {renderRoute(route)}
     </QueryClientProvider>
   );

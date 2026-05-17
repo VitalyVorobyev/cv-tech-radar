@@ -2,9 +2,9 @@
 // (libraries) tracked across GitHub / PyPI / crates.io / npm. Papers and
 // packages never share a visualization: this reuses the polar `RadarPlot`
 // component but with the four fixed CAPABILITY quadrants and the same five
-// rings. Two surfaces, toggled by a sub-nav: the radar board and a
-// reverse-chronological release-event feed. Filter state is mirrored to the
-// URL, exactly like RadarView.
+// rings. Three surfaces — radar board, release-event feed, artifact table —
+// are selected by the ecosystem lane's tabs (see app.tsx) and passed in as the
+// `surface` prop. Filter state is mirrored to the URL, exactly like RadarView.
 
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -17,6 +17,7 @@ import type {
 import { api, isStaticMode } from "../lib/api";
 import { Chrome } from "../ui/Chrome";
 import { ArtifactPanel } from "../ui/ArtifactPanel";
+import { ArtifactTable } from "../ui/ArtifactTable";
 import { EcosystemBadge } from "../ui/EcosystemBadge";
 import { SeverityDot } from "../ui/SeverityDot";
 import { RadarPlot, type RadarDot } from "../ui/RadarPlot";
@@ -30,7 +31,7 @@ import {
 import { readUrlParams, writeUrlParams } from "../lib/urlState";
 import { useTweaks } from "../lib/tweaks";
 
-type EcoSurface = "radar" | "releases";
+export type EcoSurface = "radar" | "releases" | "artifacts";
 
 function usePrefersReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
@@ -50,12 +51,10 @@ function readInitialFilters() {
   const quad = params.get("quad");
   const ring = params.get("ring") as Ring | null;
   const q = params.get("q") ?? "";
-  const view = params.get("view");
   return {
     quad: ECOSYSTEM_QUADRANTS.some((qd) => qd.id === quad) ? quad : null,
     ring: RING_ORDER.includes(ring as Ring) ? (ring as Ring) : null,
     q,
-    view: (view === "releases" ? "releases" : "radar") as EcoSurface,
   };
 }
 
@@ -86,10 +85,9 @@ function searchMatches(it: ArtifactBoardItem, ql: string): boolean {
   return hay.includes(ql);
 }
 
-export function EcosystemView() {
+export function EcosystemView({ surface }: { surface: EcoSurface }) {
   const reducedMotion = usePrefersReducedMotion();
   const initial = useMemo(readInitialFilters, []);
-  const [surface, setSurface] = useState<EcoSurface>(initial.view);
   const [focusedQuad, setFocusedQuad] = useState<string | null>(initial.quad);
   const [focusedRing, setFocusedRing] = useState<Ring | null>(initial.ring);
   const [capabilityFilter, setCapabilityFilter] = useState<string | null>(null);
@@ -107,18 +105,14 @@ export function EcosystemView() {
   const canEdit = !isStaticMode();
   const queryClient = useQueryClient();
 
-  // Mirror filter state to the URL.
+  // Mirror filter state to the URL. The surface is the route, not a param.
   useEffect(() => {
-    writeUrlParams(
-      {
-        quad: focusedQuad,
-        ring: focusedRing,
-        q: search || null,
-        view: surface,
-      },
-      { view: "radar" },
-    );
-  }, [focusedQuad, focusedRing, search, surface]);
+    writeUrlParams({
+      quad: focusedQuad,
+      ring: focusedRing,
+      q: search || null,
+    });
+  }, [focusedQuad, focusedRing, search]);
 
   const allArtifacts = useMemo(() => {
     if (!data) return [] as ArtifactBoardItem[];
@@ -147,6 +141,18 @@ export function EcosystemView() {
       .filter((a) => searchMatches(a, ql))
       .map(toRadarDot);
   }, [allArtifacts, search]);
+
+  // The artifact table honours the same sidebar focus (ring / capability) and
+  // the search box — there is no radar to dim, so filtering is explicit here.
+  const tableArtifacts = useMemo<ArtifactBoardItem[]>(() => {
+    const ql = search.toLowerCase();
+    return allArtifacts.filter(
+      (a) =>
+        searchMatches(a, ql) &&
+        (focusedRing === null || a.ring === focusedRing) &&
+        (focusedQuad === null || a.capability === focusedQuad),
+    );
+  }, [allArtifacts, search, focusedRing, focusedQuad]);
 
   const ringCounts = useMemo(() => {
     const counts: Record<Ring, number> = {
@@ -266,8 +272,6 @@ export function EcosystemView() {
             </div>
           </header>
 
-          <SurfaceToggle surface={surface} onChange={setSurface} />
-
           {isError && (
             <div
               role="alert"
@@ -282,7 +286,7 @@ export function EcosystemView() {
             </div>
           )}
 
-          {surface === "radar" ? (
+          {surface === "radar" && (
             <>
               <div
                 style={{
@@ -327,11 +331,20 @@ export function EcosystemView() {
                 onToggleLabels={() => setTweaks({ showLabels: !tweaks.showLabels })}
               />
             </>
-          ) : (
+          )}
+          {surface === "releases" && (
             <ReleaseFeed
               onSelectArtifact={(id) => {
                 setSelectedId(id);
               }}
+            />
+          )}
+          {surface === "artifacts" && (
+            <ArtifactTable
+              artifacts={tableArtifacts}
+              isLoading={isLoading}
+              selectedId={selectedId}
+              onSelect={(id) => setSelectedId((prev) => (prev === id ? null : id))}
             />
           )}
         </section>
@@ -350,60 +363,6 @@ export function EcosystemView() {
       {selectedId !== null && (
         <ArtifactPanel artifactId={selectedId} onClose={() => setSelectedId(null)} />
       )}
-    </div>
-  );
-}
-
-function SurfaceToggle({
-  surface,
-  onChange,
-}: {
-  surface: EcoSurface;
-  onChange(next: EcoSurface): void;
-}) {
-  const tabs: { value: EcoSurface; label: string }[] = [
-    { value: "radar", label: "Radar" },
-    { value: "releases", label: "Releases" },
-  ];
-  return (
-    <div
-      role="tablist"
-      aria-label="Ecosystem surface"
-      style={{
-        display: "flex",
-        gap: "1.25rem",
-        borderBottom: "1px solid var(--color-rule)",
-        paddingBottom: "0.5rem",
-      }}
-    >
-      {tabs.map((tab) => {
-        const active = surface === tab.value;
-        return (
-          <button
-            key={tab.value}
-            type="button"
-            role="tab"
-            aria-selected={active}
-            onClick={() => onChange(tab.value)}
-            style={{
-              background: "transparent",
-              border: "none",
-              padding: 0,
-              cursor: "pointer",
-              fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-small)",
-              color: active ? "var(--color-ink)" : "var(--color-muted)",
-              borderBottom: active
-                ? "1px solid currentColor"
-                : "1px solid transparent",
-              letterSpacing: "var(--tracking-caps)",
-              textTransform: "lowercase",
-            }}
-          >
-            {tab.label}
-          </button>
-        );
-      })}
     </div>
   );
 }
