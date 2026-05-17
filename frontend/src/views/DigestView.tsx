@@ -1,5 +1,7 @@
 // Digest view — render the pre-built digest Markdown for a date.
-// A small "Run digest" button kicks off the digest job in the background.
+// With no date in the hash (`#/digest`) it shows a date-grid landing of every
+// day that has a digest; `#/digest/2026-05-13` opens that day. A small
+// "Run digest" button kicks off the digest job in the background.
 
 import { useEffect, useId, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -9,6 +11,7 @@ import { api } from "../lib/api";
 import { useJobPoller, isTerminalState } from "../lib/jobs";
 import { Button } from "../ui/Button";
 import { Chrome } from "../ui/Chrome";
+import { ContentDateGrid } from "../ui/ContentDateGrid";
 import { StatusBadge } from "../ui/StatusBadge";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -18,9 +21,10 @@ function isoToday(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+// "" means browse mode — `#/digest` with no date segment shows the date grid.
 function readHashDate(): string {
   const match = HASH_DATE_RE.exec(window.location.hash);
-  return match ? match[1]! : "today";
+  return match ? match[1]! : "";
 }
 
 export function DigestView() {
@@ -31,14 +35,15 @@ export function DigestView() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Listen for hash changes so a deep link updates the date.
+  // Listen for hash changes so a deep link — or a date-grid pick — updates.
   useEffect(() => {
     const handler = () => setDate(readHashDate());
     window.addEventListener("hashchange", handler);
     return () => window.removeEventListener("hashchange", handler);
   }, []);
 
-  const validDate = date === "today" || DATE_RE.test(date);
+  const browsing = date === "";
+  const validDate = DATE_RE.test(date);
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["digest", "markdown", date],
@@ -57,6 +62,7 @@ export function DigestView() {
   }, [poll.data, refetch, queryClient]);
 
   async function runDigest() {
+    if (!validDate) return;
     setSubmitError(null);
     setSubmitting(true);
     try {
@@ -92,50 +98,69 @@ export function DigestView() {
             flexWrap: "wrap",
           }}
         >
-          <h2
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--text-display-l)",
-              fontWeight: 400,
-              margin: 0,
-              letterSpacing: "var(--tracking-tight)",
-            }}
-          >
-            Digest
-          </h2>
-          <div style={{ display: "flex", gap: "1rem", alignItems: "baseline" }}>
-            <label
-              htmlFor={dateId}
+          <div style={{ display: "flex", alignItems: "baseline", gap: "1rem" }}>
+            <h2
               style={{
-                display: "flex",
-                alignItems: "baseline",
-                gap: "0.5rem",
-                fontFamily: "var(--font-mono)",
-                fontSize: "var(--text-micro)",
-                color: "var(--color-muted)",
-                letterSpacing: "var(--tracking-caps)",
-                textTransform: "uppercase",
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--text-display-l)",
+                fontWeight: 400,
+                margin: 0,
+                letterSpacing: "var(--tracking-tight)",
               }}
             >
-              date
-              <input
-                id={dateId}
-                type="date"
-                value={date === "today" ? isoToday() : date}
-                onChange={(e) => setDate(e.target.value || "today")}
-                className="queue-input queue-input--date"
-              />
-            </label>
-            <StatusBadge state={state} />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={runDigest}
-              disabled={submitting || state === "running" || state === "queued"}
-            >
-              {submitting ? "Submitting…" : "Run digest"}
-            </Button>
+              Digest
+            </h2>
+            {!browsing && (
+              <a
+                href="#/digest"
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "var(--text-micro)",
+                  color: "var(--color-accent)",
+                  letterSpacing: "0.04em",
+                }}
+              >
+                ‹ all dates
+              </a>
+            )}
           </div>
+          {!browsing && (
+            <div style={{ display: "flex", gap: "1rem", alignItems: "baseline" }}>
+              <label
+                htmlFor={dateId}
+                style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: "0.5rem",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "var(--text-micro)",
+                  color: "var(--color-muted)",
+                  letterSpacing: "var(--tracking-caps)",
+                  textTransform: "uppercase",
+                }}
+              >
+                date
+                <input
+                  id={dateId}
+                  type="date"
+                  value={validDate ? date : isoToday()}
+                  onChange={(e) => {
+                    if (e.target.value) window.location.hash = `#/digest/${e.target.value}`;
+                  }}
+                  className="queue-input queue-input--date"
+                />
+              </label>
+              <StatusBadge state={state} />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={runDigest}
+                disabled={submitting || state === "running" || state === "queued"}
+              >
+                {submitting ? "Submitting…" : "Run digest"}
+              </Button>
+            </div>
+          )}
         </header>
 
         {submitError && (
@@ -151,10 +176,19 @@ export function DigestView() {
           </div>
         )}
 
-        {isLoading && (
+        {browsing && (
+          <ContentDateGrid
+            kind="digest"
+            onPick={(picked) => {
+              window.location.hash = `#/digest/${picked}`;
+            }}
+          />
+        )}
+
+        {!browsing && isLoading && (
           <div className="skeleton-block" style={{ height: "12rem" }} aria-hidden="true" />
         )}
-        {isError && (
+        {!browsing && isError && (
           <div
             role="alert"
             style={{
@@ -163,11 +197,10 @@ export function DigestView() {
               color: "var(--color-muted)",
             }}
           >
-            Could not load digest:{" "}
-            {error instanceof Error ? error.message : "unknown error"}.
+            Could not load digest: {error instanceof Error ? error.message : "unknown error"}.
           </div>
         )}
-        {!isLoading && !isError && data && !data.exists && (
+        {!browsing && !isLoading && !isError && data && !data.exists && (
           <div
             style={{
               padding: "2rem 0",
@@ -202,7 +235,7 @@ export function DigestView() {
             to run the full daily iteration first.
           </div>
         )}
-        {!isLoading && !isError && data && data.exists && (
+        {!browsing && !isLoading && !isError && data && data.exists && (
           <article
             style={{
               fontFamily: "var(--font-display)",

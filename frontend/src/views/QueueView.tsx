@@ -2,13 +2,14 @@
 // Renders the candidate list, filter bar, hotkeys, and shortcut sheet.
 // Extension points: Chrome accepts a filterSlot; app.tsx can switch views on URL hash.
 
-import { useState, useCallback, useId } from "react";
+import { useState, useCallback, useEffect, useId } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { Candidate } from "../lib/api";
 import { api } from "../lib/api";
 import { useHotkeys } from "../lib/hotkeys";
 import { Chrome } from "../ui/Chrome";
 import { CandidateRow } from "../ui/CandidateRow";
+import { ContentDateGrid } from "../ui/ContentDateGrid";
 import { ShortcutSheet } from "../ui/ShortcutSheet";
 import type { Ring } from "../lib/api";
 import { writeUrlParams } from "../lib/urlState";
@@ -53,24 +54,33 @@ function filterCandidates(
 }
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const HASH_DATE_RE = /^#\/queue\/(\d{4}-\d{2}-\d{2})/;
 
-function readDateParam(): string {
-  const v = new URLSearchParams(window.location.search).get("date");
-  if (!v) return "today";
-  return v === "today" || DATE_RE.test(v) ? v : "today";
+// "" means browse mode — `#/queue` with no date segment shows the date grid.
+function readQueueDate(): string {
+  const match = HASH_DATE_RE.exec(window.location.hash);
+  return match ? match[1]! : "";
 }
 
 export function QueueView() {
   const filterId = useId();
   const dateId = useId();
 
-  // Date is part of the route — drives the query and the empty-state copy.
-  const [date, setDate] = useState<string>(readDateParam);
+  // Date is part of the route (`#/queue/2026-05-13`); "" shows the date grid.
+  const [date, setDate] = useState<string>(readQueueDate);
+
+  // A date-grid pick or a deep link changes the hash — keep state in sync.
+  useEffect(() => {
+    const handler = () => setDate(readQueueDate());
+    window.addEventListener("hashchange", handler);
+    return () => window.removeEventListener("hashchange", handler);
+  }, []);
 
   // Server state — date is part of the cache key so changing it refetches.
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["queue", date],
     queryFn: () => api.queue(date),
+    enabled: date !== "",
   });
 
   // UI state
@@ -88,16 +98,9 @@ export function QueueView() {
     () => new URLSearchParams(window.location.search).get("track"),
   );
 
-  function updateUrl(
-    newQ: string,
-    newRing: Ring | null,
-    newTrack: string | null,
-    newDate: string,
-  ) {
-    writeUrlParams(
-      { date: newDate, q: newQ, ring: newRing, track: newTrack },
-      { date: "today" },
-    );
+  // The filter params live in the query string; the date lives in the hash.
+  function updateUrl(newQ: string, newRing: Ring | null, newTrack: string | null) {
+    writeUrlParams({ q: newQ, ring: newRing, track: newTrack });
   }
 
   const candidates = data?.candidates ?? [];
@@ -201,6 +204,44 @@ export function QueueView() {
     Escape: handleEscape,
   });
 
+  // Browse mode — no date in the hash. Show the date grid instead of a queue.
+  if (date === "") {
+    return (
+      <div
+        style={{
+          minHeight: "100dvh",
+          display: "flex",
+          flexDirection: "column",
+          maxWidth: "80rem",
+          margin: "0 auto",
+        }}
+      >
+        <Chrome />
+        <main
+          style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}
+        >
+          <h2
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--text-display-l)",
+              fontWeight: 400,
+              margin: 0,
+              letterSpacing: "var(--tracking-tight)",
+            }}
+          >
+            Queue
+          </h2>
+          <ContentDateGrid
+            kind="queue"
+            onPick={(picked) => {
+              window.location.hash = `#/queue/${picked}${window.location.search}`;
+            }}
+          />
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
@@ -224,14 +265,25 @@ export function QueueView() {
             >
               date
             </label>
+            <a
+              href="#/queue"
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-micro)",
+                color: "var(--color-accent)",
+                letterSpacing: "0.04em",
+              }}
+            >
+              ‹ all dates
+            </a>
             <input
               id={dateId}
               type="date"
-              value={date === "today" ? new Date().toISOString().slice(0, 10) : date}
+              value={DATE_RE.test(date) ? date : new Date().toISOString().slice(0, 10)}
               onChange={(e) => {
-                const next = e.target.value || "today";
-                setDate(next);
-                updateUrl(q, ringFilter, trackFilter, next);
+                if (e.target.value) {
+                  window.location.hash = `#/queue/${e.target.value}${window.location.search}`;
+                }
               }}
               aria-label="Queue date"
               className="queue-input queue-input--date"
@@ -242,7 +294,7 @@ export function QueueView() {
               value={q}
               onChange={(e) => {
                 setQ(e.target.value);
-                updateUrl(e.target.value, ringFilter, trackFilter, date);
+                updateUrl(e.target.value, ringFilter, trackFilter);
               }}
               placeholder="Filter…"
               aria-label="Filter candidates"
@@ -317,7 +369,7 @@ export function QueueView() {
                 onClick={() => {
                   const next = active ? null : r;
                   setRingFilter(next);
-                  updateUrl(q, next, trackFilter, date);
+                  updateUrl(q, next, trackFilter);
                 }}
                 aria-pressed={active}
                 style={{
@@ -360,7 +412,7 @@ export function QueueView() {
                     onClick={() => {
                       const next = active ? null : t;
                       setTrackFilter(next);
-                      updateUrl(q, ringFilter, next, date);
+                      updateUrl(q, ringFilter, next);
                     }}
                     aria-pressed={active}
                     style={{

@@ -91,7 +91,8 @@ function parseRoute(): Route {
     if (raw === "settings") return "settings";
     if (raw === "pipeline") return "pipeline";
     if (raw === "score-debug") return "score-debug";
-    if (raw === "queue") return "queue";
+    // `queue/2026-05-13` → "queue"; QueueView reads the date from the hash.
+    if (raw.startsWith("queue")) return "queue";
     if (raw === "ecosystem/releases") return "ecosystem/releases";
     if (raw === "ecosystem/artifacts") return "ecosystem/artifacts";
     if (raw === "ecosystem") return "ecosystem";
