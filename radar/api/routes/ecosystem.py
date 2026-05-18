@@ -47,14 +47,14 @@ router = APIRouter(tags=["ecosystem"])
 
 
 def _to_event_item(
-    event: ArtifactEvent, artifact: Artifact, ref: ArtifactRef
+    event: ArtifactEvent, artifact: Artifact, ref: ArtifactRef | None
 ) -> EcosystemEventItem:
     return EcosystemEventItem(
         id=event.id,
         artifact_id=artifact.id,
         artifact_key=artifact.key,
         artifact_name=artifact.name,
-        ecosystem=ref.ecosystem,
+        ecosystem=ref.ecosystem if ref is not None else "unknown",
         event_type=event.event_type,
         version=event.version,
         event_date=event.event_date,
@@ -194,7 +194,7 @@ def get_ecosystem_artifact(
         artifact.events, key=lambda event: (event.event_date, event.id), reverse=True
     )
     events = [
-        _to_event_item(event, artifact, refs_by_id[event.artifact_ref_id])
+        _to_event_item(event, artifact, refs_by_id.get(event.artifact_ref_id))
         for event in events_sorted
     ]
 

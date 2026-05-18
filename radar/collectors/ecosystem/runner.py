@@ -156,6 +156,8 @@ def run_ecosystem_fetch(
 
     try:
         for artifact_config in config.artifacts.artifacts:
+            if not artifact_config.enabled:
+                continue
             artifact = session.scalar(select(Artifact).where(Artifact.key == artifact_config.key))
             if artifact is None:
                 continue
