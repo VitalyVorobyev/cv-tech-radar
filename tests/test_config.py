@@ -80,3 +80,57 @@ sources:
     )
     with pytest.raises(ConfigError):
         load_app_config(config_dir)
+
+
+def test_artifacts_config_loads(app_config):
+    keys = {artifact.key for artifact in app_config.artifacts.artifacts}
+    assert "opencv" in keys
+    opencv = next(a for a in app_config.artifacts.artifacts if a.key == "opencv")
+    assert {ref.ecosystem for ref in opencv.refs} >= {"github", "pypi"}
+
+
+def test_missing_artifacts_file_is_tolerated(tmp_path):
+    config_dir = copy_config(tmp_path)
+    (config_dir / "artifacts.yaml").unlink()
+    config = load_app_config(config_dir)
+    assert config.artifacts.artifacts == []
+
+
+def test_artifact_unknown_track_fails(tmp_path):
+    config_dir = copy_config(tmp_path)
+    (config_dir / "artifacts.yaml").write_text(
+        """
+artifacts:
+  - key: opencv
+    name: OpenCV
+    capability: cv-imaging
+    tracks: [Not A Real Track]
+    refs:
+      - { ecosystem: github, ref: opencv/opencv }
+""",
+        encoding="utf-8",
+    )
+    with pytest.raises(ConfigError):
+        load_app_config(config_dir)
+
+
+def test_artifact_duplicate_ecosystem_ref_fails(tmp_path):
+    config_dir = copy_config(tmp_path)
+    (config_dir / "artifacts.yaml").write_text(
+        """
+artifacts:
+  - key: opencv
+    name: OpenCV
+    capability: cv-imaging
+    refs:
+      - { ecosystem: github, ref: opencv/opencv }
+  - key: opencv-fork
+    name: OpenCV fork
+    capability: cv-imaging
+    refs:
+      - { ecosystem: github, ref: opencv/opencv }
+""",
+        encoding="utf-8",
+    )
+    with pytest.raises(ConfigError):
+        load_app_config(config_dir)

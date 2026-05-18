@@ -8,9 +8,20 @@ from pathlib import Path
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, aliased
 
-from radar.models import Digest, Item, ItemClassification, RadarDecision
+from radar.models import (
+    Artifact,
+    ArtifactEvent,
+    ArtifactRef,
+    Digest,
+    Item,
+    ItemClassification,
+    RadarDecision,
+)
 from radar.schemas import RadarRing
 from radar.utils import date_window_bounds, ensure_dir, utc_now
+
+# Rows as returned by radar.reports.ecosystem.collect_ecosystem_events.
+EcosystemEventRow = tuple[ArtifactEvent, Artifact, ArtifactRef]
 
 DIGEST_RING_ORDER: tuple[RadarRing, ...] = (
     RadarRing.USE,
@@ -99,7 +110,10 @@ def render_digest_markdown(
     rows: list[tuple[Item, RadarDecision]],
     target_date: date,
     days: int,
+    *,
+    ecosystem_events: list[EcosystemEventRow] | None = None,
 ) -> str:
+    ecosystem_events = ecosystem_events or []
     window_label = f"window: {days} day{'s' if days != 1 else ''}"
     lines: list[str] = [
         f"# Daily Digest — {target_date.isoformat()} ({window_label})",
@@ -107,6 +121,7 @@ def render_digest_markdown(
     ]
     if not rows:
         lines.extend(["_No decisions for window._", ""])
+        _append_ecosystem_section(lines, ecosystem_events)
         return "\n".join(lines)
 
     by_ring: dict[str, list[tuple[Item, RadarDecision]]] = {ring.value: [] for ring in RadarRing}
@@ -134,6 +149,8 @@ def render_digest_markdown(
         for item, _ in ignore_bucket[:IGNORE_PREVIEW_LIMIT]:
             lines.append(f"- {item.title}")
         lines.append("")
+
+    _append_ecosystem_section(lines, ecosystem_events)
 
     uncertain_rows = [(item, dec) for item, dec in rows if dec.uncertain]
     lines.append("## Uncertainty / Open Questions")
@@ -167,6 +184,32 @@ def _render_item_block(
     return block
 
 
+_EVENT_TYPE_LABELS = {"major_release": "major release", "release": "release"}
+
+
+def _append_ecosystem_section(lines: list[str], events: list[EcosystemEventRow]) -> None:
+    """Append the ``## Ecosystem`` section — relevant release events for the window.
+
+    The ecosystem lane has no per-event curator decision (events are surfaced
+    straight from the relevance filter), so this lists ``relevant`` events as
+    collected, newest first.
+    """
+    lines.append("## Ecosystem")
+    lines.append("")
+    if not events:
+        lines.extend(["_No release events for window._", ""])
+        return
+    for event, artifact, ref in events:
+        version = event.version or "—"
+        label = _EVENT_TYPE_LABELS.get(event.event_type, event.event_type.replace("_", " "))
+        lines.append(
+            f"- **{artifact.name}** {version} — {label} ({ref.ecosystem}) ([link]({event.url}))"
+        )
+        if event.summary:
+            lines.append(f"  {event.summary}")
+    lines.append("")
+
+
 def write_digest_outputs(
     session: Session,
     rows: list[tuple[Item, RadarDecision]],
@@ -175,10 +218,12 @@ def write_digest_outputs(
     *,
     reports_dir: Path | str = Path("reports/digests"),
     exports_dir: Path | str = Path("data/exports/digests"),
+    ecosystem_events: list[EcosystemEventRow] | None = None,
 ) -> tuple[Path, Path]:
+    ecosystem_events = ecosystem_events or []
     report_path = ensure_dir(Path(reports_dir)) / f"{target_date.isoformat()}.md"
     export_path = ensure_dir(Path(exports_dir)) / f"{target_date.isoformat()}.json"
-    markdown = render_digest_markdown(rows, target_date, days)
+    markdown = render_digest_markdown(rows, target_date, days, ecosystem_events=ecosystem_events)
     report_path.write_text(markdown, encoding="utf-8")
 
     export_payload = {
@@ -201,6 +246,21 @@ def write_digest_outputs(
                 else None,
             }
             for item, decision in rows
+        ],
+        "ecosystem_events": [
+            {
+                "event_id": event.id,
+                "artifact_key": artifact.key,
+                "artifact_name": artifact.name,
+                "ecosystem": ref.ecosystem,
+                "event_type": event.event_type,
+                "version": event.version,
+                "severity": event.severity,
+                "url": event.url,
+                "summary": event.summary,
+                "event_date": event.event_date.isoformat() if event.event_date else None,
+            }
+            for event, artifact, ref in ecosystem_events
         ],
     }
     export_path.write_text(

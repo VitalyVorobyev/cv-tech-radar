@@ -1,0 +1,235 @@
+# Ecosystem monitoring artifacts.
+#
+# Each artifact is one software *project*, tracked across one or more package
+# ecosystems (github / pypi / crates / npm). Releases and version changes for
+# these refs feed the separate Ecosystem radar — see docs/ecosystem.md.
+#
+# Fields:
+#   key          stable slug, the artifact's identity (do not rename casually)
+#   status       adopted (part of the stack) | watchlist (evaluating upstream)
+#   capability   ecosystem radar quadrant:
+#                cv-imaging | ml-runtimes | viz-3d-sensors | build-tooling
+#   tracks       radar track names — must match config/topics.yaml
+#   refs         ecosystem refs: owner/repo for github, package name otherwise
+#   track_major_only  emit events only for major version bumps
+#   extra_keywords    widen release-note relevance matching for this artifact
+#
+# This list is a hand-maintained inventory — curate it to match what you
+# actually use and watch.
+
+artifacts:
+  # --- Adopted stack -------------------------------------------------------
+  - key: opencv
+    name: OpenCV
+    description: Core open-source computer vision library.
+    status: adopted
+    capability: cv-imaging
+    homepage_url: https://opencv.org
+    tracks:
+      - Open-Source CV Tooling
+      - Calibration & Camera Models
+    refs:
+      - { ecosystem: github, ref: opencv/opencv }
+      - { ecosystem: pypi, ref: opencv-python }
+    extra_keywords: [aruco, charuco, calib3d]
+
+  - key: opencv-rust
+    name: opencv-rust
+    description: Rust bindings for OpenCV.
+    status: adopted
+    capability: cv-imaging
+    tracks:
+      - Open-Source CV Tooling
+    refs:
+      # github omitted: twistedfall/opencv-rust ships via tags, no GitHub Releases.
+      - { ecosystem: crates, ref: opencv }
+
+  - key: nalgebra
+    name: nalgebra
+    description: Rust linear algebra library for geometry and transforms.
+    status: adopted
+    capability: cv-imaging
+    homepage_url: https://nalgebra.org
+    tracks:
+      - 3D Geometry & Reconstruction
+      - Open-Source CV Tooling
+    refs:
+      # github omitted: dimforge/nalgebra ships via tags, no GitHub Releases.
+      - { ecosystem: crates, ref: nalgebra }
+
+  - key: ndarray
+    name: ndarray
+    description: N-dimensional array container for Rust.
+    status: adopted
+    capability: cv-imaging
+    tracks:
+      - Open-Source CV Tooling
+    refs:
+      - { ecosystem: github, ref: rust-ndarray/ndarray }
+      - { ecosystem: crates, ref: ndarray }
+
+  - key: image-rs
+    name: image
+    description: Pure-Rust image encoding, decoding and processing.
+    status: adopted
+    capability: cv-imaging
+    tracks:
+      - Open-Source CV Tooling
+    refs:
+      # github omitted: image-rs/image ships via tags, no GitHub Releases.
+      - { ecosystem: crates, ref: image }
+
+  - key: pytorch
+    name: PyTorch
+    description: Deep learning framework.
+    status: adopted
+    capability: ml-runtimes
+    homepage_url: https://pytorch.org
+    tracks:
+      - Vision Foundation Models
+      - Edge AI & Deployment
+    refs:
+      - { ecosystem: github, ref: pytorch/pytorch }
+      - { ecosystem: pypi, ref: torch }
+
+  - key: onnxruntime
+    name: ONNX Runtime
+    description: Cross-platform inference and training accelerator.
+    status: adopted
+    capability: ml-runtimes
+    tracks:
+      - Edge AI & Deployment
+    refs:
+      - { ecosystem: github, ref: microsoft/onnxruntime }
+      - { ecosystem: pypi, ref: onnxruntime }
+
+  - key: rerun
+    name: Rerun
+    description: Multimodal data visualization for CV and robotics.
+    status: adopted
+    capability: viz-3d-sensors
+    homepage_url: https://rerun.io
+    tracks:
+      - 3D Geometry & Reconstruction
+    refs:
+      - { ecosystem: github, ref: rerun-io/rerun }
+      - { ecosystem: pypi, ref: rerun-sdk }
+      - { ecosystem: crates, ref: rerun }
+
+  - key: zenoh
+    name: Zenoh
+    description: Zero-overhead pub/sub, store and query protocol.
+    status: adopted
+    capability: build-tooling
+    tracks:
+      - Robotics Vision
+    refs:
+      - { ecosystem: github, ref: eclipse-zenoh/zenoh }
+      - { ecosystem: crates, ref: zenoh }
+
+  - key: vite
+    name: Vite
+    description: Frontend build tool used by the radar UI.
+    status: adopted
+    capability: build-tooling
+    track_major_only: true
+    tracks:
+      - Open-Source CV Tooling
+    refs:
+      # github omitted: vitejs/vite is a monorepo; its newest Release is a
+      # sibling sub-package (plugin-legacy), not vite core. npm is authoritative.
+      - { ecosystem: npm, ref: vite }
+
+  - key: tauri
+    name: Tauri
+    description: Toolkit for building desktop apps with web frontends.
+    status: adopted
+    capability: build-tooling
+    tracks:
+      - Open-Source CV Tooling
+    refs:
+      # github omitted: tauri-apps/tauri is a monorepo; its newest Release is a
+      # sibling sub-package (tauri-cli), not the tauri crate. crates is authoritative.
+      - { ecosystem: crates, ref: tauri }
+
+  # --- Watchlist -----------------------------------------------------------
+  - key: ort
+    name: ort
+    description: Rust wrapper for ONNX Runtime.
+    status: watchlist
+    capability: ml-runtimes
+    tracks:
+      - Edge AI & Deployment
+    refs:
+      - { ecosystem: github, ref: pykeio/ort }
+      - { ecosystem: crates, ref: ort }
+
+  - key: candle
+    name: Candle
+    description: Minimalist ML framework for Rust.
+    status: watchlist
+    capability: ml-runtimes
+    tracks:
+      - Edge AI & Deployment
+      - Vision Foundation Models
+    refs:
+      # github omitted: huggingface/candle ships via tags, no GitHub Releases.
+      - { ecosystem: crates, ref: candle-core }
+
+  - key: burn
+    name: Burn
+    description: Deep learning framework for Rust.
+    status: watchlist
+    capability: ml-runtimes
+    tracks:
+      - Edge AI & Deployment
+    refs:
+      - { ecosystem: github, ref: tracel-ai/burn }
+      - { ecosystem: crates, ref: burn }
+
+  - key: ultralytics
+    name: Ultralytics
+    description: YOLO object detection and tracking models.
+    status: watchlist
+    capability: ml-runtimes
+    tracks:
+      - Object Tracking
+      - Vision Foundation Models
+    refs:
+      - { ecosystem: github, ref: ultralytics/ultralytics }
+      - { ecosystem: pypi, ref: ultralytics }
+
+  - key: kornia
+    name: Kornia
+    description: Differentiable computer vision library for PyTorch.
+    status: watchlist
+    capability: cv-imaging
+    tracks:
+      - Open-Source CV Tooling
+      - 3D Geometry & Reconstruction
+    refs:
+      - { ecosystem: github, ref: kornia/kornia }
+      - { ecosystem: pypi, ref: kornia }
+
+  - key: open3d
+    name: Open3D
+    description: Library for 3D data processing and visualization.
+    status: watchlist
+    capability: viz-3d-sensors
+    tracks:
+      - 3D Geometry & Reconstruction
+      - 3D Sensors
+    refs:
+      - { ecosystem: github, ref: isl-org/Open3D }
+      - { ecosystem: pypi, ref: open3d }
+
+  - key: slint
+    name: Slint
+    description: Declarative GUI toolkit for Rust, C++ and JavaScript.
+    status: watchlist
+    capability: build-tooling
+    tracks:
+      - Open-Source CV Tooling
+    refs:
+      - { ecosystem: github, ref: slint-ui/slint }
+      - { ecosystem: crates, ref: slint }

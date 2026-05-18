@@ -17,6 +17,7 @@ from typing import Protocol
 from sqlalchemy import select
 
 from radar.collectors.arxiv import ArxivFetchStats, fetch_and_store_arxiv
+from radar.collectors.ecosystem.runner import EcosystemFetchStats, run_ecosystem_fetch
 from radar.curation import (
     ApplyReport,
     ProposalParseError,
@@ -30,6 +31,7 @@ from radar.models import Item, Source
 from radar.relevance_check import JudgmentSummary, check_relevance_for_date
 from radar.reports.candidate_queue import collect_candidates, write_candidate_outputs
 from radar.reports.digest import collect_digest_rows, write_digest_outputs
+from radar.reports.ecosystem import collect_ecosystem_events
 from radar.schemas import AppConfig, ChatSettings, EmbeddingsSettings
 
 
@@ -115,6 +117,54 @@ def format_fetch_summary(summary: FetchArxivSummary) -> str:
     return msg
 
 
+@dataclass
+class FetchEcosystemSummary:
+    artifacts_synced: int = 0
+    refs_polled: int = 0
+    refs_ok: int = 0
+    refs_not_found: int = 0
+    refs_errored: int = 0
+    events_created: int = 0
+    per_ref_errors: list[tuple[str, str, str]] = field(default_factory=list)
+
+
+def run_fetch_ecosystem(
+    session,
+    config: AppConfig,
+    *,
+    github_token: str | None = None,
+) -> FetchEcosystemSummary:
+    stats: EcosystemFetchStats = run_ecosystem_fetch(
+        session,
+        config,
+        github_token=github_token,
+    )
+    return FetchEcosystemSummary(
+        artifacts_synced=stats.artifacts_synced,
+        refs_polled=stats.refs_polled,
+        refs_ok=stats.refs_ok,
+        refs_not_found=stats.refs_not_found,
+        refs_errored=stats.refs_errored,
+        events_created=stats.events_created,
+        per_ref_errors=list(stats.per_ref_errors),
+    )
+
+
+def format_ecosystem_summary(summary: FetchEcosystemSummary) -> str:
+    msg = (
+        f"ecosystem: {summary.artifacts_synced} artifact(s) synced, "
+        f"{summary.refs_polled} ref(s) polled "
+        f"— {summary.refs_ok} ok, {summary.refs_not_found} not found, "
+        f"{summary.refs_errored} errored. "
+        f"{summary.events_created} new release event(s)."
+    )
+    if summary.per_ref_errors:
+        msg += "\n[yellow]Ref failures:[/yellow]"
+        for key, ecosystem, error in summary.per_ref_errors:
+            msg += f"\n  [yellow]{key} ({ecosystem}): {error}[/yellow]"
+    return msg
+
+
 def run_classify(session, config: AppConfig, target_date) -> int:
     return classify_items_for_date(session, config, target_date)
 
@@ -185,6 +235,12 @@ def run_digest(
     exports_dir: Path,
 ) -> DigestSummary:
     rows = collect_digest_rows(session, target_date, days)
+    ecosystem_events = collect_ecosystem_events(
+        session,
+        target_date=target_date,
+        days=days,
+        relevant_only=True,
+    )
     report_path, export_path = write_digest_outputs(
         session,
         rows,
@@ -192,6 +248,7 @@ def run_digest(
         days,
         reports_dir=reports_dir,
         exports_dir=exports_dir,
+        ecosystem_events=ecosystem_events,
     )
     return DigestSummary(count=len(rows), report_path=report_path, export_path=export_path)
 
@@ -236,9 +293,11 @@ __all__ = [
     "DigestSummary",
     "EmbedSummary",
     "FetchArxivSummary",
+    "FetchEcosystemSummary",
     "JudgmentSummary",
     "ProgressCallback",
     "ProposalParseError",
+    "format_ecosystem_summary",
     "format_fetch_summary",
     "run_apply",
     "run_candidates",
@@ -246,5 +305,6 @@ __all__ = [
     "run_digest",
     "run_embed",
     "run_fetch_arxiv",
+    "run_fetch_ecosystem",
     "run_relevance_check",
 ]

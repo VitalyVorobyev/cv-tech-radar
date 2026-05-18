@@ -69,6 +69,24 @@ export interface QueueResponse {
   candidates: Candidate[];
 }
 
+// Non-empty content days — backs the Queue/Digest date-grid landing.
+export interface QueueDate {
+  date: string;
+  candidate_count: number;
+  decided_count: number;
+}
+
+export interface DigestDate {
+  date: string;
+  title: string;
+  item_count: number;
+}
+
+export interface ContentDatesResponse {
+  queue: QueueDate[];
+  digest: DigestDate[];
+}
+
 export interface HealthResponse {
   ok: boolean;
   version: string;
@@ -549,6 +567,133 @@ export interface ManualItemResponse {
   final_score: number;
 }
 
+// Ecosystem monitoring ------------------------------------------------------
+// A separate radar lane: software artifacts (libraries) tracked across
+// GitHub / PyPI / crates.io / npm. Mirrors radar/api/schemas.py exactly.
+
+export type Ecosystem = "github" | "pypi" | "crates" | "npm";
+
+export type Capability =
+  | "cv-imaging"
+  | "ml-runtimes"
+  | "viz-3d-sensors"
+  | "build-tooling";
+
+export type EventSeverity = "high" | "medium" | "low";
+
+export interface EcosystemLatestEvent {
+  event_type: string;
+  version: string | null;
+  event_date: string;
+  summary: string;
+  url: string;
+}
+
+export interface ArtifactBoardItem {
+  artifact_id: number;
+  key: string;
+  name: string;
+  description: string;
+  status: string;
+  ring: Ring;
+  capability: string;
+  tracks: string[];
+  ecosystems: string[];
+  latest_event: EcosystemLatestEvent | null;
+  recent_event_count: number;
+  decided_at: string | null;
+  movement: Movement | null;
+}
+
+export interface EcosystemBoardRings {
+  Use: ArtifactBoardItem[];
+  Prototype: ArtifactBoardItem[];
+  Evaluate: ArtifactBoardItem[];
+  Watch: ArtifactBoardItem[];
+  Ignore: ArtifactBoardItem[];
+}
+
+export interface EcosystemBoardResponse {
+  rings: EcosystemBoardRings;
+  counts: BoardCounts;
+  include_ignore: boolean;
+}
+
+export interface EcosystemEventItem {
+  id: number;
+  artifact_id: number;
+  artifact_key: string;
+  artifact_name: string;
+  ecosystem: string;
+  event_type: string;
+  version: string | null;
+  event_date: string;
+  summary: string;
+  body: string;
+  url: string;
+  severity: string;
+  relevant: boolean;
+  matched_keywords: string[];
+}
+
+export interface EcosystemEventsResponse {
+  date: string;
+  days: number;
+  events: EcosystemEventItem[];
+}
+
+export interface EcosystemEventsQuery {
+  date?: string;
+  days?: number;
+  relevant_only?: boolean;
+  artifact_key?: string | null;
+  ecosystem?: string | null;
+}
+
+export interface ArtifactRefDetail {
+  ecosystem: string;
+  ref: string;
+  last_version: string | null;
+  last_release_at: string | null;
+  last_status: string;
+  last_checked_at: string | null;
+}
+
+export interface ArtifactDecisionEntry {
+  ring: Ring;
+  tracks: string[];
+  reason: string;
+  action: string;
+  decided_by: string;
+  uncertain: boolean;
+  decided_at: string;
+}
+
+export interface ArtifactDetail {
+  artifact_id: number;
+  key: string;
+  name: string;
+  description: string;
+  status: string;
+  capability: string;
+  homepage_url: string;
+  ring: Ring;
+  tracks: string[];
+  refs: ArtifactRefDetail[];
+  events: EcosystemEventItem[];
+  decisions: ArtifactDecisionEntry[];
+}
+
+export interface ArtifactDecisionRequest {
+  artifact_id: number;
+  ring: Ring;
+  reason: string;
+  action?: string;
+  tracks?: string[];
+  uncertain?: boolean;
+  decided_by?: string;
+}
+
 export const api = {
   health(): Promise<HealthResponse> {
     return request<HealthResponse>("/api/health");
@@ -557,6 +702,16 @@ export const api = {
   queue(date: string = "today", limit = 25): Promise<QueueResponse> {
     const params = new URLSearchParams({ date, limit: String(limit) });
     return request<QueueResponse>(`/api/queue?${params}`);
+  },
+
+  // Non-empty content days, for the Queue/Digest date-grid landing. The Queue
+  // and Digest views exist only in the served (non-static) build, so static
+  // mode just yields an empty listing.
+  contentDates(): Promise<ContentDatesResponse> {
+    if (isStaticMode()) {
+      return Promise.resolve({ queue: [], digest: [] });
+    }
+    return request<ContentDatesResponse>("/api/content-dates");
   },
 
   postDecision(body: DecisionRequest): Promise<DecisionResponse> {
@@ -813,5 +968,64 @@ export const api = {
     return request<NearDuplicatesResponse>(
       `/api/near-duplicates?${params}`,
     );
+  },
+
+  // ---- ecosystem ----------------------------------------------------------
+
+  ecosystemBoard(includeIgnore = false): Promise<EcosystemBoardResponse> {
+    if (isStaticMode()) {
+      return readStatic<EcosystemBoardResponse>("ecosystem-board.json");
+    }
+    const params = new URLSearchParams();
+    if (includeIgnore) params.set("include_ignore", "true");
+    const qs = params.toString();
+    return request<EcosystemBoardResponse>(
+      `/api/ecosystem/board${qs ? `?${qs}` : ""}`,
+    );
+  },
+
+  ecosystemEvents(query: EcosystemEventsQuery = {}): Promise<EcosystemEventsResponse> {
+    // The static bundle ships one events file (relevant + irrelevant, a wide
+    // window); the `relevant only` toggle and ecosystem filter are applied
+    // client-side in EcosystemView when there is no backend.
+    if (isStaticMode()) {
+      return readStatic<EcosystemEventsResponse>("ecosystem-events.json");
+    }
+    const params = new URLSearchParams();
+    if (query.date) params.set("date", query.date);
+    if (query.days !== undefined) params.set("days", String(query.days));
+    if (query.relevant_only !== undefined) {
+      params.set("relevant_only", query.relevant_only ? "true" : "false");
+    }
+    if (query.artifact_key) params.set("artifact_key", query.artifact_key);
+    if (query.ecosystem) params.set("ecosystem", query.ecosystem);
+    const qs = params.toString();
+    return request<EcosystemEventsResponse>(
+      `/api/ecosystem/events${qs ? `?${qs}` : ""}`,
+    );
+  },
+
+  ecosystemArtifact(id: number): Promise<ArtifactDetail> {
+    if (isStaticMode()) {
+      return readStatic<ArtifactDetail>(
+        `ecosystem-artifacts/${encodeURIComponent(String(id))}.json`,
+      );
+    }
+    return request<ArtifactDetail>(
+      `/api/ecosystem/artifacts/${encodeURIComponent(String(id))}`,
+    );
+  },
+
+  postEcosystemDecision(
+    body: ArtifactDecisionRequest,
+  ): Promise<DecisionResponse> {
+    if (isStaticMode()) {
+      return refuseInStatic<DecisionResponse>("postEcosystemDecision");
+    }
+    return request<DecisionResponse>("/api/ecosystem/decisions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
   },
 };

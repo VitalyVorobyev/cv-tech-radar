@@ -8,6 +8,7 @@ from pydantic import ValidationError
 
 from radar.schemas import (
     AppConfig,
+    ArtifactsConfig,
     EmbeddingsConfig,
     NegativeTopicsConfig,
     PrioritySourcesConfig,
@@ -33,6 +34,17 @@ def _read_yaml(path: Path) -> dict[str, Any]:
     return data
 
 
+def _read_yaml_optional(path: Path) -> dict[str, Any]:
+    """Read a YAML mapping, returning {} when the file is absent.
+
+    Used for optional config files (e.g. artifacts.yaml) so deployments that
+    predate the file keep loading unchanged.
+    """
+    if not path.exists():
+        return {}
+    return _read_yaml(path)
+
+
 def load_app_config(config_dir: Path | str = "config") -> AppConfig:
     root = Path(config_dir)
     try:
@@ -47,6 +59,7 @@ def load_app_config(config_dir: Path | str = "config") -> AppConfig:
             ),
             scoring=ScoringConfig.model_validate(_read_yaml(root / "scoring.yaml")),
             embeddings=EmbeddingsConfig.model_validate(_read_yaml(root / "embeddings.yaml")),
+            artifacts=ArtifactsConfig.model_validate(_read_yaml_optional(root / "artifacts.yaml")),
         )
     except ValidationError as exc:
         msg = f"Invalid radar configuration in {root}: {exc}"

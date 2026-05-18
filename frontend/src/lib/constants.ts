@@ -8,7 +8,9 @@ export const GOLDEN_ANGLE_DEG = 137.508;
 export const GOLDEN_RATIO = 0.6180339;
 
 export interface Quadrant {
-  id: QuadrantId;
+  // Papers radar uses QuadrantId; the ecosystem radar uses CapabilityId.
+  // Both are plain string slugs, so `string` keeps RadarPlot generic.
+  id: string;
   label: string;
   tracks: readonly string[];
 }
@@ -47,6 +49,38 @@ export const RING_COPY: Record<Exclude<Ring, "Ignore">, string> = {
   Evaluate: "Worth a closer look. Benchmark or read-through.",
   Watch: "Adjacent. Track upstream development.",
 };
+
+// --- Ecosystem radar quadrants ---------------------------------------------
+// The ecosystem radar's four quadrants are the artifact `capability` values —
+// a fixed backend enum (radar/schemas.py CapabilityId), NOT config-driven, so
+// they are hardcoded here. Order maps to RadarPlot's TL, TR, BR, BL positions.
+
+export type CapabilityId =
+  | "cv-imaging"
+  | "ml-runtimes"
+  | "build-tooling"
+  | "viz-3d-sensors";
+
+export const CAPABILITY_QUADRANTS: ReadonlyArray<{
+  id: CapabilityId;
+  label: string;
+}> = [
+  { id: "cv-imaging", label: "CV & imaging" }, // TL
+  { id: "ml-runtimes", label: "ML runtimes & models" }, // TR
+  { id: "build-tooling", label: "Build & app tooling" }, // BR
+  { id: "viz-3d-sensors", label: "3D, sensors & viz" }, // BL
+] as const;
+
+// One Quadrant per capability whose `tracks` array contains exactly that
+// capability id — the ecosystem radar places each dot by `capability`, so the
+// quadrant's membership list IS the single capability id.
+export const ECOSYSTEM_QUADRANTS: readonly Quadrant[] = CAPABILITY_QUADRANTS.map(
+  (cap) => ({ id: cap.id, label: cap.label, tracks: [cap.id] as const }),
+);
+
+export const CAPABILITY_LABEL: Record<CapabilityId, string> = Object.fromEntries(
+  CAPABILITY_QUADRANTS.map((cap) => [cap.id, cap.label]),
+) as Record<CapabilityId, string>;
 
 export const LAUNCH_DATE = new Date("2025-12-01T00:00:00Z");
 

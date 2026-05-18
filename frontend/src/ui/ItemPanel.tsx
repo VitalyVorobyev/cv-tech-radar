@@ -75,6 +75,26 @@ export function ItemPanel({
     },
   });
 
+  // "Remove from radar" records an Ignore decision — the item drops off the
+  // board (which excludes Ignore) but keeps its history and can be re-decided.
+  const remove = useMutation({
+    mutationFn: async () => {
+      if (!data) throw new Error("no item");
+      return api.postDecision({
+        item_id: itemId,
+        ring: "Ignore",
+        reason: data.reason || "Removed from the radar.",
+        action: "",
+        tracks: data.tracks,
+        uncertain: data.uncertain,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["board"] });
+      onClose();
+    },
+  });
+
   // Esc to close.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -162,6 +182,8 @@ export function ItemPanel({
           data={data}
           onTrackClick={onTrackClick}
           onPromote={promote.mutate}
+          onRemove={remove.mutate}
+          removePending={remove.isPending}
           onSelectItem={onSelectItem}
         />
       )}
@@ -173,11 +195,15 @@ function ItemPanelBody({
   data,
   onTrackClick,
   onPromote,
+  onRemove,
+  removePending,
   onSelectItem,
 }: {
   data: ItemDetail;
   onTrackClick?(track: string): void;
   onPromote(target: Ring): void;
+  onRemove(): void;
+  removePending: boolean;
   onSelectItem?(itemId: number): void;
 }) {
   const ringIsAccent = data.ring === "Use" || data.ring === "Prototype";
@@ -185,6 +211,7 @@ function ItemPanelBody({
     data.ring && data.ring !== "Ignore" ? nextRing(data.ring as Ring, "promote") : null;
   const demoteTarget =
     data.ring && data.ring !== "Ignore" ? nextRing(data.ring as Ring, "demote") : null;
+  const canRemove = Boolean(data.ring) && data.ring !== "Ignore";
   return (
     <>
       <h2
@@ -359,6 +386,16 @@ function ItemPanelBody({
         {!IS_STATIC && demoteTarget && (
           <button type="button" style={actionStyle} onClick={() => onPromote(demoteTarget)}>
             Demote to {demoteTarget}
+          </button>
+        )}
+        {!IS_STATIC && canRemove && (
+          <button
+            type="button"
+            style={removeStyle}
+            disabled={removePending}
+            onClick={() => onRemove()}
+          >
+            {removePending ? "Removing…" : "Remove from radar"}
           </button>
         )}
       </footer>
@@ -538,4 +575,13 @@ const actionStyle = {
   borderRadius: "var(--radius-sm)",
   textDecoration: "none",
   cursor: "pointer",
+} as const;
+
+// "Remove from radar" — set apart from Promote/Demote as a quieter, terminal
+// action: muted text, no border emphasis, pushed to the end of the footer row.
+const removeStyle = {
+  ...actionStyle,
+  marginLeft: "auto",
+  color: "var(--color-muted)",
+  border: "1px solid transparent",
 } as const;

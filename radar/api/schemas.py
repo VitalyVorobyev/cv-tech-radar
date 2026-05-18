@@ -228,3 +228,138 @@ class TimelineWeekOut(BaseModel):
 
 class TimelineResponse(BaseModel):
     weeks: list[TimelineWeekOut]
+
+
+# --- Ecosystem monitoring ---------------------------------------------------
+
+
+class EcosystemLatestEvent(BaseModel):
+    event_type: str
+    version: str | None
+    event_date: datetime
+    summary: str
+    url: str
+
+
+class ArtifactBoardItem(BaseModel):
+    artifact_id: int
+    key: str
+    name: str
+    description: str
+    status: str
+    ring: str
+    capability: str
+    tracks: list[str] = Field(default_factory=list)
+    ecosystems: list[str] = Field(default_factory=list)
+    latest_event: EcosystemLatestEvent | None = None
+    recent_event_count: int = 0
+    decided_at: datetime | None = None
+    movement: Movement | None = None
+
+
+class EcosystemBoardRingsOut(BaseModel):
+    Use: list[ArtifactBoardItem] = Field(default_factory=list)
+    Prototype: list[ArtifactBoardItem] = Field(default_factory=list)
+    Evaluate: list[ArtifactBoardItem] = Field(default_factory=list)
+    Watch: list[ArtifactBoardItem] = Field(default_factory=list)
+    Ignore: list[ArtifactBoardItem] = Field(default_factory=list)
+
+
+class EcosystemBoardResponse(BaseModel):
+    rings: EcosystemBoardRingsOut
+    counts: BoardCountsOut
+    include_ignore: bool = False
+
+
+class EcosystemEventItem(BaseModel):
+    id: int
+    artifact_id: int
+    artifact_key: str
+    artifact_name: str
+    ecosystem: str
+    event_type: str
+    version: str | None
+    event_date: datetime
+    summary: str
+    body: str
+    url: str
+    severity: str
+    relevant: bool
+    matched_keywords: list[str] = Field(default_factory=list)
+
+
+class EcosystemEventsResponse(BaseModel):
+    date: str
+    days: int
+    events: list[EcosystemEventItem] = Field(default_factory=list)
+
+
+class ArtifactRefDetail(BaseModel):
+    ecosystem: str
+    ref: str
+    last_version: str | None = None
+    last_release_at: datetime | None = None
+    last_status: str
+    last_checked_at: datetime | None = None
+
+
+class ArtifactDecisionEntry(BaseModel):
+    ring: str
+    tracks: list[str] = Field(default_factory=list)
+    reason: str
+    action: str
+    decided_by: str
+    uncertain: bool
+    decided_at: datetime
+
+
+class ArtifactDetailResponse(BaseModel):
+    artifact_id: int
+    key: str
+    name: str
+    description: str
+    status: str
+    capability: str
+    homepage_url: str
+    ring: str
+    tracks: list[str] = Field(default_factory=list)
+    refs: list[ArtifactRefDetail] = Field(default_factory=list)
+    events: list[EcosystemEventItem] = Field(default_factory=list)
+    decisions: list[ArtifactDecisionEntry] = Field(default_factory=list)
+
+
+class ArtifactDecisionCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    artifact_id: int
+    ring: RadarRing
+    reason: str = Field(min_length=1)
+    action: str = ""
+    tracks: list[str] | None = None
+    uncertain: bool = False
+    decided_by: str = "web-curator"
+
+
+class ArtifactDecisionCreatedOut(BaseModel):
+    decision_id: int
+    created_at: datetime
+
+
+# --- Content-date listings (Queue / Digest date-grid landing) ---------------
+
+
+class QueueDateOut(BaseModel):
+    date: str
+    candidate_count: int
+    decided_count: int
+
+
+class DigestDateOut(BaseModel):
+    date: str
+    title: str
+    item_count: int
+
+
+class ContentDatesResponse(BaseModel):
+    queue: list[QueueDateOut] = Field(default_factory=list)
+    digest: list[DigestDateOut] = Field(default_factory=list)

@@ -9,6 +9,7 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
+    Index,
     Integer,
     String,
     Text,
@@ -164,3 +165,124 @@ class Digest(Base):
     json_path: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+
+# --- Ecosystem monitoring ---------------------------------------------------
+#
+# Software artifacts (libraries the user adopts or watches) are tracked in a
+# parallel set of tables — see docs/ecosystem.md. They are deliberately kept
+# separate from `items` (one-shot papers): an artifact is a long-lived entity
+# that is re-polled and emits a stream of dated events.
+
+
+class Artifact(Base):
+    """A software project tracked across one or more package ecosystems."""
+
+    __tablename__ = "artifacts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    key: Mapped[str] = mapped_column(String(120), unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(240))
+    description: Mapped[str] = mapped_column(Text, default="")
+    status: Mapped[str] = mapped_column(String(20), index=True)
+    capability: Mapped[str] = mapped_column(String(30), index=True)
+    tracks_json: Mapped[list[str]] = mapped_column(JSON, default=list)
+    homepage_url: Mapped[str] = mapped_column(Text, default="")
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    first_decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
+
+    refs: Mapped[list[ArtifactRef]] = relationship(
+        back_populates="artifact", cascade="all, delete-orphan"
+    )
+    events: Mapped[list[ArtifactEvent]] = relationship(back_populates="artifact")
+    decisions: Mapped[list[ArtifactDecision]] = relationship(back_populates="artifact")
+
+
+class ArtifactRef(Base):
+    """One ecosystem reference of an artifact (a GitHub repo, a package, ...)."""
+
+    __tablename__ = "artifact_refs"
+    __table_args__ = (UniqueConstraint("ecosystem", "ref", name="uq_artifact_ref_ecosystem_ref"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    artifact_id: Mapped[int] = mapped_column(ForeignKey("artifacts.id"), index=True)
+    ecosystem: Mapped[str] = mapped_column(String(20), index=True)
+    ref: Mapped[str] = mapped_column(String(240))
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    artifact: Mapped[Artifact] = relationship(back_populates="refs")
+    state: Mapped[ArtifactState | None] = relationship(
+        back_populates="artifact_ref", uselist=False, cascade="all, delete-orphan"
+    )
+
+
+class ArtifactState(Base):
+    """Last-seen version per ecosystem ref — the diff baseline (no history)."""
+
+    __tablename__ = "artifact_state"
+    __table_args__ = (UniqueConstraint("artifact_ref_id", name="uq_artifact_state_ref"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    artifact_ref_id: Mapped[int] = mapped_column(ForeignKey("artifact_refs.id"), index=True)
+    last_version: Mapped[str | None] = mapped_column(String(120))
+    last_release_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_checked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_status: Mapped[str] = mapped_column(String(20), default="ok")
+    last_error: Mapped[str] = mapped_column(Text, default="")
+    consecutive_failures: Mapped[int] = mapped_column(Integer, default=0)
+
+    artifact_ref: Mapped[ArtifactRef] = relationship(back_populates="state")
+
+
+class ArtifactEvent(Base):
+    """A dated release / version change. Deduped on (ref, type, version)."""
+
+    __tablename__ = "artifact_events"
+    __table_args__ = (
+        UniqueConstraint(
+            "artifact_ref_id",
+            "event_type",
+            "version",
+            name="uq_artifact_event_ref_type_version",
+        ),
+        Index("ix_artifact_event_artifact_date", "artifact_id", "event_date"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    artifact_id: Mapped[int] = mapped_column(ForeignKey("artifacts.id"), index=True)
+    artifact_ref_id: Mapped[int] = mapped_column(ForeignKey("artifact_refs.id"), index=True)
+    event_type: Mapped[str] = mapped_column(String(40), index=True)
+    event_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    version: Mapped[str | None] = mapped_column(String(120))
+    summary: Mapped[str] = mapped_column(Text, default="")
+    body: Mapped[str] = mapped_column(Text, default="")
+    url: Mapped[str] = mapped_column(Text, default="")
+    severity: Mapped[str] = mapped_column(String(20), default="low", index=True)
+    relevant: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    matched_keywords_json: Mapped[list[str]] = mapped_column(JSON, default=list)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    raw_payload_json: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    artifact: Mapped[Artifact] = relationship(back_populates="events")
+    artifact_ref: Mapped[ArtifactRef] = relationship()
+
+
+class ArtifactDecision(Base):
+    """Curator ring assignment for an artifact. Append-only, latest-wins."""
+
+    __tablename__ = "artifact_decisions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    artifact_id: Mapped[int] = mapped_column(ForeignKey("artifacts.id"), index=True)
+    ring: Mapped[str] = mapped_column(String(40), index=True)
+    tracks_json: Mapped[list[str]] = mapped_column(JSON, default=list)
+    decision_reason: Mapped[str] = mapped_column(Text, default="")
+    action: Mapped[str] = mapped_column(Text, default="")
+    decided_by: Mapped[str] = mapped_column(String(120), default="")
+    uncertain: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    previous_ring: Mapped[str | None] = mapped_column(String(40))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+    artifact: Mapped[Artifact] = relationship(back_populates="decisions")

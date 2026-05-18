@@ -4,7 +4,15 @@ import json
 from datetime import UTC, datetime, timedelta
 
 from radar.db import session_scope
-from radar.models import Item, RadarDecision
+from radar.models import (
+    Artifact,
+    ArtifactDecision,
+    ArtifactEvent,
+    ArtifactRef,
+    ArtifactState,
+    Item,
+    RadarDecision,
+)
 from radar.reports.static_bundle import BUNDLE_FILES, build_static_bundle
 from radar.schemas import RadarRing
 
@@ -174,3 +182,172 @@ def test_build_static_bundle_empty_db(db_engine, app_config, tmp_path):
 
     meta = json.loads((target / "meta.json").read_text())
     assert meta["item_count"] == 0
+
+    # Ecosystem files are always written, even with no artifacts.
+    eco_board = json.loads((target / "ecosystem-board.json").read_text())
+    assert eco_board["rings"]["Use"] == []
+    assert eco_board["counts"] == {
+        "Use": 0,
+        "Prototype": 0,
+        "Evaluate": 0,
+        "Watch": 0,
+        "Ignore": 0,
+    }
+    eco_events = json.loads((target / "ecosystem-events.json").read_text())
+    assert eco_events["events"] == []
+    artifacts_dir = target / "ecosystem-artifacts"
+    assert artifacts_dir.exists()
+    assert list(artifacts_dir.iterdir()) == []
+    assert meta["ecosystem_artifact_count"] == 0
+    assert meta["ecosystem_event_count"] == 0
+
+
+def _add_artifact(
+    session,
+    *,
+    artifact_id: int,
+    key: str,
+    name: str,
+    status: str,
+    capability: str,
+    tracks: list[str],
+) -> None:
+    session.add(
+        Artifact(
+            id=artifact_id,
+            key=key,
+            name=name,
+            description=f"{name} description.",
+            status=status,
+            capability=capability,
+            tracks_json=tracks,
+            homepage_url=f"https://example.test/{key}",
+        )
+    )
+
+
+def test_build_static_bundle_writes_ecosystem_files(db_engine, app_config, tmp_path):
+    now = datetime(2026, 5, 14, 12, 0, 0, tzinfo=UTC)
+    released = now - timedelta(days=3)
+
+    with session_scope(db_engine) as session:
+        # adopted -> seed ring Use; watchlist -> seed ring Watch.
+        _add_artifact(
+            session,
+            artifact_id=1,
+            key="opencv",
+            name="OpenCV",
+            status="adopted",
+            capability="cv-imaging",
+            tracks=["Open-Source CV Tooling"],
+        )
+        _add_artifact(
+            session,
+            artifact_id=2,
+            key="rerun",
+            name="Rerun",
+            status="watchlist",
+            capability="viz-3d-sensors",
+            tracks=["3D Geometry & Reconstruction"],
+        )
+        session.flush()
+        ref = ArtifactRef(id=1, artifact_id=1, ecosystem="github", ref="opencv/opencv")
+        session.add(ref)
+        session.flush()
+        session.add(
+            ArtifactState(
+                artifact_ref_id=1,
+                last_version="4.11.0",
+                last_release_at=released,
+                last_status="ok",
+            )
+        )
+        session.add(
+            ArtifactEvent(
+                id=1,
+                artifact_id=1,
+                artifact_ref_id=1,
+                event_type="release",
+                event_date=released,
+                version="4.11.0",
+                summary="OpenCV 4.11.0",
+                body="Release notes for 4.11.0.",
+                url="https://example.test/opencv/4.11.0",
+                severity="medium",
+                relevant=True,
+                matched_keywords_json=["aruco"],
+            )
+        )
+        # A non-relevant event — the static events file ships it too so the
+        # frontend's "relevant only" toggle works client-side.
+        session.add(
+            ArtifactEvent(
+                id=2,
+                artifact_id=1,
+                artifact_ref_id=1,
+                event_type="release",
+                event_date=released - timedelta(days=1),
+                version="4.10.9",
+                summary="OpenCV 4.10.9",
+                body="",
+                url="https://example.test/opencv/4.10.9",
+                severity="low",
+                relevant=False,
+                matched_keywords_json=[],
+            )
+        )
+        session.flush()
+        session.add(
+            ArtifactDecision(
+                artifact_id=1,
+                ring=RadarRing.USE.value,
+                tracks_json=["Open-Source CV Tooling"],
+                decision_reason="Core dependency.",
+                action="",
+                decided_by="tester",
+                uncertain=False,
+                previous_ring=None,
+                created_at=now - timedelta(days=1),
+            )
+        )
+
+    target = tmp_path / "bundle"
+    with session_scope(db_engine) as session:
+        build_static_bundle(target, session=session, config=app_config, weeks=4)
+
+    eco_board = json.loads((target / "ecosystem-board.json").read_text())
+    assert [a["key"] for a in eco_board["rings"]["Use"]] == ["opencv"]
+    assert [a["key"] for a in eco_board["rings"]["Watch"]] == ["rerun"]
+    assert eco_board["counts"]["Use"] == 1
+    assert eco_board["counts"]["Watch"] == 1
+    opencv_row = eco_board["rings"]["Use"][0]
+    assert opencv_row["capability"] == "cv-imaging"
+    assert opencv_row["ecosystems"] == ["github"]
+    assert opencv_row["latest_event"]["version"] == "4.11.0"
+
+    eco_events = json.loads((target / "ecosystem-events.json").read_text())
+    # Wide window, unfiltered — relevant + non-relevant, newest first.
+    assert [e["version"] for e in eco_events["events"]] == ["4.11.0", "4.10.9"]
+    assert eco_events["events"][0]["relevant"] is True
+    assert eco_events["events"][1]["relevant"] is False
+
+    artifacts_dir = target / "ecosystem-artifacts"
+    artifact_files = sorted(p.name for p in artifacts_dir.iterdir())
+    assert artifact_files == ["1.json", "2.json"]
+    detail = json.loads((artifacts_dir / "1.json").read_text())
+    assert detail["key"] == "opencv"
+    assert detail["ring"] == "Use"
+    assert detail["homepage_url"] == "https://example.test/opencv"
+    assert [r["last_version"] for r in detail["refs"]] == ["4.11.0"]
+    assert [e["version"] for e in detail["events"]] == ["4.11.0", "4.10.9"]
+    assert [d["ring"] for d in detail["decisions"]] == ["Use"]
+    # Uncurated artifact still gets a detail file, seeded by status.
+    detail2 = json.loads((artifacts_dir / "2.json").read_text())
+    assert detail2["ring"] == "Watch"
+    assert detail2["decisions"] == []
+
+    meta = json.loads((target / "meta.json").read_text())
+    assert meta["ecosystem_artifact_count"] == 2
+    assert meta["ecosystem_event_count"] == 2
+    assert meta["ecosystem_ring_counts"]["Use"] == 1
+    assert meta["ecosystem_ring_counts"]["Watch"] == 1

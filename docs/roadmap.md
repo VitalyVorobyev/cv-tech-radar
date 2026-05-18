@@ -1,155 +1,115 @@
 # CV Radar Roadmap
 
-This roadmap starts from the current Phase 1-2 implementation: arXiv `cs.CV`
-ingestion, SQLite persistence, deterministic classification, candidate queues, CI,
-and a real 100-paper arXiv smoke test.
+CV Radar is a private-first computer-vision technology radar. It now runs as
+**two parallel monitoring lanes** over one SQLite database:
 
-## Current State
+- **Papers radar** — arXiv `cs.CV` ingestion → deterministic classification →
+  scoring → candidate queue → curator decisions → daily digest.
+- **Ecosystem radar** — a hand-maintained inventory of software *artifacts*
+  (libraries) polled across GitHub / PyPI / crates.io / npm for release events.
 
-The local loop works:
+Both lanes share the five rings (`Use` / `Prototype` / `Evaluate` / `Watch` /
+`Ignore`), a FastAPI + React UI, and a static-export build.
 
-```bash
-uv run radar init-db
-uv run radar fetch-arxiv --days 365 --max-results 100
-uv run radar classify --date 2026-05-07
-uv run radar candidates --date 2026-05-07
-uv run radar score-debug --date 2026-05-07
-uv run radar decide ITEM_ID --ring Watch --reason "..." --action "..."
-```
+## Current State — what works
 
-The latest real smoke test fetched 100 arXiv entries and generated a 25-item
-candidate queue. That queue is useful for tuning, not yet for daily reading. The
-top candidates are mostly borderline object tracking, edge deployment, dataset,
-and open-source tooling items. This is exactly the right failure mode for the
-next phase: we can inspect real noise instead of guessing.
+### Papers pipeline
 
-## Phase 2.5 - Signal Calibration
+- arXiv `cs.CV` ingestion, SQLite persistence, raw/normalized split, dedup.
+- Deterministic keyword classification + multi-component scoring.
+- Candidate queue Markdown/JSON; `radar score-debug` for per-component inspection.
+- Curator decisions: `radar decide`, the `radar apply` bulk-decision bridge,
+  and `radar decisions`.
+- `radar digest` — a short, ring-sectioned daily digest.
+- `radar daily-fetch` / `daily-publish` umbrella commands.
+- `radar eval` — precision/recall against a labeled set.
 
-Goal: make the candidate queue trustworthy before adding more sources.
+### Ecosystem lane
 
-- [x] Build a small labeled evaluation set from real candidate queues
-      (`tests/fixtures/labeled_items.yaml`, seeded from 2026-05-08).
-- [x] Add `radar eval` to report precision, recall, per-class false-positive counts,
-      and missing-relevant ids against the labeled set.
-- [ ] Add a review import format so Markdown TODOs are not the only bulk-review surface.
-- [ ] Tune keywords, negative topics, and thresholds against observed false positives;
-      use `radar eval --date <date>` as the yardstick before/after each change.
-- [ ] Grow the labeled set beyond the initial 25-item seed.
+- `config/artifacts.yaml` inventory; GitHub/PyPI/crates/npm collectors with an
+  idempotent, first-seen-safe diff runner.
+- Release events with relevance/severity classification.
+- `radar fetch-ecosystem`, `radar ecosystem`, `radar artifact-decide`.
+- Folded into `daily-fetch`; the digest gains an `## Ecosystem` section.
+- See [ecosystem.md](ecosystem.md).
 
-Baseline (as of 2026-05-11, before any tuning, on the 2026-05-08 candidate queue):
+### Local semantic assist (optional, off by default)
 
-| metric | value |
-|---|---|
-| precision @ 25 | 0.050 |
-| recall @ 25 | 1.000 |
-| dominant false-positive classes | broad_vlm (8), generative_editing (2), medical_imaging (2), out_of_domain_3d (2) |
+- Ollama embeddings + `radar embed` + `radar near-duplicates`.
+- LLM second-opinion `radar relevance-check` — shadow mode only, never affects
+  the candidate queue.
 
-Exit criteria:
+### UI
 
-- A daily 100-paper arXiv batch yields a manageable review queue.
-- Obvious hype/noise stays visible for calibration but does not look promoted.
-- A few genuinely relevant calibration, 3D geometry, edge, robotics, or
-  industrial-vision items surface when present.
-- Explicit decisions can be persisted and listed from SQLite.
-- `radar eval` precision on the labeled set is materially above the 0.05 baseline.
+- FastAPI HTTP API + React/Vite frontend, with two-lane navigation.
+- Papers lane: radar board, queue, timeline, tracks, digest, pipeline,
+  score-debug, manual-add, settings.
+- Ecosystem lane: radar board, release feed, artifact table.
+- Date-grid landings for the Queue and Digest views.
+- Static export build (`radar build-static`) — the radar, tracks, timeline and
+  ecosystem surfaces run with no backend.
 
-## Phase 3 - RSS And Vendor Sources
+## Open work
 
-Goal: add high-signal non-paper inputs without turning the project into a scraper.
+### Signal calibration (papers lane)
 
-- Implement RSS source loading from `config/sources.yaml`.
-- Normalize RSS entries into the same `items` table.
-- Start with a small hand-picked source set: OpenCV, MVTec, NVIDIA developer or
-  research feeds, selected camera/sensor vendors, and standards bodies where RSS
-  is practical.
-- Add graceful feed failure reporting and per-source fetch stats.
-- Keep broad social media and fragile scraping out of scope.
+Goal: make the candidate queue trustworthy.
 
-Exit criteria:
+- [ ] Grow `tests/fixtures/labeled_items.yaml` past the initial 2026-05-08 seed.
+- [ ] Tune `topics.yaml` / `negative_topics.yaml` / `scoring.yaml` against
+      observed false positives; `radar eval` is the yardstick before/after.
 
-- `uv run radar fetch-rss` stores normalized blog/vendor/library items.
-- Failed feeds do not fail the whole run.
-- Candidate queues include source type and source-specific rationale.
+Baseline (2026-05-11, pre-tuning, on the 2026-05-08 queue): precision@25 0.05,
+recall@25 1.00. Dominant noise classes: `broad_vlm` (8), `generative_editing`
+(2), `medical_imaging` (2), `out_of_domain_3d` (2).
 
-## Phase 4 - Curation Workflow
+### RSS and vendor sources
 
-Goal: make the radar useful as a daily engineering habit.
+Goal: add high-signal non-paper inputs without becoming a scraper.
 
-- Add durable radar decisions with ring, tracks, reason, and action.
-- Generate short daily digest drafts from accepted decisions.
-- Update persistent track notes only when evidence is meaningful.
-- Keep public/Atlas output explicitly manual.
+- [ ] Implement RSS loading from `config/sources.yaml`; `radar fetch-rss`.
+- [ ] Normalize RSS entries into `items` with blog/vendor/release type detection.
+- [ ] Graceful per-feed failure reporting and source-level fetch stats.
 
-Exit criteria:
+Hand-picked starting set: OpenCV, MVTec, NVIDIA developer/research feeds,
+selected camera/sensor vendors, standards bodies. Out of scope: broad social
+media and fragile scraping.
 
-- A user can review candidates, record decisions, and generate a daily digest.
-- The digest is short enough to read in a few minutes.
-- Track notes summarize movement rather than mirroring every item.
+### Ecosystem radar follow-ups
 
-## Phase 5 - Static Export And UI
+- [ ] GitHub collector tag-support: fall back to the `/tags` API when a repo
+      publishes no GitHub *Releases* (candle, image, nalgebra, opencv-rust),
+      and add a per-ref tag/release prefix filter so monorepos (vite, tauri)
+      select the right sub-package. Then re-add the 6 dropped `github` refs.
+- [ ] Calibrate ecosystem event volume; add a weekly synthesis if warranted.
 
-Goal: make the radar easier to browse after the backend signal is acceptable.
+### Local LLM filter mode
 
-- Stabilize `data/exports/latest.json`.
-- Add historical exports by date.
-- Build a Vite/React dashboard that reads static JSON.
-- Include dashboard, radar board, track page, candidate queue, and digest view.
+- [ ] Run `radar relevance-check` shadow mode ~5 days on real candidates; extend
+      `radar eval` with `--with-llm` to compute hypothetical filtered precision.
+- [ ] Add a filter mode that demotes confidently-`no` items to `Watch` and lists
+      them in a separate "LLM-rejected" digest/queue section — ships only after
+      eval shows ≥0.9 noise-class rejection precision and ≈1.0 relevant-class
+      acceptance recall.
+- [ ] Pick the `near_duplicate_threshold` value by hand once embeddings are
+      populated on real candidate runs.
 
-Exit criteria:
-
-- The UI shows current radar state without a backend server.
-- Filtering by ring, track, type, source, and date works.
-- The UI helps review and navigate; it does not hide weak scoring.
-
-## Phase 6 - Local Semantic Assist
-
-Goal: use local inference where it improves filtering without creating a cloud dependency.
-
-Now that `radar eval` exists, this phase has a measurable gate. Currently planned
-roles, in honest priority order (see [docs/handoff.md](handoff.md) for the
-full value assessment):
-
-1. **Embedding-based near-duplicate detection — landed.** Wired through the
-   existing `OllamaEmbeddingClient` and a new `item_embeddings` table.
-   `radar embed --date YYYY-MM-DD` populates vectors (idempotent on
-   `(item_id, model)`); `radar near-duplicates --days N [--threshold X]`
-   reports cosine groupings above `embeddings.near_duplicate_threshold`
-   (default 0.92). Does not feed into `final_score`. Next: actually run
-   against real data to calibrate the threshold.
-2. **LLM second-opinion relevance filter — shadow mode landed.** `gemma4:e2b`
-   answers a strict yes/no per candidate via `radar relevance-check`;
-   judgments live in `item_llm_judgments` and are idempotent on
-   `(item_id, model)`. The candidate queue is untouched. Filter mode (demote
-   confidently-`no` items in the queue) ships only after `radar eval` shows
-   the LLM would lift precision on the labeled set with ≥0.9 noise-class
-   rejection precision and ≈1.0 relevant-class acceptance recall.
-
-Out of scope for this phase (re-evaluate later):
-
-- LLM-written digest narrative (low value on a private radar today).
-- LLM-drafted per-card gloss in the queue UI (modest value, high bias risk).
-- LLM-driven track reassignment.
-- Anything that changes `final_score` directly without eval evidence.
-
-Exit criteria:
-
-- Embedding near-duplicate report flags real arXiv v2/follow-up pairs on the
-  on-disk candidate runs.
-- LLM second-opinion in shadow mode improves `radar eval` precision when
-  applied as a hypothetical filter, on the labeled set, by a meaningful margin.
-- Running without Ollama remains fully supported (no crashes, no missing UI
-  affordances, no slowdown).
-
-## Phase 7 - Atlas And Public Output
+### Atlas and public output
 
 Goal: promote only curated radar output into durable public material.
 
-- Add an Atlas candidate workflow.
-- Add public-safe export fields separate from private notes.
-- Draft weekly/monthly public radar posts only from explicitly accepted items.
-- Preserve a hard boundary between private raw radar and public Vitavision content.
+- [ ] Atlas candidate workflow; public-safe export fields separate from private notes.
+- [ ] Weekly/monthly public radar posts drafted only from explicitly accepted items.
 
-Exit criteria:
+Preserve a hard boundary between the private raw radar and public Vitavision
+content — private notes, ignored items, and raw payloads are never published by
+default.
 
-- Public candidates are explicitly selected.
-- Private notes, ignored items, and raw source payloads are never published by default.
+## Deferred
+
+Re-evaluate when the work above lands:
+
+- LLM-written digest narrative.
+- LLM-drafted per-card gloss in the queue UI.
+- LLM-driven track reassignment.
+- Anything that changes `final_score` directly without eval evidence.

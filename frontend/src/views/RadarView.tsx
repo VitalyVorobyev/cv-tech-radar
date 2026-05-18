@@ -4,9 +4,9 @@
 // active track filter, search) is mirrored to the URL.
 
 import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { BoardItem, BoardRings, Ring } from "../lib/api";
-import { api } from "../lib/api";
+import { api, isStaticMode } from "../lib/api";
 import { Chrome } from "../ui/Chrome";
 import { ItemPanel } from "../ui/ItemPanel";
 import { RadarPlot } from "../ui/RadarPlot";
@@ -75,6 +75,10 @@ export function RadarView() {
   });
   const { quadrants } = useQuadrants();
 
+  // Drag-to-change-ring is a curator action — only when a write API exists.
+  const canEdit = !isStaticMode();
+  const queryClient = useQueryClient();
+
   // Mirror state to URL.
   useEffect(() => {
     writeUrlParams({
@@ -89,6 +93,24 @@ export function RadarView() {
     if (!data) return [] as BoardItem[];
     return flattenBoardItems(data.rings);
   }, [data]);
+
+  // Dropping a dot in a new ring band records a decision; "Ignore" removes it.
+  const changeRing = useMutation({
+    mutationFn: ({ itemId, ring }: { itemId: number; ring: Ring }) => {
+      const it = allItems.find((i) => i.item_id === itemId);
+      return api.postDecision({
+        item_id: itemId,
+        ring,
+        reason: it?.reason || `Moved to ${ring} from the radar.`,
+        action: it?.action ?? "",
+        tracks: it?.tracks ?? [],
+        uncertain: it?.uncertain ?? false,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["board"] });
+    },
+  });
 
   const visibleItems = useMemo(() => {
     const ql = search.toLowerCase();
@@ -234,11 +256,13 @@ export function RadarView() {
               selectedId={selectedId}
               showLabels={tweaks.showLabels}
               reducedMotion={reducedMotion}
+              canEdit={canEdit}
               onHoverDot={setHoveredId}
               onSelectDot={(id) => setSelectedId((prev) => (prev === id ? null : id))}
               onFocusQuad={setFocusedQuad}
               onFocusRing={setFocusedRing}
               onTrackFilter={setTrackFilter}
+              onChangeRing={(itemId, ring) => changeRing.mutate({ itemId, ring })}
             />
           </div>
 

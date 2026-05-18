@@ -61,6 +61,14 @@ uv run radar decide ITEM_ID --ring Watch --reason "..." --action "..."
 uv run radar decisions --date today
 ```
 
+Ecosystem radar (second lane — software artifacts, not papers):
+
+```bash
+uv run radar fetch-ecosystem                    # poll artifacts; also runs inside daily-fetch
+uv run radar ecosystem --days 7                 # list recent release events
+uv run radar artifact-decide KEY --ring Prototype --reason "..."
+```
+
 `radar apply` is the bulk-decision bridge: the curator fills `### Claude decision` blocks
 in the candidate Markdown with a small YAML payload (`ring`, `tracks`, `reason`, `action`,
 `uncertain`), and `apply` parses + records them in a single transaction.
@@ -83,6 +91,10 @@ Stages, with the module that owns each:
 7. **Enrichers** (`radar/enrichers/ollama.py`) — optional Ollama embeddings, disabled in `embeddings.yaml` by default. Keep the deterministic path the default; do not introduce Ollama as a hard dependency.
 
 Persistence (`radar/db.py`, `radar/models.py`) is SQLAlchemy 2.x with SQLite. The schema separates `raw_items` (source-of-truth payload) from `items` (normalized) so collectors can be re-run without losing classifications or decisions. `Item.normalized_title` is used for cross-source dedup; collectors should set it via `normalize_title()` in `radar/utils.py`. Sessions are scoped via `session_scope()` — always commit or rollback through the context manager.
+
+### Ecosystem lane
+
+A second monitoring lane runs parallel to the paper pipeline: the **ecosystem radar** tracks software *artifacts* (libraries the user adopts or watches) and emits their release/version changes as events. It is deliberately separate from `items` — an artifact is a long-lived, re-polled entity, not a one-shot paper. Owned modules: `config/artifacts.yaml` (hand-maintained inventory), `radar/collectors/ecosystem/` (GitHub/PyPI/crates/npm collectors + idempotent diff runner), `radar/artifact_decisions.py`, `radar/reports/ecosystem.py`, `radar/api/routes/ecosystem.py`. `daily-fetch` polls it; the digest gains an `## Ecosystem` section. See [docs/ecosystem.md](docs/ecosystem.md).
 
 Date handling: all timestamps are timezone-aware UTC (`utc_now()`); `parse_date_arg()` and `date_bounds()` in `radar/utils.py` convert CLI date strings to UTC day windows used by every "by date" query.
 
@@ -128,6 +140,7 @@ before committing.
 
 - [README.md](README.md) — user-facing overview and quickstart.
 - [docs/daily-workflow.md](docs/daily-workflow.md) — the 5-minute daily ritual: candidate queue → curator skill → `apply` → `digest`.
+- [docs/ecosystem.md](docs/ecosystem.md) — the ecosystem radar: artifact inventory, collectors, the second monitoring lane.
 - [docs/roadmap.md](docs/roadmap.md) — phase plan (currently Phase 2.5 signal calibration).
 - [docs/skills.md](docs/skills.md), [docs/skill-workflows.md](docs/skill-workflows.md) — project-specific Codex skills (`cv-radar-curator`, `cv-radar-scoring-evaluator`, `cv-radar-source-onboarding`, `cv-radar-digest-writer`, `cv-radar-atlas-bridge`) and how to drive them.
 - [docs/tasks.md](docs/tasks.md), [docs/handoff.md](docs/handoff.md) — active work items and handoff notes.
