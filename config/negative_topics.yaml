@@ -23,3 +23,10 @@ negative_topics:
   # it's a legitimate industrial 3D sensor.
   - autonomous driving
   - self-driving
+  # Video-deflickering noise — 2026-05-20 item 1766 (VDFP) floated into the top
+  # 25 and matched the Calibration & Camera Models + Sensors tracks purely
+  # because screen-capture flicker-banding papers mention "rolling shutter".
+  # `rolling shutter` stays a positive keyword (it's a real calibration/sensor
+  # topic); `deflickering` is specific to the video-restoration task and does
+  # not collide with any radar track.
+  - deflickering

@@ -194,6 +194,46 @@ def test_autonomous_driving_dataset_gets_negative_penalty(app_config):
     assert result.negative_topic_penalty > 0
 
 
+def test_video_deflickering_gets_negative_penalty(app_config):
+    """Anchor: 2026-05-20 item 1766 VDFP ("Video Deflickering with
+    Flicker-banding Priors").
+
+    VDFP is a screen-capture video-restoration paper, but it matched the
+    Calibration & Camera Models + Sensors tracks and floated into the top-25
+    candidate queue purely because flicker-banding is caused by rolling
+    shutter. `rolling shutter` stays a legitimate positive keyword; the
+    `deflickering` negative topic fires on the restoration task itself and
+    drops the score so future VDFP-shape papers do not surface.
+    """
+    item = make_item(
+        "VDFP: Video Deflickering with Flicker-banding Priors",
+        "Capturing digital screens with smartphones frequently induces severe "
+        "banding due to hardware synchronization mismatches. We propose VDFP, a "
+        "perception-guided framework with a Degradation Field Modeling based on "
+        "the rolling shutter mechanism, and release the DeViD dataset.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source)
+    assert "deflickering" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+
+
+def test_calibration_paper_survives_deflickering_negative_topic(app_config):
+    """Guard: the `deflickering` negative topic must not touch a genuine
+    rolling-shutter calibration paper — `rolling shutter` stays positive."""
+    item = make_item(
+        "Rolling-Shutter Camera Calibration for Industrial Metrology",
+        "We estimate intrinsic calibration, lens distortion, and the rolling "
+        "shutter readout model via bundle adjustment for industrial cameras "
+        "using a pinhole model.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source)
+    assert "Calibration & Camera Models" in result.tracks
+    assert result.negative_topic_penalty == 0
+    assert result.final_score >= app_config.scoring.thresholds.watch
+
+
 def test_industrial_inspection_dataset_still_matches_track(app_config):
     """Anchor: 2026-05-11 item 518 MMVIAD — a legitimate Watch/Evaluate item.
 
