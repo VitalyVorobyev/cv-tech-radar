@@ -14,7 +14,7 @@ dependencies = [
     "ruamel.yaml>=0.18.6",
     "sqlalchemy>=2.0.36",
     "typer>=0.16.0",
-    "uvicorn[standard]>=0.34",
+    "uvicorn[standard]>=0.48.0",
 ]
 
 [project.scripts]
