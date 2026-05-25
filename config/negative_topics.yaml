@@ -30,3 +30,28 @@ negative_topics:
   # topic); `deflickering` is specific to the video-restoration task and does
   # not collide with any radar track.
   - deflickering
+  # Medical-imaging noise — 2026-05-21 curation queued 5 medical papers into 25
+  # candidate slots (VEELA CTA vessel segmentation, OSS surgical-skill
+  # assessment, case-aware medical-image classification, two frozen-VFM/VLM
+  # medical benchmarks). `medical segmentation` above was too narrow: those
+  # abstracts say "computed tomography", "surgical", "medical imaging" instead.
+  # The radar is industrial-CV focused (calibration, inspection, 3D sensors,
+  # tracking, OSS tooling); medical imaging is an unrelated domain and these
+  # phrases are medical-specific enough not to collide with any radar track.
+  - medical imaging
+  - computed tomography
+  - histopathology
+  - surgical
+  - clinical
+  # Image-restoration / super-resolution / T2I-decoder noise — 2026-05-22
+  # queued three restoration/generation papers (SANA-SR one-step diffusion SR,
+  # PixIE low-light enhancement, PiD pixel-diffusion text-to-image decoder)
+  # that piggy-backed on `dinov2`, `foundation model`, `reconstruction`,
+  # `pruning`, and `deployment` matches. Generic image restoration / SR /
+  # enhancement / T2I are outside the radar (we already filter `image editing`,
+  # `image generation`, `video generation`); these phrases close the obvious
+  # remaining gap without colliding with any positive radar keyword.
+  - super-resolution
+  - image restoration
+  - low-light image enhancement
+  - text-to-image

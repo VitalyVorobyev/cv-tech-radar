@@ -136,6 +136,46 @@ def test_fetch_arxiv_pagination_walks_multiple_pages(db_engine, app_config):
     assert stats.latest_published_at == datetime(2026, 5, 10, 10, 0, tzinfo=UTC)
 
 
+def test_fetch_arxiv_cutoff_spans_full_announce_batch(db_engine, app_config):
+    """arXiv freeze is ~18:00 UTC; cutoff must reach back across that boundary.
+
+    Regression for the 2026-05-19 incident: with a rolling now-N-days cutoff,
+    a mid-day fetch dropped ~90% of papers because their submittedDate fell
+    earlier on the same UTC day as the run. The cutoff must be anchored to
+    today's UTC midnight minus 6h, so `--days 1` captures the prior announce
+    batch even at 17:00 UTC.
+    """
+    feed_text = Path("tests/fixtures/arxiv_feed.xml").read_text(encoding="utf-8")
+    empty_feed = (
+        '<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"></feed>'
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        start = int(request.url.params["start"])
+        return httpx.Response(200, text=feed_text if start == 0 else empty_feed)
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    source_config = app_config.sources.sources[0]
+    with session_scope(db_engine) as session:
+        source = session.scalar(select(Source).where(Source.key == source_config.id))
+        # Run at 2026-05-11 17:21 UTC — fixture entries dated 2026-05-10 10:00 UTC.
+        # Old formula (now - 1d = 2026-05-10 17:21) would drop both entries;
+        # new formula (2026-05-11 00:00 - 1d - 6h = 2026-05-09 18:00) keeps them.
+        stats = fetch_and_store_arxiv(
+            session,
+            source,
+            source_config,
+            days=1,
+            max_results=2,
+            max_pages=2,
+            page_delay_seconds=0.0,
+            client=client,
+            now=datetime(2026, 5, 11, 17, 21, tzinfo=UTC),
+        )
+    assert stats.stored == 2
+    assert stats.skipped_old == 0
+
+
 def test_fetch_arxiv_sleeps_between_pages(db_engine, app_config, monkeypatch):
     """page_delay_seconds gates ``time.sleep`` between successive page fetches.
 

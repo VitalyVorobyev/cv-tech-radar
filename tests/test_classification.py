@@ -7,6 +7,12 @@ from sqlalchemy import select
 from radar.filters.keyword_filter import classify_item, classify_items_for_date, keyword_matches
 from radar.models import Item, Source
 
+# Fixtures publish on 2026-05-10; pinning classification one day later keeps
+# novelty in the fresh-item band so threshold assertions stay deterministic
+# regardless of when the suite runs (novelty is otherwise relative to now()).
+FIXTURE_PUBLISHED_AT = datetime(2026, 5, 10, 10, 0, tzinfo=UTC)
+FIXTURE_NOW = datetime(2026, 5, 11, 10, 0, tzinfo=UTC)
+
 
 def make_item(title: str, summary: str) -> Item:
     return Item(
@@ -16,7 +22,7 @@ def make_item(title: str, summary: str) -> Item:
         abstract_or_summary=summary,
         url="https://example.test/item",
         pdf_url=None,
-        published_at=datetime(2026, 5, 10, 10, 0, tzinfo=UTC),
+        published_at=FIXTURE_PUBLISHED_AT,
         updated_at=None,
         source_name="arXiv cs.CV",
         external_id="x",
@@ -34,7 +40,7 @@ def test_classification_maps_calibration_geometry(app_config):
         "for industrial cameras using a pinhole model.",
     )
     source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
-    result = classify_item(item, config=app_config, source=source)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
     assert "Calibration & Camera Models" in result.tracks
     assert "3D Geometry & Reconstruction" in result.tracks
     assert result.final_score >= app_config.scoring.thresholds.watch
@@ -97,7 +103,9 @@ def test_classify_items_for_date_persists_results(db_engine, app_config):
     from radar.models import ItemClassification
 
     with session_scope(db_engine) as session:
-        count = classify_items_for_date(session, app_config, datetime(2026, 5, 10).date())
+        count = classify_items_for_date(
+            session, app_config, datetime(2026, 5, 10).date(), now=FIXTURE_NOW
+        )
         assert count == 1
         stored = session.scalar(select(ItemClassification))
         assert stored is not None
@@ -228,7 +236,7 @@ def test_calibration_paper_survives_deflickering_negative_topic(app_config):
         "using a pinhole model.",
     )
     source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
-    result = classify_item(item, config=app_config, source=source)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
     assert "Calibration & Camera Models" in result.tracks
     assert result.negative_topic_penalty == 0
     assert result.final_score >= app_config.scoring.thresholds.watch
@@ -252,6 +260,126 @@ def test_industrial_inspection_dataset_still_matches_track(app_config):
         "Source code is available at https://github.com/example/MMVIAD.",
     )
     source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
-    result = classify_item(item, config=app_config, source=source)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
     assert "Industrial Vision Inspection" in result.tracks
     assert result.final_score >= app_config.scoring.thresholds.watch
+    # Guard: the medical-imaging negative topics must not fire on a genuine
+    # industrial-inspection paper ("inspection", "quality control" stay clean).
+    assert result.negative_topic_penalty == 0
+
+
+def test_image_restoration_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-05-22 candidate 11 (SANA-SR, item 2044).
+
+    SANA-SR is a one-step diffusion super-resolution / image restoration model
+    optimized for mobile deployment; it surfaced in the top-25 candidate queue
+    only because the abstract matches `pruning`, `deployment`, and `benchmark`.
+    The new `super-resolution` + `image restoration` negative topics close that
+    gap without colliding with any positive radar keyword. Companion abstract
+    fragments come straight from the SANA-SR abstract; we assert both negative
+    topics fire and the recommended ring is Ignore.
+    """
+    item = make_item(
+        "SANA-SR: Efficient One-Step Diffusion Restoration Model",
+        "Real-world image super-resolution aims to recover high-quality images "
+        "from complex degradations. We revisit Real-ISR from compact latent "
+        "representation and linear-complexity modeling. SANA-SR achieves "
+        "competitive image restoration on benchmark datasets; after pruning, "
+        "the deployed model runs in 0.019s for practical mobile deployment.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert result.negative_topic_penalty > 0
+    assert "super-resolution" in result.negative_keywords
+    assert "image restoration" in result.negative_keywords
+    assert result.recommended_ring == "Ignore"
+
+
+def test_low_light_enhancement_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-05-22 candidate 13 (PixIE, item 2033).
+
+    PixIE is a DINOv3-prompted low-light image enhancement (LLIE) framework —
+    generic image-restoration work that surfaced only because the abstract
+    matches `foundation model`, `dinov2`-class signals, and `reconstruction`.
+    The `low-light image enhancement` negative topic fires on LLIE while
+    leaving legitimate low-light sensor/calibration work untouched (those
+    papers do not use the exact 4-word phrase).
+    """
+    item = make_item(
+        "PixIE: Prompted Pixel-Space Low-Light Image Enhancement",
+        "Low-light images exhibit severe noise, contrast loss, and semantic "
+        "ambiguity. We propose PixIE, a feed-forward pixel-space low-light "
+        "image enhancement framework prompted by a vision foundation model "
+        "(DINOv3). Experiments on LLIE benchmarks show improved PSNR and "
+        "reconstruction fidelity.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "low-light image enhancement" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+    assert result.recommended_ring == "Ignore"
+
+
+def test_text_to_image_decoder_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-05-22 candidate 24 (PiD, item 1999).
+
+    PiD is a pixel-diffusion decoder for high-resolution text-to-image latent
+    decoding. It matched only `dinov2` and `reconstruction` (their VAE
+    language). `text-to-image` closes the T2I-generation gap left open by the
+    existing `image generation` / `image editing` negatives.
+    """
+    item = make_item(
+        "PiD: Fast High-Resolution Latent Decoding with Pixel Diffusion",
+        "Most practical high-resolution text-to-image systems perform "
+        "generation in a compact latent space. We introduce PiD, a Pixel "
+        "Diffusion decoder for high-resolution decoding, about 6x faster "
+        "than cascaded diffusion-based super-resolution pipelines.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "text-to-image" in result.negative_keywords
+    assert "super-resolution" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+    assert result.recommended_ring == "Ignore"
+
+
+def test_calibration_paper_survives_image_restoration_negative_topics(app_config):
+    """Guard: the new image-restoration / SR negative topics must not touch a
+    genuine calibration / 3D reconstruction paper. The phrases we added
+    (`super-resolution`, `image restoration`, `low-light image enhancement`,
+    `text-to-image`) are specific enough that a calibration paper mentioning
+    `reconstruction` and `lens distortion` stays clean."""
+    item = make_item(
+        "Bundle Adjustment for Multi-View 3D Reconstruction with Lens Distortion",
+        "We refine intrinsic calibration, lens distortion, and the rolling "
+        "shutter readout model via bundle adjustment for industrial cameras, "
+        "improving 3D reconstruction accuracy.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Calibration & Camera Models" in result.tracks
+    assert result.negative_topic_penalty == 0
+    assert result.final_score >= app_config.scoring.thresholds.watch
+
+
+def test_medical_imaging_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-05-21 curation queued 5 medical papers into 25 candidate
+    slots. Medical imaging is outside the radar's industrial-CV scope; the
+    medical-domain negative topics must penalize them and keep them in Ignore.
+    Anchored on item 1956 (VEELA), a CT-angiography liver-vessel benchmark.
+    """
+    item = make_item(
+        "VEELA: A Clinically-Constrained Benchmark for Liver Vessel Segmentation "
+        "in Computed Tomography Angiography",
+        "Accurate segmentation of hepatic and portal vessels in contrast-enhanced "
+        "computed tomography angiography remains challenging. We introduce a "
+        "rigorously curated liver vessel dataset derived from 40 CTA scans, "
+        "manually delineated under multi-expert clinical consensus, and a "
+        "standardized benchmarking framework for vascular segmentation.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert result.negative_topic_penalty > 0
+    assert "computed tomography" in result.negative_keywords
+    assert "clinical" in result.negative_keywords
+    assert result.recommended_ring == "Ignore"

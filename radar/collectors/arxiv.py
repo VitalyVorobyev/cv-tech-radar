@@ -56,7 +56,13 @@ def fetch_and_store_arxiv(
     0.0 in tests to keep them fast.
     """
     now = now or utc_now()
-    cutoff = now - timedelta(days=days)
+    # arXiv freezes daily submissions at ~14:00 ET (~18:00 UTC) and announces
+    # them under the *next* UTC date. A rolling now-N-days cutoff therefore
+    # truncates the most recent announce batch whenever the fetch runs mid-day.
+    # Anchor the cutoff to (today 00:00 UTC) - N days - 6h so `--days N` captures
+    # the last N full announce batches regardless of run time.
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    cutoff = today_start - timedelta(days=days, hours=6)
     fetched = stored = updated = skipped_old = pages = 0
     latest_published_at: datetime | None = None
     rate_limited = False

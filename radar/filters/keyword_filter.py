@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from datetime import datetime
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -17,14 +18,20 @@ from radar.scoring.score_item import (
 from radar.utils import date_bounds, utc_now
 
 
-def classify_items_for_date(session: Session, config: AppConfig, target_date) -> int:
+def classify_items_for_date(
+    session: Session,
+    config: AppConfig,
+    target_date,
+    *,
+    now: datetime | None = None,
+) -> int:
     start, end = date_bounds(target_date)
     items = session.scalars(
         select(Item).where(Item.published_at >= start, Item.published_at <= end)
     ).all()
     for item in items:
         source = session.scalar(select(Source).where(Source.name == item.source_name))
-        result = classify_item(item, config=config, source=source)
+        result = classify_item(item, config=config, source=source, now=now)
         upsert_classification(session, item, result)
     return len(items)
 
@@ -34,6 +41,7 @@ def classify_item(
     *,
     config: AppConfig,
     source: Source | None = None,
+    now: datetime | None = None,
 ) -> ClassificationResult:
     title_text = item.title.casefold()
     body_text = item.abstract_or_summary.casefold()
@@ -80,7 +88,7 @@ def classify_item(
     source_priority = score_source_priority(source, config, full_text)
     implementation = score_implementation(item)
     attention = 0.0
-    novelty = score_novelty(item)
+    novelty = score_novelty(item, now=now)
     final = final_score(
         relevance=relevance,
         source_priority=source_priority,
