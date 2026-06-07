@@ -23,7 +23,7 @@ radar = "radar.cli:app"
 [dependency-groups]
 dev = [
     "pytest>=8.3.4",
-    "ruff>=0.15.14",
+    "ruff>=0.15.16",
 ]
 
 [build-system]
