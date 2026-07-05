@@ -1,0 +1,79 @@
+name: Deploy Pages
+
+# Publishes the static radar (React, static mode) at the site root and the
+# methodology mdBook under /book/. The curated data is the committed
+# frontend/public/data snapshot — no database is needed in CI.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "frontend/**"
+      - "book/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one in-flight deploy to finish rather than cancelling it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build site
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: bun install --frozen-lockfile
+
+      - name: Build radar (static)
+        working-directory: frontend
+        env:
+          VITE_BASE_PATH: /cv-tech-radar/
+        run: bun run build:static
+
+      - name: Set up mdBook
+        uses: peaceiris/actions-mdbook@v2
+        with:
+          mdbook-version: "0.4.52"
+
+      - name: Build book
+        run: mdbook build book
+
+      - name: Assemble site (radar at root, book under /book/)
+        run: |
+          cp -r book/book frontend/dist/book
+          touch frontend/dist/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist
+
+  deploy:
+    name: Deploy to Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

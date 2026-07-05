@@ -1,0 +1,26 @@
+{
+  "abstract": "We present HERCULES, an open-source simulator and data-collection pipeline for heterogeneous multi-robot autonomy. Built upon the Unreal Engine 5 (UE5)-based simulators AirSim and Cosys-AirSim, HERCULES resolves key architectural limitations of prior frameworks to enable concurrent unmanned aerial and ground vehicle (UAV-UGV) operation in large-scale, photorealistic, dynamic environments. It introduces a new waypoint-tracking UGV controller that mirrors existing UAV control interfaces, and provides a shared navigation stack for mapping, traversability analysis, planning, and control across heterogeneous platforms. Expanding inherited sensor suites, it adds physics-based long-wave infrared (LWIR) cameras and configurable night-vision modes for degraded visual environments. HERCULES provides lightweight APIs, ROS 2 wrappers, and rigorous time synchronization across sensors and platforms, and brings state-of-the-art game-engine capabilities into robotics simulation, integrating intelligent agents such as pedestrians, traffic, and wildlife with high-fidelity dynamic phenomena, including fire, flooding, and crop disease spread. HERCULES runs in two modes: passively, replaying offline-designed trajectories to generate reproducible multi-modal datasets, and actively, running an online planner in closed loop from live observations. Our experiments in heterogeneous multi-robot SLAM, collaborative perception, and exploration, using both HERCULES-generated data and active closed-loop execution, demonstrate its utility for advancing heterogeneous multi-robot autonomy. We publicly release our source code, experiment code, documentation, and datasets, including a heterogeneous multi-robot SLAM benchmark collected with two UAVs and two UGVs across kilometer-scale desert, forest, and city environments, at https://lunarlab-gatech.github.io/HERCULES-website.",
+  "decided_at": "2026-06-23T13:14:23.941482",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-23T13:14:23.941482",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 4395,
+  "movement": null,
+  "published_at": "2026-06-22T01:51:40",
+  "reason": "Open-source UE5/AirSim simulator + data pipeline for heterogeneous multi-robot SLAM/perception; ROS2, physics-based LWIR, km-scale SLAM benchmark, released code+datasets. Heavy UE5 dependency and field/AV framing, but a concrete simulation tool.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "HERCULES: An Open-Source Simulation Framework for Heterogeneous Multi-Robot SLAM, Collaborative Perception, and Exploration",
+  "track": "Synthetic Data & Simulation",
+  "tracks": [
+    "Synthetic Data & Simulation",
+    "Robotics Vision",
+    "Open-Source CV Tooling"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.22756v1"
+}

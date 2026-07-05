@@ -1,0 +1,28 @@
+{
+  "abstract": "Ceres Solver is Google's open-source C++ library for modeling and solving large, complicated optimization problems. It is the de-facto non-linear least squares engine behind bundle adjustment in structure from motion (SfM) / SLAM, camera intrinsic and extrinsic calibration, hand-eye calibration, photometric calibration, pose refinement, and general non-linear optimization on manifolds. Provides analytic, numeric, and automatic differentiation, sparse and dense linear solvers, trust-region (Levenberg-Marquardt, dogleg) and line-search strategies, and robust loss functions.",
+  "decided_at": "2026-05-15T14:20:10.842565",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-14T07:38:13.924519",
+      "ring": "Use"
+    }
+  ],
+  "id": 1135,
+  "movement": null,
+  "published_at": "2026-05-14T12:00:00",
+  "reason": "De-facto non-linear least-squares engine for bundle adjustment, hand-eye, and calibration refinement. Production-grade with autodiff and robust losses.",
+  "ring": "Use",
+  "source": "Manual",
+  "title": "Ceres Solver",
+  "track": "Calibration & Camera Models",
+  "tracks": [
+    "Calibration & Camera Models",
+    "3D Geometry & Reconstruction",
+    "Robotics Vision",
+    "Robot Guidance",
+    "Open-Source CV Tooling"
+  ],
+  "uncertain": false,
+  "url": "http://ceres-solver.org/"
+}

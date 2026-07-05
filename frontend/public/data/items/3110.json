@@ -1,0 +1,25 @@
+{
+  "abstract": "Recovering the relative 6-DoF pose between two image groups underlies cross-sequence relocalization and multi-camera rig odometry. Each group carries known intra-group geometry from visual odometry or rig calibration, and pretrained multi-view backbones already fuse such geometry into visual features. Yet current models treat all views as an unstructured set, leaving cross-group reasoning as the missing piece. We introduce \\ours{}, which keeps the foundation model entirely frozen and adds three lightweight trainable modules to bridge the two groups: a perceiver resampler, a cross-group bridge with merged self-attention, and a multi-frame pose head. The trainable footprint totals about 32M parameters, under 6\\% of the full model, and is supervised only by relative poses. Across four datasets that span indoor and outdoor simulation, real-world cross-season capture, and zero-shot sim-to-real transfer, \\ours{} attains state-of-the-art accuracy on both tasks, while every baseline is retrained with its full original supervision. Code is available at https://github.com/WeiYuFei0217/G2G.",
+  "decided_at": "2026-06-10T13:23:03.382980",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-10T13:23:03.382980",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3110,
+  "movement": null,
+  "published_at": "2026-06-06T18:08:45",
+  "reason": "Relative 6-DoF pose between image groups (multi-camera rig odometry / relocalization), code available; touches rig calibration and visual odometry.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "G2G: Exploiting Intra-Group Geometry for Inter-Group Pose Estimation",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Calibration & Camera Models"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.08284v1"
+}

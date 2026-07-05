@@ -1,0 +1,25 @@
+{
+  "abstract": "Visual localization in complex indoor environments remains a critical challenge for robotics and AR applications. Sequential localization, where pose estimates are refined over time, is important for autonomous agents. However, traditional methods often require storing extensive image databases or point clouds, leading to significant overhead. This paper introduces a novel, lightweight approach to sequential visual localization using 3D scene graphs. Our method represents the environment with a compact scene graph, where nodes represent objects (with coarse meshes) and edges encode spatial relationships. For each image in the localization phase, we extract per-patch semantic features, predicting object identities. Localization is performed within a particle filter framework. Each particle, representing a camera pose, projects the coarse object meshes from the scene graph into the image, assigning object identities to patches based on visibility. The similarity of the per-patch features, in the input image, and object features from the scene graph determines the weight of a particle. Subsequent images are incorporated sequentially, refining the pose estimate. By leveraging a compact scene graph and efficient semantic matching, our method significantly reduces storage while maintaining performance on real-world datasets. The code will be available at https://github.com/DmblnNicole/sg2loc.",
+  "decided_at": "2026-06-11T13:59:44.481290",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-11T13:59:44.481290",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3474,
+  "movement": null,
+  "published_at": "2026-06-10T10:03:21",
+  "reason": "Lightweight sequential visual localization using a particle filter over 3D scene graphs, with released code; relevant to robot guidance, worth tracking.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "SG2Loc: Sequential Visual Localization on 3D Scene Graphs",
+  "track": "Robotics Vision",
+  "tracks": [
+    "Robotics Vision",
+    "Open-Source CV Tooling"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.11880v1"
+}

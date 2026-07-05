@@ -1,0 +1,25 @@
+{
+  "abstract": "Event-based vision sensors offer asynchronous, high-temporal-resolution measurements that are attractive for low-latency robotic perception, but many event-based motion estimation methods are computationally intensive and difficult to map to FPGA hardware. We present a streaming velocity estimator that discretizes asynchronous events into fixed-duration time bins, constructs a 1-bit spatial occupancy grid, and evaluates multiple velocity hypotheses in parallel using only fixed-width integer logic - shift registers, counters, comparators, and small LUT-mapped multiplies - with no dividers and no DSP blocks. It requires no frame reconstruction, no floating-point arithmetic, and no iterative optimization. The method deliberately trades dense sub-pixel optical flow for a sparse, quantized velocity estimate at each active pixel, suited to low-latency tasks such as reactive obstacle avoidance on size-, weight-, and power-constrained platforms. On noisy synthetic data with known ground-truth velocities, the method recovers both magnitude and direction, with magnitude estimates being most challenged when objects of different velocities intersect. On a real event-camera sequence, directional accuracy reaches 99.5% across all four evaluated motion segments, with performance remaining robust across occupancy densities in the 10-40% range. We characterize the algorithm's density-dependent behavior, present a parameter sensitivity analysis, show that the proposed datapath requires less than 2 kB of storage, and implement a single-axis prototype on a low-cost Xilinx Artix-7.",
+  "decided_at": "2026-05-28T13:11:32.106941",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-28T13:11:32.106941",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2360,
+  "movement": null,
+  "published_at": "2026-05-27T11:13:58",
+  "reason": "Event-camera velocity estimator targeting low-cost FPGA (Artix-7) with integer-only logic and <2 kB storage; concrete low-latency edge path, real event-camera evaluation at 99.5% directional accuracy. Sparse-output trade-off acknowledged.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "EventShiftFlow: Towards Hardware-efficient FPGA-based Flow Estimation",
+  "track": "3D Sensors",
+  "tracks": [
+    "3D Sensors",
+    "Edge AI & Deployment"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.28312v1"
+}

@@ -1,0 +1,25 @@
+{
+  "abstract": "Scene graphs are becoming a standard representation for robot navigation, providing hierarchical geometric and semantic scene understanding. However, most scene graph mapping methods rely on depth cameras or LiDAR sensors. In this work, we present LEXI-SG, the first dense monocular visual mapping system for open-vocabulary 3D scene graphs using only RGB camera input. Our approach exploits the semantic priors of open-vocabulary foundation models to partition the scene into rooms, deferring feed-forward reconstruction to when each room is fully observed -- enabling scalable dense mapping without sliding-window scale inconsistencies. We propose a room-based factor graph formulation to globally align room reconstructions while preserving local map consistency and naturally imposing the semantic scene graph hierarchy. Within each room, we further support open-vocabulary object segmentation and tracking. We validate LEXI-SG on indoor scenes from the Habitat-Matterport 3D and self-collected egocentric office sequences. We evaluate its performance against existing feed-forward SLAM methods, as well as established scene graphs baselines. We demonstrate improved trajectory estimation and dense reconstruction, as well as, competitive performance in open-vocabulary segmentation. LEXI-SG shows that accurate, scalable, open-vocabulary 3D scene graphs can be achieved from monocular RGB alone. Our project page and office sequences are available here: https://ori-drs.github.io/lexisg-web/.",
+  "decided_at": "2026-05-14T07:24:28.534271",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-14T07:24:28.534271",
+      "ring": "Watch"
+    }
+  ],
+  "id": 1000,
+  "movement": null,
+  "published_at": "2026-05-13T16:19:02",
+  "reason": "Monocular RGB-only dense mapping + open-vocab 3D scene graph from ORI-DRS, room-based factor graph aligns reconstructions. Indoor/Habitat focus, project page only \u2014 useful if monocular SLAM enters our stack.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "LEXI-SG: Monocular 3D Scene Graph Mapping with Room-Guided Feed-Forward Reconstruction",
+  "track": "Robotics Vision",
+  "tracks": [
+    "Robotics Vision",
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.13741v1"
+}

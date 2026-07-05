@@ -1,0 +1,24 @@
+{
+  "abstract": "We propose SADGE, a quantitative similarity metric that predicts the performance of synthetic image datasets for common computer vision tasks without downstream model training. Estimating whether a synthetic dataset will lead to a model that performs well on real-world data remains a bottleneck in model development. Existing evaluation metrics (e.g., PSNR, FID, CLIP) primarily measure semantic alignment between real and synthetic images (Appearance Similarity Score). Less commonly, structural similarity between images is considered to assess the domain gap (Geometric Similarity Score). However, to the best of our knowledge there exists no studies that evaluate which similarity metric is the best downstream predictor for a given synthetic dataset. In this paper, we show over a wide variety of different synthetic datasets and downstream tasks that neither appearance nor geometry alone can reliably predict downstream performance; rather, it is their non-linear interplay that dictates synthetic data utility. Specifically, we measure how commonly used Appearance and Geometric Similarity metrics computed between synthetic and real images correlate with downstream performance in object detection, semantic segmentation, and pose estimation. Across five public synthetic-to-real benchmark families and 15 dataset-level variants (79k image pairs), SADGE achieves the strongest association with downstream transfer performance under both linear and rank-based criteria, reaching Pearson r=0.88 and Spearman rho=0.77. We compute for each combination of geometry-based methods and appearance-based approaches SADGE scores across all benchmark families. The best configuration is obtained by fusing DINOv3 appearance similarity with MASt3R geometric consistency through a constrained bilinear interaction, outperforming both the strongest geometry-only baseline and the strongest appearance-only baseline .",
+  "decided_at": "2026-05-22T19:29:02.217939",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-22T19:29:02.217939",
+      "ring": "Watch"
+    }
+  ],
+  "id": 1943,
+  "movement": null,
+  "published_at": "2026-05-21T13:27:15",
+  "reason": "A metric that predicts whether a synthetic dataset will transfer to real data without downstream training \u2014 a genuine bottleneck for synthetic-data pipelines. Weak signal only \u2014 no code, measurement study, fusion of DINOv3 + MASt3R similarity.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "SADGE: Structure and Appearance Domain Gap Estimation of Synthetic and Real Data",
+  "track": "Synthetic Data & Simulation",
+  "tracks": [
+    "Synthetic Data & Simulation"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.22467v1"
+}

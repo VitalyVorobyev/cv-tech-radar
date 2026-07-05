@@ -1,0 +1,24 @@
+{
+  "abstract": "Reconstructing printable 3D models from Mars rover imagery is challenging because Martian terrain is low-texture, irregular, and partially observed. We evaluate a pipeline that estimates stereo depth from NASA Curiosity images, completes geometry, and exports watertight OBJ meshes. On Middlebury, RAFT-Stereo outperforms semi-global block matching (SGBM), reducing disparity MAE from 3.22px to 0.73px and increasing valid prediction coverage from 76.3% to 100.0%. On Curiosity imagery, however, RAFT's denser disparities show weaker edge alignment and higher photometric reprojection error, suggesting that benchmark accuracy does not directly transfer to Martian terrain reconstruction. Geometry completion demonstrates a tradeoff between local fidelity and global connectivity. We find that alpha shapes preserve accurate but fragmented structure, Poisson reconstruction produces more coherent meshes but adds unsupported surfaces, and a deterministic diffusion-fill baseline is intermediate but sensitive to stereo quality. Overall, standard stereo and completion methods can produce printable approximations of Martian terrain, but reliable reconstruction requires stronger domain-specific validation.",
+  "decided_at": "2026-06-10T13:23:03.888333",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-10T13:23:03.888333",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3030,
+  "movement": null,
+  "published_at": "2026-06-09T03:24:01",
+  "reason": "Stereo-depth benchmark (RAFT-Stereo vs SGBM) showing benchmark accuracy does not transfer to low-texture real terrain.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Benchmarking stereo reconstruction for 3D printable Martian terrain models",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.10364v1"
+}

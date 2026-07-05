@@ -1,0 +1,24 @@
+{
+  "abstract": "Reliable crack assessment requires not only accurate pixel-level masks but also connected crack geometry and confidence estimates that remain stable under domain shift. However, existing segmentation models can achieve high overlap scores while fragmenting cracks, missing fine branches, and providing no calibrated uncertainty. To address this gap, this paper proposes CrackGeoFM, a multi-task framework that combines a frozen visual foundation backbone with crack-specific adaptation for mask prediction, skeleton reconstruction, and uncertainty estimation. The framework integrates a Frequency-Guided Crack Enhancement Module (FCEM) to enhance high-frequency crack cues, a Crack-Domain Feature Adaptation Module (CFAM) to adapt frozen backbone features to crack-domain patterns, and a Structure-Aware Multi-Task Decoder (SMTD) to jointly decode masks, skeletons, and uncertainty. Across 20 crack datasets, CrackGeoFM achieves state-of-the-art segmentation, improved topology preservation, calibrated uncertainty, and effective few-shot adaptation with only five labeled images. These results support reliable, generalizable, and engineering-oriented crack analysis for infrastructure assessment.",
+  "decided_at": "2026-06-10T13:51:58.613983",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-10T13:51:58.613983",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3363,
+  "movement": null,
+  "published_at": "2026-06-04T03:08:01",
+  "reason": "Crack-detection foundation model for civil-infrastructure inspection with topology preservation; surface-defect inspection signal.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Multi-Task Crack Foundation Model for Engineering-Reliable Crack Representation and Topology Preservation in Civil Infrastructure",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.05641v1"
+}

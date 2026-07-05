@@ -1,0 +1,24 @@
+{
+  "abstract": "Correspondence pruning aims to identify inliers from an initial set of correspondences. Most existing Graph Neural Network (GNN)-based methods rely on geometric features mapped from coarse Euclidean coordinates, which struggle to capture the subtle geometric consistencies presented by inliers. While Mamba-based methods possess global receptive fields and long sequence modeling capabilities, they tend to accumulate substantial inconsistent features within the hidden state space, making it difficult to distinguish inliers from outliers. In this paper, we integrate frequency domain perception into this task for the first time and propose SFMambaNet, a novel Spectral-Frequency enhanced Mamba-based two-view correspondence pruning network. Our method is collaboratively composed of two components: First, we design a Local Spectral-Geometric Attention (LSGA) block. LSGA incorporates spectral positional encoding into local graph interactions and introduces multi-scale Mamba processing to enhance the capture of subtle geometric consistencies and improve local feature discriminability. Building upon this, we design a Spectral-Integrated Global Mamba (SIGM) block. SIGM embeds a frequency gating mechanism within the state space, utilizing the frequency information provided by LSGA to explicitly suppress high-frequency noise accumulation within hidden states and mitigate the propagation of inconsistent features. This enhances inlier-outlier separability and achieves robust global context modeling capabilities with nearly linear complexity. Extensive experiments demonstrate that SFMambaNet outperforms current state-of-the-art methods on several challenging tasks. The code is available at https://github.com/Kirito14IT/SFMambaNet.",
+  "decided_at": "2026-06-04T13:09:59.719516",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-04T13:09:59.719516",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2772,
+  "movement": null,
+  "published_at": "2026-06-03T06:18:05",
+  "reason": "Two-view correspondence pruning (inlier selection) sits directly upstream of pose, calibration, and SfM and ships code, but is Mamba-framed and unproven against strong RANSAC and MAGSAC baselines.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "SFMambaNet: Spectral-Frequency Enhanced Selective State Space Model for Correspondence Pruning",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.04493v1"
+}

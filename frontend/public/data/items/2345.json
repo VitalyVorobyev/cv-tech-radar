@@ -1,0 +1,24 @@
+{
+  "abstract": "Self-supervised depth estimation from monocular sequences relies on the joint learning of a depth and a pose network. Despite abundant research done to improve the depth network, efforts on the pose remain limited. In this context, even when depth is estimated up to scale, we highlight the importance of the alignment between the scene scales estimated by the pose and depth nets. Then, we introduce SA4Depth, an approach to improve this alignment and boost the depth predictions while keeping the inference time unchanged. Our proposed method uses the depth estimated during training to reproject learnable visual features across consecutive frames and refine the pose estimates by reducing feature alignment residuals. With our method, the estimated scene scales by the separate depth and pose networks are aligned, and the prediction scale consistency is improved across different sequences. Our differentiable refinement integrates seamlessly into existing self-supervised pipelines and substantially improves their depth estimates. We demonstrate this with extensive experiments both outdoors and indoors on KITTI, Cityscapes, and NYUv2. Additionally, results on KITTI Odometry confirm the effectiveness of our pose refinement. Our code is available at https://github.com/Runningchauncey/SA4Depth .",
+  "decided_at": "2026-05-28T13:11:32.102841",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-28T13:11:32.102841",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2345,
+  "movement": null,
+  "published_at": "2026-05-27T13:38:25",
+  "reason": "Self-supervised monocular depth with explicit pose-depth scale alignment and public code; aligned scales matter when chaining VO+depth. Generic KITTI/NYU benchmark though.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "SA4Depth: Consistent Pose-Depth Scale Alignment for Self-Supervised Monocular Depth Estimation",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.28477v1"
+}

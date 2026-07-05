@@ -1,0 +1,25 @@
+{
+  "abstract": "Despite the rapid advancements in event-based motion estimation, current geometric methods primarily focus on velocity estimation. However, absolute pose estimation, which is equally crucial for key applications such as robotic navigation and augmented reality, remains relatively underexplored. Consequently, the simultaneous recovery of absolute pose and velocity from event streams remains an open and challenging problem. To address this gap, we propose a geometric framework for absolute pose and velocity estimation by leveraging 3D lines in the scene and the events they trigger. At the core of the framework lie two key geometric constraints: the orthogonality between a 3D line and the normal vector of its corresponding event plane, and the collinearity of an event with the 2D projection of its associated line. Based on these constraints, we present both linear and polynomial solvers for absolute pose estimation. The former enables efficient computation, while the latter provides a globally optimal solution for rotation. For velocity estimation, we develop an efficient linear solver and a more accurate optimization-based solver to recover both angular and linear velocities. Notably, our methods require a minimum of three event-line correspondences to determine the 6-DoF absolute pose or velocities independently. Extensive experiments in simulation and on real-world datasets demonstrate that our methods achieve state-of-the-art performance, with significant improvements in accuracy and computational efficiency compared to existing methods. The demo code is publicly available at https://github.com/Zibin6/EventPoseVelocity.",
+  "decided_at": "2026-06-09T13:19:31.076462",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-09T13:19:31.076462",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2900,
+  "movement": null,
+  "published_at": "2026-06-08T07:35:28",
+  "reason": "Geometric framework for absolute pose + velocity estimation from event cameras using 3D line features. Provides both linear and polynomial solvers, requiring only 3 event-line correspondences for full 6-DoF. Demo code is publicly available. Relevant to robotic navigation and localization in high-speed or low-light scenarios where frame cameras fail.\n",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "A Geometric Framework for Absolute Pose and Velocity Estimation with Event Cameras",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Robotics Vision"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.09139v1"
+}

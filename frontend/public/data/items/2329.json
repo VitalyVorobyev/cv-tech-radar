@@ -1,0 +1,24 @@
+{
+  "abstract": "Transparent objects are common in daily life, and it is important to understand their multilayer depth, including the transparent surface and the objects behind it. Existing methods for multilayer depth typically extend single-layer prediction. They define layers by the front-to-back ordering of 3D points and predict the layers sequentially. However, as layered geometry can admit multiple valid groupings of 3D points into layers, a predefined grouping strategy is inherently restrictive. In this work, we propose SeeGroup, a multi-layer depth estimation method that avoids imposing a predefined grouping and allows the model itself to adaptively assign surfaces to depth maps. We formulate per-pixel multi-layer depth as a point process, treating depth layers as unordered events along each camera ray. This induces a permutation-invariant likelihood over the observed depth layers, yielding a loss that naturally supports arbitrary layer groupings. Experiments demonstrate that our method significantly advances the state of the art of multi-layer depth estimation, improving quadruplet relative depth accuracy on LayeredDepth benchmark from 61.34% to 70.09%. Code is available at https://github.com/princeton-vl/SeeGroup.",
+  "decided_at": "2026-05-28T13:11:32.100228",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-28T13:11:32.100228",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2329,
+  "movement": null,
+  "published_at": "2026-05-27T16:55:46",
+  "reason": "Multi-layer depth for transparent surfaces with public code (princeton-vl/SeeGroup) \u2014 relevant for industrial inspection through glass/plastic, though benchmark is synthetic.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "SeeGroup: Multi-Layer Depth Estimation of Transparent Surfaces via Self-Determined Grouping",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.28735v1"
+}

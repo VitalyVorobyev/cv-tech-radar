@@ -1,0 +1,25 @@
+{
+  "abstract": "Aerial navigation on Mars requires vision-based pipelines that are robust to the diverse illumination conditions and terrain morphology of the Martian surface. A key bottleneck for training and evaluating such methods is the scarcity of large-scale, annotated aerial datasets. We present MARTIAN, an open-source Blender-based rendering framework that leverages real HiRISE orbital map products to synthesize realistic aerial views of the Martian terrain under controllable lighting conditions and at varying altitudes. MARTIAN generates observations with accurate pose annotations, directly addressing the scarcity of training data for vision-based navigation on Mars. The framework has been validated through its deployment in concurrent work on map-based localization systems for Ingenuity and future Mars rotorcraft, where synthetically trained deep image matchers were successfully evaluated on real Mars imagery. MARTIAN is publicly available at: https://github.com/nasa-jpl/martian.",
+  "decided_at": "2026-05-29T13:08:05.180709",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-29T13:08:05.180709",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2534,
+  "movement": null,
+  "published_at": "2026-05-28T09:12:57",
+  "reason": "Open-source Blender-based renderer (NASA-JPL) producing pose-annotated synthetic views \u2014 useful synthetic-data reference, but Mars-aerial domain is niche.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "MARTIAN: A Rendering Framework for Aerial Mars Imagery from HiRISE Orbital Data",
+  "track": "Synthetic Data & Simulation",
+  "tracks": [
+    "Synthetic Data & Simulation",
+    "Open-Source CV Tooling"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.29647v1"
+}

@@ -1,0 +1,25 @@
+{
+  "abstract": "Zero-shot 3D anomaly detection is essential for industrial quality inspection, where labeled anomaly samples are scarce. Meanwhile, existing methods lack an effective mechanism to fuse complementary 2D color images with 3D geometric structures, limiting their ability to detect both surface and structural defects in a unified framework. To address these issues, we propose CoGeoAD, a unified CLIP-based framework that fuses color and geometric features by constructing pixel-aligned paired multi-view images. The framework introduces a Data-Driven Multi-View Attention (MVA) mechanism to adaptively aggregate 3D features and a Multi-Stage Color-Geometric Fusion (MS-CGF) module to hierarchically integrate multi-level features from both modalities. Extensive experiments on the MVTec3D-AD and Eyecandies benchmarks demonstrate that CoGeoAD achieves state-of-the-art performance, effectively capturing both structural and textural anomalies in complex industrial scenarios. our source code is available at https://github.com/kingdomShu/CoGeoAD.",
+  "decided_at": "2026-06-25T13:24:28.121436",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-25T13:24:28.121436",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 4838,
+  "movement": null,
+  "published_at": "2026-06-24T01:12:22",
+  "reason": "Zero-shot 3D anomaly detection fusing color+geometry, SOTA on MVTec3D-AD/Eyecandies, open code. Squarely industrial 3D inspection; worth a read/compare.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "CoGeoAD: Hierarchical Color-Geometric Fusion with Multi-View Attention for Zero-Shot 3D Anomaly Detection",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection",
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.25273v1"
+}

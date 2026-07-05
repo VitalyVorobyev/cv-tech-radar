@@ -1,0 +1,27 @@
+{
+  "abstract": "Industrial Anomaly Detection (IAD) is critical for quality control, but existing methods struggle with subtle, geometric defects. Standard 2D (RGB) images are sensitive to texture and lighting but often miss fine geometric anomalies. While 3D point clouds capture macro-shape, they are typically too sparse to detect micro-defects like scratches or pits. We address this fundamental data limitation by introducing Real-IAD-MVN (Multi-View Normal), a large-scale industrial dataset. By upgrading our acquisition system, Real-IAD-MVN captures high-fidelity surface normal maps from five distinct viewpoints, replacing sparse 3D data entirely. This provides a comprehensive geometric representation at a micro-detail level, making previously invisible side-wall and occluded defects explicitly detectable. Our experiments, conducted on this new dataset, first provide evidence that incorporating dense, multi-view pseudo-3D (surface normals) yields significantly better detection performance than using sparse 3D point cloud data. To further validate the dataset and provide a strong benchmark, we introduce a baseline method based on reconstruction, which learns to extract cross-modal unified prototypes from the image and normal map streams. We demonstrate that this unified prototype approach surpasses existing state-of-the-art multimodal fusion methods, highlighting the rich potential of our new dataset for advancing geometric anomaly detection.",
+  "decided_at": "2026-05-12T10:48:51.455615",
+  "decided_by": "seed-script",
+  "history": [
+    {
+      "at": "2026-05-12T10:48:51.455615",
+      "ring": "Prototype"
+    }
+  ],
+  "id": 152,
+  "movement": null,
+  "published_at": "2026-05-08T02:34:51",
+  "reason": "Has code + clear test path \u2014 worth a spike",
+  "ring": "Prototype",
+  "source": "arXiv cs.CV",
+  "title": "Real-IAD MVN: A Multi-View Normal Vector Dataset and Benchmark for High-Fidelity Industrial Anomaly Detection",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Industrial Vision Inspection",
+    "Vision Foundation Models",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.07149v1"
+}

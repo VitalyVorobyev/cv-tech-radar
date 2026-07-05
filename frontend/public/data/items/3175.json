@@ -1,0 +1,26 @@
+{
+  "abstract": "Smart eyewear enables unobtrusive, context-aware interaction through multimodal sensors and on-device intelligence, but is severely limited by power, memory, and compute constraints in a compact form factor. Open-hardware platforms supporting event-based vision and embedded ML at this scale are rare. This work introduces an open-source smart glasses platform for rapid prototyping of novel sensors and algorithms. Its modular design uses a flexible FPC interposer to support both event-based and frame-based cameras without full PCB redesign. A hardware-software co-designed power management system combines a configurable PMIC with event-driven wake-up via an nRF5340 coordinator, keeping the GAP9 RISC-V SoC powered down between inferences. The prototype achieves up to 11.5 hours of continuous on-device ML from a 200 mAh battery. As a demonstration, an egocentric hand gesture recognition pipeline was evaluated on the LynX dataset using polarity-separated event histograms from a Prophesee GENX320 camera. R(2+1)D achieved the best cross-subject accuracy of 83.94\\% (macro F1 = 0.781) under leave-two-subjects-out validation, with 78.3 ms end-to-end inference latency on the GAP9. Temporal augmentation and removal of ambiguous classes provided the largest gains (+8.9 pp). All hardware designs, firmware, and models are released open source.",
+  "decided_at": "2026-06-10T13:51:58.856648",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-10T13:51:58.856648",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3175,
+  "movement": null,
+  "published_at": "2026-06-05T16:27:02",
+  "reason": "Ultra-low-power on-device AI eyewear with event-based vision, open-source; edge + event-sensor signal.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "OpenGlass: Ultra-Low-Power On-Device AI Eyewear with Event-based Vision",
+  "track": "Edge AI & Deployment",
+  "tracks": [
+    "Edge AI & Deployment",
+    "Sensors",
+    "Cameras & Standards"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.07431v2"
+}

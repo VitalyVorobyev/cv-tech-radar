@@ -1,0 +1,24 @@
+{
+  "abstract": "Fisheye cameras are widely deployed in autonomous driving perception suites for their low cost and full-coverage field of view (FOV), yet their potential remains underleveraged in 3D object detection. Severe radial distortion challenges most BEV detectors by violating the fundamental assumption of uniform sampling. To bridge this gap, we propose Distortion-Aware PETR (DAPETR), a projection-free detector tailored for mixed pinhole-fisheye camera setups. DAPETR incorporates two key learned-adaptive modules: a unified distortion-aware positional embedding that harmonizes positional encodings for image representations with fisheye geometry, and a bidirectional feature-geometry co-modulation module that mutually adapts image features and 3D positional embeddings. In our experiments on a converted KITTI-360 benchmark, we systematically compare our learned adaptive approach against PETR in polar coordinates (PolarPETR). We find that while both methods improve over the baseline, our learned modules achieve superior performance. Crucially, we uncover a negative interaction when combining both strategies, revealing that learned adaptation and explicit geometric reparameterization can conflict. Our final DAPETR model significantly advances the research and benchmark for fisheye BEV detection, providing critical insights into effective distortion-aware 3D perception design other than image rectification.",
+  "decided_at": "2026-06-10T13:23:03.635506",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-10T13:23:03.635506",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3072,
+  "movement": null,
+  "published_at": "2026-06-07T15:32:10",
+  "reason": "Distortion-aware fisheye BEV detection; second fisheye-distortion data point today, calibration-relevant.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Distortion-Aware PETR for BEV Object Detection with Mixed Pinhole-Fisheye Cameras",
+  "track": "Calibration & Camera Models",
+  "tracks": [
+    "Calibration & Camera Models"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.08680v1"
+}

@@ -1,0 +1,24 @@
+{
+  "abstract": "Surface reconstruction with differentiable rendering has achieved impressive performance in recent years, yet the pervasive photometric ambiguities have strictly bottlenecked existing approaches. This paper presents AmbiSuR, a framework that explores an intrinsic solution upon Gaussian Splatting for the photometric ambiguity-robust surface 3D reconstruction with high performance. Starting by revisiting the foundation, our investigation uncovers two built-in primitive-wise ambiguities in representation, while revealing an intrinsic potential for ambiguity self-indication in Gaussian Splatting. Stemming from these, a photometric disambiguation is first introduced, constraining ill-posed geometry solution for definite surface formation. Then, we propose an ambiguity indication module that unleashes the self-indication potential to identify and further guide correcting underconstrained reconstructions. Extensive experiments demonstrate our superior surface reconstructions compared to existing methods across various challenging scenarios, excelling in broad compatibility. Project: https://fictionarry.github.io/AmbiSuR-Proj/ .",
+  "decided_at": "2026-05-13T06:09:13.600122",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-13T06:09:13.600122",
+      "ring": "Watch"
+    }
+  ],
+  "id": 807,
+  "movement": null,
+  "published_at": "2026-05-12T17:59:47",
+  "reason": "Identifies built-in photometric ambiguities in Gaussian Splatting with a self-indication module \u2014 relevant if 3DGS surface reconstruction becomes a tool for inspection. Project page only, no repo yet.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Revisiting Photometric Ambiguity for Accurate Gaussian-Splatting Surface Reconstruction",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.12494v1"
+}

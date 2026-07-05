@@ -1,0 +1,25 @@
+{
+  "abstract": "Point clouds are a primary sensory representation for robotic perception, underpinning LiDAR-based autonomous driving, simultaneous localization and mapping (SLAM), and navigation. Within these pipelines, Farthest Point Sampling (FPS) is the most well-known downsampling operator, as its uniform coverage preserves the geometric structure on which downstream perception relies. However, the large time complexity of classical FPS scales poorly with the million-point-per-second rates of modern 3D sensors, making it a dominant latency bottleneck that conflicts with the real-time and limited onboard compute budgets of robotic systems. Therefore, we propose RadiusFPS, an FPS acceleration framework based on spherical voxel pruning that preserves the standard FPS update rule under the same initialization and tie-breaking policy. By indexing the point cloud with spherical voxels, RadiusFPS derives a conservative geometric bound that prunes redundant distance computations in each iteration, complemented by a coordinate-wise point-skip test that removes residual updates. We further introduce RadiusFPS-G, a warp-level GPU implementation that fuses voxel selection, pruning, and distance update into memory-coalesced kernels, eliminating costly global-memory round-trips. On indoor (S3DIS, ScanNet) and outdoor LiDAR (SemanticKITTI) benchmarks, RadiusFPS-G attains up to 2.5x speedup over GPU-based FPS and matches or exceeds QuickFPS among the evaluated methods while using roughly half its GPU memory, with comparable segmentation accuracy. When coupled with the learning-based FastPoint sampler, the resulting pipeline achieves the fastest End-to-End inference among all evaluated configurations. These properties make high-quality FPS-style sampling practical for latency- and memory-constrained robotic vision.",
+  "decided_at": "2026-06-10T13:51:58.607680",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-10T13:51:58.607680",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3292,
+  "movement": null,
+  "published_at": "2026-06-04T14:57:05",
+  "reason": "Efficient farthest-point-sampling for point clouds on CPU/GPU; reusable 3D tooling primitive.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "RadiusFPS: Efficient Farthest Point Sampling on CPUs and GPUs via Spherical Voxel Pruning",
+  "track": "3D Sensors",
+  "tracks": [
+    "3D Sensors",
+    "Open-Source CV Tooling"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.06255v1"
+}

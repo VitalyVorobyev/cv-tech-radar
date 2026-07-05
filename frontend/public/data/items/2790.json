@@ -1,0 +1,24 @@
+{
+  "abstract": "Data-Free Quantization (DFQ) addresses data security concerns by synthesizing samples, without accessing real data. It has garnered increasing attention in the context of Vision Transformers (ViTs), owing to the superiority of the self-attention mechanism compared to classical convolutional operation. However, previous DFQ arts for ViTs often suffer from a distribution mismatch between synthetic samples and input distribution expected by quantized models Q, resulting in the suboptimal performance. In this paper, we propose a novel Masked Attention Alignment approach for Data-Free Quantization of ViTs, named MaskAQ, revealing that: 1) the semantics in the self-attention mechanism is predominantly localized to a sparse subset of patches, called informative regions; 2) the informative regions dominate the mutual information between synthetic samples and Q's outputs. To these ends, we incorporate differential entropy maximum over patch similarity of synthetic samples, to decouple informative regions from noisy background. To couple with varied Q, the informative regions are selected to align full-precision models with Q via a masked attention alignment objective, thus yielding high-quality synthetic samples. Furthermore, a periodic sample refreshing strategy comes up to endow MaskAQ with the capacity to continually adapt to the evolving state of Q throughout the training process, to preserve desirable mutual information with synthetic samples. Extensive experiments verify the merits of MaskAQ over state-of-the-art approaches across multiple backbones and downstream tasks. Our code is available at https://github.com/hfutqian/MaskAQ.",
+  "decided_at": "2026-06-04T13:09:59.720049",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-04T13:09:59.720049",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2790,
+  "movement": null,
+  "published_at": "2026-06-03T02:38:19",
+  "reason": "Data-free post-training quantization for ViTs with released code; useful for edge ViT deployment when no calibration data is available.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Selective Coupling of Decoupled Informative Regions: Masked Attention Alignment for Data-Free Quantization of Vision Transformers",
+  "track": "Edge AI & Deployment",
+  "tracks": [
+    "Edge AI & Deployment"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.04373v2"
+}

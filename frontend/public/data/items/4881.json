@@ -1,0 +1,29 @@
+{
+  "abstract": "We present OctoSense, an open-source sensor platform with stereo RGB and event cameras, LiDAR, a thermal camera, an inertial measurement unit, RTK-corrected global positioning system, and proprioception (CAN bus data from a car, and joint angles for a quadruped robot). The eponymous OctoSense dataset contains 59 hours of time-synchronized driving data across different types of environments at different times of the day, including situations with highly degraded sensors. We demonstrate multi-modal self-supervised learning using such real-world robotics data, where sensors have different representations, frequencies, latencies and noise. Our approach, a \"late-fusion\" masked autoencoder, (i) uses modality-specific tokenizers to account for different spatiotemporal characteristics of these sensors, and (ii) caches modality-specific tokens at inference time to process new measurements as they come. This architecture (i) is fast (6.68 ms and 112 ms on NVIDIA 5090 and Orin NX respectively, to compute the representation), (ii) performs better than existing image-only foundation models on tasks such as estimation of optical flow, depth, semantic segmentation, and ego-motion (translation, rotation, and steering angle), and (iii) predicts robustly at nighttime or in situations where sensory data is degraded. See our project page for links to the dataset, code, and supplementary videos: https://abisulco.com/octosense/.",
+  "decided_at": "2026-06-29T13:33:32.332161",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-29T13:33:32.332161",
+      "ring": "Watch"
+    }
+  ],
+  "id": 4881,
+  "movement": null,
+  "published_at": "2026-06-25T17:30:49",
+  "reason": "Open multi-sensor platform + 59 h dataset (stereo RGB, event, LiDAR, thermal, IMU, RTK) with an edge-deployable late-fusion MAE (6.7 ms on 5090, 112 ms on Orin NX) that beats image-only foundation models on flow/depth/segmentation/ego-motion. Relevant to 3D sensors + edge, but primarily a dataset/platform announcement.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "OctoSense: Self-Supervised Learning for Multimodal Robot Perception",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "3D Sensors",
+    "Robotics Vision",
+    "Vision Foundation Models",
+    "Open-Source CV Tooling",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.27317v1"
+}

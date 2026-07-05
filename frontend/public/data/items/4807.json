@@ -1,0 +1,25 @@
+{
+  "abstract": "Path-traced synthetic stereo data underlie a large fraction of modern disparity-estimation training pipelines. We report a previously unrecognised property of such data: while the Monte Carlo (MC) noise streams of the two cameras are statistically independent, the underlying \\emph{variance fields} -- deterministic per-pixel functions of the rendering integrand -- are highly correlated once aligned by the ground-truth disparity warp. Across 20 scenes rendered with Mitsuba~3, the warped Pearson correlation reaches $\u03c1{=}0.754{\\pm}0.016$ across 20 scenes at $\\mathrm{SPP}{=}512$, and on a representative scene remains essentially invariant ($\u03c1{=}0.778{\\pm}0.001$) over a $16\\times$ range of samples per pixel. The effect is strongest in Lambertian regions ($\u03c1{\\approx}0.78$) and substantially weaker in glass ($\u03c1{\\approx}0.30$), as predicted by an integrand decomposition into view-independent and view-dependent components. A residual-shuffle intervention that breaks the cross-view alignment while preserving the clean image degrades the GT cost margin by $33\\%$ on non-glass and the variance-based winner-take-all accuracy on glass by $4.3\\times$, confirming the structure functions as a matching cue. This signal is unique to MC-rendered data and constitutes a candidate sim-to-real shortcut whose impact on trained networks remains to be quantified.",
+  "decided_at": "2026-06-25T13:24:28.129690",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-25T13:24:28.129690",
+      "ring": "Watch"
+    }
+  ],
+  "id": 4807,
+  "movement": null,
+  "published_at": "2026-06-24T07:13:00",
+  "reason": "Identifies a correlated-variance shortcut in path-traced synthetic stereo data that acts as a hidden matching cue (Mitsuba 3). A useful caution for anyone training stereo/disparity nets on synthetic data; analysis only, no method.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Cross-View Variance Correlation in Path-Traced Stereo:A Hidden Shortcut in Synthetic Training Data",
+  "track": "Synthetic Data & Simulation",
+  "tracks": [
+    "Synthetic Data & Simulation",
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.25483v1"
+}

@@ -1,0 +1,24 @@
+{
+  "abstract": "Deploying Vision-Language Models on resource-constrained hardware typically requires INT8 quantization, but in joint-embedding architectures such as CLIP this introduces a failure mode distinct from quantized CNN classifiers: activation noise accumulated across transformer blocks perturbs the direction of the multimodal embedding, eroding the cosine alignment on which zero-shot retrieval depends. We characterize this as Quantization-Induced Representation Collapse (QIRC) and quantify it on INT8 CLIP ViT-B/32, where the layer-wise noise-to-signal ratio grows from below 10% in shallow blocks to 52% at Layer 11. We propose LRA-EE (Layer-wise Representation-Aware Early Exit), which bypasses noise-saturated deep layers via Spatio-Semantic Aggregation (replacing the immature shallow [CLS] with a global patch-token average), a learned multi-feature gate (confidence, top-2 margin, spatial-activation variance), and Layer-adaptive Confidence Thresholding calibrated to each layer's Information-to-Noise Ratio. On ImageNet-1K zero-shot classification, LRA-EE reduces FLOPs by 13.4% and improves Top-1 accuracy by +2.44%p (58.72% -> 61.16%) over the INT8 baseline. A four-quadrant decomposition isolates the Rescue Effect: 9.5% of samples are correctly classified at shallow exits but lost to noise at full depth, against only 7.1% suffering the inverse.",
+  "decided_at": "2026-05-27T13:22:57.159946",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-27T13:22:57.159946",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2290,
+  "movement": null,
+  "published_at": "2026-05-26T00:45:46",
+  "reason": "INT8 quantization failure analysis on CLIP ViT-B/32 plus a Layer-wise Representation-Aware Early-Exit fix (+2.44%p Top-1, -13.4% FLOPs). Concrete edge-AI insight for VLM joint embeddings; niche but solid.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "The Rescue Effect: Spatio-Semantic Early Exit Bypasses Quantization Collapse in CLIP",
+  "track": "Edge AI & Deployment",
+  "tracks": [
+    "Edge AI & Deployment"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.26415v1"
+}

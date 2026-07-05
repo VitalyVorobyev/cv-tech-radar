@@ -1,0 +1,25 @@
+{
+  "abstract": "Multi-object tracking (MOT) is a fundamental task in computer vision that requires continuously tracking multiple targets while maintaining consistent identities across frames. However, most existing approaches primarily rely on instance-level object features for trajectory association, which often leads to degraded performance under challenging conditions such as object deformation, nonlinear motion, and occlusion. In this work, we propose SAMOFT, a robust tracker that leverages pixel-level cues to improve robustness under complex motion scenarios. Specifically, we introduce a Pixel Motion Matching (PMM) module that integrates the Segment Anything Model (SAM) with dense optical flow to refine Kalman filter-based motion prediction using instantaneous foreground pixel motion. To further enhance robustness under unreliable detections, we design a Centroid Distance Matching (CDM) module that performs flexible mask-based centroid matching for low-confidence or partially occluded observations. Moreover, a Distribution-Based Correction (DBC) module models long-tailed motion patterns in a training-free manner using historical optical flow statistics and dynamically corrects trajectory states online. We also incorporate a Cluster-Aware ReID (CA-ReID) strategy to improve the stability and discriminative power of trajectory appearance features. Extensive experiments on the DanceTrack and MOTChallenge benchmarks demonstrate that SAMOFT consistently improves baseline trackers and achieves competitive performance compared with recent state-of-the-art methods, validating the effectiveness of leveraging pixel-level cues for robust multi-object tracking.",
+  "decided_at": "2026-05-12T10:48:51.456448",
+  "decided_by": "seed-script",
+  "history": [
+    {
+      "at": "2026-05-12T10:48:51.456448",
+      "ring": "Watch"
+    }
+  ],
+  "id": 717,
+  "movement": null,
+  "published_at": "2026-05-10T08:39:54",
+  "reason": "Interesting but speculative \u2014 keep on radar",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "SAMOFT: Robust Multi-Object Tracking via Region and Flow",
+  "track": "Object Tracking",
+  "tracks": [
+    "Object Tracking",
+    "Vision Foundation Models"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.09417v1"
+}

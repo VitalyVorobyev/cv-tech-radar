@@ -1,0 +1,24 @@
+{
+  "abstract": "Monocular depth foundation models generalize well across scenes, yet they are typically optimized with uniform pixel-wise objectives that do not distinguish user-specified or task-relevant target regions from the surrounding context. We therefore introduce Focusable Monocular Depth Estimation (FDE), a region-aware depth estimation task in which, given a specified target region, the model is required to prioritize foreground depth accuracy, preserve sharp boundary transitions, and maintain coherent global scene geometry. To prioritize task-critical region modeling, we propose FocusDepth, a prompt-conditioned monocular relative depth estimation framework that guides depth modeling to focus on target regions via box/text prompts. The core Multi-Scale Spatial-Aligned Fusion (MSSA) in FocusDepth spatially aligns multi-scale features from Segment Anything Model 3 to the Depth Anything family and injects them through scale-specific, gated conditional fusion. This enables dense prompt cue injection without disrupting geometric representations, thereby endowing the depth estimation model with focused perception capability. To study FDE, we establish FDE-Bench, a target-centric monocular relative depth benchmark built from image-target-depth triplets across five datasets, containing 252.9K/72.5K train/val triplets and 972 categories spanning real-world and embodied simulation environments. On FDE-Bench, FocusDepth consistently improves over globally fine-tuned DA2/DA3 baselines under both box and text prompts, with the largest gains appearing in target boundary and foreground regions while preserving global scene geometry. Ablations show that MSSA's spatial alignment is the key design factor, as disrupting prompt-geometry correspondence increases AbsRel by up to 13.8%.",
+  "decided_at": "2026-05-13T06:09:13.601460",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-13T06:09:13.601460",
+      "ring": "Watch"
+    }
+  ],
+  "id": 898,
+  "movement": null,
+  "published_at": "2026-05-12T08:30:53",
+  "reason": "Region-prompted monocular depth could matter for inspection ROIs where global accuracy is irrelevant but a part-of-interest needs sharp boundaries. Builds on Depth Anything 2/3 + SAM3.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Focusable Monocular Depth Estimation",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.11756v1"
+}

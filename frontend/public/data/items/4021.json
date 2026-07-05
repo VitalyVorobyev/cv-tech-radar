@@ -1,0 +1,25 @@
+{
+  "abstract": "This paper presents a contact-based 3-D surface measurement method based on a Digital Fringe Projection (DFP) system, belonging to the vision-based tactile sensing family pioneered by the commercially successful GelSight sensor. Such sensors have proven effective for robotic fingertip manipulation and contact sensing. However, because GelSight employs photometric stereo with RGB LEDs, it does not measure absolute depth directly but instead infers it by integrating estimated surface gradients, which can accumulate reconstruction errors; in addition, it becomes increasingly difficult to calibrate as the sensing area grows, and its depth accuracy is challenged on highly reflective or transparent objects. To overcome these drawbacks, we propose a fringe-projection-based contact measurement technique that performs triangulation-based 3-D reconstruction on a coated silicone contact surface, providing dense per-pixel surface geometry and full-field 3-D shape measurement over the contact region. By integrating high-accuracy digital fringe projection into the sensor, our approach simplifies calibration over larger areas and enhances depth precision for complex surfaces. Experimental results, including a direct comparison with a GelSight Mini sensor, a sphere-fitting accuracy evaluation, and an uncertainty analysis, confirm that the proposed method significantly improves the accuracy and stability of structured-light-based 3-D measurements, allowing reliable reconstruction of objects with diverse optical properties.",
+  "decided_at": "2026-06-17T13:10:07.448436",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-17T13:10:07.448436",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 4021,
+  "movement": null,
+  "published_at": "2026-06-16T02:38:39",
+  "reason": "Digital fringe-projection (structured-light) contact 3D metrology for reflective/transparent surfaces, with calibration over larger areas and triangulation accuracy benchmarked against GelSight. Squarely on the 3D-sensors / industrial-metrology core, yet ranked last (no code, low relevance) \u2014 a false negative the scoring under-ranks.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "Contact-Based Fringe Projection Profilometry for High-Resolution 3-D Surface Measurement of Reflective and Transparent Objects",
+  "track": "3D Sensors",
+  "tracks": [
+    "3D Sensors",
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.17438v1"
+}

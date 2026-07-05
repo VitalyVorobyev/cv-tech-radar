@@ -1,0 +1,24 @@
+{
+  "abstract": "Recent progress in dense optical flow has been driven by increasingly complex architectures and multi-step refinement for test-time scaling. While these approaches achieve strong benchmark performance, they also require substantial computation during inference. This raises a fundamental question: Is scaling test-time computation the only way to improve dense optical flow accuracy? We argue that it is not. Instead, powerful visual semantic and geometric priors encoded in modern foundation models can reduce, if not overcome, the need for computationally expensive iterative refinement at test-time. In this paper, we present a framework that estimates dense optical flow in a single forward pass, leveraging pretrained foundation representations, while avoiding iterative refinement and additional inference-time computation, thus offering an alternative to test-time scaling. Our method extracts visual semantic features from a frozen DINO-v2 backbone and combines them with geometric cues from a monocular depth foundation model. We fuse these complementary priors into a unified representation and apply a global matching formulation to estimate dense correspondences without recurrent updates or test-time optimization. Despite avoiding iterative refinement, our approach achieves strong cross-dataset generalization across challenging benchmarks. On Sintel Final, we obtain 2.81 EPE without refinement, significantly improving over state-of-the-art (SOTA) SEA-RAFT under comparable training conditions and outperforming RAFT, GMFlow (without refinement), and recent FlowSeek in the same setting. These results suggest that strong foundation priors can substitute for test-time scaling, offering a computationally efficient alternative to refinement-heavy pipelines.",
+  "decided_at": "2026-05-12T19:04:08.107613",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-12T18:10:57.480999",
+      "ring": "Watch"
+    }
+  ],
+  "id": 25,
+  "movement": null,
+  "published_at": "2026-05-08T16:56:24",
+  "reason": "Single-pass optical flow with foundation features; potentially relevant to tracking pipelines but no code mentioned.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Rethinking Dense Optical Flow without Test-Time Scaling",
+  "track": "Object Tracking",
+  "tracks": [
+    "Object Tracking"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.08000v1"
+}

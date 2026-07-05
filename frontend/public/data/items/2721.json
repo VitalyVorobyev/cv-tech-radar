@@ -1,0 +1,25 @@
+{
+  "abstract": "Long-horizon online visual mapping is a core capability for robot perception, requiring continuous camera-motion and scene-geometry estimation from visual streams under bounded memory and computation. Recent feed-forward 3D reconstruction models provide strong geometric priors, but their streaming variants often predict poses in a fixed coordinate system tied to the first frame or a persistent scene memory. This fixed-gauge design leads to train--test mismatch, attention bias toward early anchors, and accumulated drift on sequences much longer than those seen during training. We propose \\emph{Anchor3R}, a streaming 3D reconstruction framework that treats feed-forward reconstruction as current-centric local measurement prediction rather than persistent global-gauge regression. At each time step, Anchor3R predicts window-relative poses and a local pointmap in the current-frame coordinate system, turning streaming reconstruction into relative-pose measurement generation. These measurements support online pose updates, while loop-closure reinsertion and motion averaging align the trajectory and transform local pointmaps into a coherent global reconstruction. Experiments on indoor, outdoor, driving, and RGB-D benchmarks show that Anchor3R improves long-horizon pose accuracy and dense reconstruction quality over existing streaming baselines, while supporting bounded-memory online inference.",
+  "decided_at": "2026-06-04T13:09:59.714869",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-04T13:09:59.714869",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2721,
+  "movement": null,
+  "published_at": "2026-06-03T16:00:13",
+  "reason": "Streaming feed-forward 3D reconstruction that predicts window-relative poses and local pointmaps to fight long-horizon drift under bounded memory; directly relevant to online mapping for robot perception, though no code yet.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Anchor3R: Streaming 3D Reconstruction with Transient Anchors for Long-Horizon Visual Mapping",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "3D Sensors"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.05035v1"
+}

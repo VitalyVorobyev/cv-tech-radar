@@ -1,0 +1,27 @@
+{
+  "abstract": "In this study, we develop a Structured framework for Gaussian Splatting (3DGS) with LiDAR integration (Structured-Li-GS). It is a lightweight Gaussian Splatting pipeline that leverages LiDAR-inertial-visual SLAM. Structured-Li-GS achieves high-quality 3D reconstructions with fewer Gaussians by training on accurate, dense, colorized point clouds. Gaussian primitives are anchored using sub-sampled point clouds, and their ellipsoidal parameters are initialized from local surface geometry. Our training strategy integrates a comprehensive set of loss terms, including photometric, flattening, offset, depth, and normal losses, guided by the dense point cloud, enabling accurate reconstruction without Gaussian densification. This approach produces up-to-scale, high-fidelity results with a moderate model size. For experimental validation, we develop a custom hardware-synchronized LiDAR-camera handheld scanner. Experiments on both benchmark datasets and our real-world in-house dataset demonstrate that Structured-Li-GS surpasses state-of-the-art methods while using fewer Gaussians.",
+  "decided_at": "2026-06-29T13:33:32.334425",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-29T13:33:32.334425",
+      "ring": "Watch"
+    }
+  ],
+  "id": 5079,
+  "movement": null,
+  "published_at": "2026-06-25T19:49:22",
+  "reason": "LiDAR-anchored 3D Gaussian Splatting from LiDAR-inertial-visual SLAM with a custom hardware-synced LiDAR-camera scanner; relevant to LiDAR-camera fused reconstruction, no code released.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Structured-Li-GS: Structured 3D Gaussians Splatting with LiDAR Incorporation and Spatial Constraints",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "3D Sensors",
+    "Robotics Vision",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.27509v1"
+}

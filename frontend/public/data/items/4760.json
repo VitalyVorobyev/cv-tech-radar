@@ -1,0 +1,26 @@
+{
+  "abstract": "Existing object-aware SLAM systems force a trade-off between real-time performance, multi-class support, and the generation of high-fidelity, semantically coherent object models. To address this trade-off, we present DSP-SLAM++, which extends the DSP-SLAM framework with an asynchronous mapping pipeline for real-time performance and dedicated sensor fusion adaptations for a monocular fisheye-LiDAR suite. Experiments demonstrate that our system generates fine-grained, geometrically-complete shapes for multiple object classes while eliminating severe mapping thread bottlenecks by reducing maximum object processing latency by up to 70\\% compared to the state-of-the-art baseline, enabling robust, real-time performance on a challenging 25 Hz multi-class datasets. This work makes high-fidelity, multi-class object SLAM more practical for real-world applications like autonomous driving and robotic manipulation by enabling its use on platforms with common fisheye-LiDAR sensor setups. The open-source code is available at: [github.com/AUBVRL/DSP-SLAMpp].",
+  "decided_at": "2026-06-25T13:24:28.117510",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-25T13:24:28.117510",
+      "ring": "Watch"
+    }
+  ],
+  "id": 4760,
+  "movement": null,
+  "published_at": "2026-06-24T15:27:23",
+  "reason": "Object-SLAM extension (async mapping) for a monocular fisheye-LiDAR rig; open code, real-time multi-class. AV/manipulation framing and incremental over DSP-SLAM, but the fisheye-LiDAR sensor fusion is the relevant angle.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "DSP-SLAM++: A Unified Framework for Multi-Class, High-Fidelity Object SLAM in the Wild",
+  "track": "3D Sensors",
+  "tracks": [
+    "3D Sensors",
+    "Robotics Vision",
+    "Calibration & Camera Models"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.25953v1"
+}

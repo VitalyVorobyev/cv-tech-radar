@@ -1,0 +1,26 @@
+{
+  "abstract": "Achieving pixel-level accurate segmentation of structural cracks across diverse scenarios remains a formidable challenge. Existing methods face significant bottlenecks in balancing crack topology modeling with computational efficiency, often failing to reconcile high segmentation quality with low resource demands. To address these limitations, we propose the Ultra-Compact Structure-Calibrated Vision RWKV (SCRWKV), a network that achieves high-precision modeling via a novel Structure-Field Encoder (SFE) backbone while maintaining linear complexity. The SFE integrates the Adaptive Multi-scale Cascaded Modulator (AMCM) to enhance texture representation and utilizes the Structure-Calibrated Insight Unit (SCIU) as its core engine. Specifically, the SCIU employs the Geometry-guided Bidirectional Structure Transformation (GBST) to capture topological correlations and integrates the Dynamic Self-Calibrating Decay (DSCD) into Dy-WKV to suppress noise propagation. Furthermore, we introduce a lightweight Cross-Scale Harmonic Fusion (CSHF) decoder to achieve precise feature aggregation. Systematic evaluations on multiple benchmarks characterized by complex textures and severe interference demonstrate that SCRWKV, with only 1.22M parameters, significantly outperforms SOTA methods. Achieving an F1 score of 0.8428 and mIoU of 0.8512 on the TUT dataset, the model confirms its robust potential for efficient real-world deployment. The code is available at https://github.com/zhxhzy/SCRWKV.",
+  "decided_at": "2026-05-15T14:20:10.847533",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-15T14:20:10.847533",
+      "ring": "Watch"
+    }
+  ],
+  "id": 1176,
+  "movement": null,
+  "published_at": "2026-05-14T15:01:22",
+  "reason": "Compact (1.22M-param) crack segmentation with code and concrete F1/mIoU numbers. Closest item to industrial surface inspection in this batch.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "SCRWKV: Ultra-Compact Structure-Calibrated Vision-RWKV for Topological Crack Segmentation",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection",
+    "Edge AI & Deployment",
+    "Open-Source CV Tooling"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.14926v1"
+}

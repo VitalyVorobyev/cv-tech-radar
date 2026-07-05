@@ -1,0 +1,25 @@
+{
+  "abstract": "Robotic manipulation of textiles remains challenging because continuous deformation and self-occlusions hinder the robust visual perception required to estimate the cloth's state. To address the lack of annotated real-world data, we developed a Blender-based synthetic pipeline exporting auto-annotated keypoints, and combined manually labeled renders with real-world data to train a wrinkle detector. We present a perception framework integrating a CNN for permutation-invariant keypoint detection and a YOLOv8-OpenCV pipeline to extract grasping points from structural wrinkles. A proposed bimanual algorithm uses this system to stretch fully folded garments via wrinkles, transitioning to keypoint-based ironing once corners emerge. The keypoint model achieves a Mean Position Error (MPE) of 1.7615 pixels. The perception system transfers to physical fabrics without fine-tuning, outperforming baselines that fail in high-occlusion states or yield false positives on severe folds.",
+  "decided_at": "2026-06-10T13:51:58.608947",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-10T13:51:58.608947",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3290,
+  "movement": null,
+  "published_at": "2026-06-04T15:30:49",
+  "reason": "Synthetic-data + vision keypoint/wrinkle detection for cloth manipulation, uses OpenCV; practical synthetic-data pipeline.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Synthetic Data Generation and Vision-based Wrinkle and Keypoint Detection for Bimanual Cloth Manipulation",
+  "track": "Synthetic Data & Simulation",
+  "tracks": [
+    "Synthetic Data & Simulation",
+    "Robot Guidance"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.06292v1"
+}

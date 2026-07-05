@@ -1,0 +1,25 @@
+{
+  "abstract": "Accurate 3D reconstruction of objects with reflective, transparent, or low-texture surfaces still remains notoriously challenging. Such materials often violate key assumptions in multi-view reconstruction pipelines, such as photometric consistency and the availability on distinct geometric texture cues. Existing datasets primarily focus on diffuse, textured objects, and therefore provide limited insight into performance under real-world material complexities. We introduce 3DReflecNet, a large-scale hybrid dataset exceeding 22 TB that is specifically designed to benchmark and advance 3D vision methods for these challenging materials. 3DReflecNet combines two types of data: over 120,000 synthetic instances generated via physically-based rendering of more than 12,000 shapes, and over 1,000 real-world objects captured using consumer devices. Together, these data consist of more than 7 million multi-view frames. The dataset spans diverse materials, complex lighting conditions, and a wide range of geometric forms, including shapes generated from both real and LLM-synthesized 2D images using diffusion-based pipelines. To support robust evaluation, we design benchmarks for five core tasks: image matching, structure-from-motion, novel view synthesis, reflection removal, and relighting. Extensive experiments demonstrate that state-of-the-art methods struggle to maintain accuracy across these settings, highlighting the need for more resilient 3D vision models.",
+  "decided_at": "2026-05-12T19:04:17.255828",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-12T10:48:51.455776",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 596,
+  "movement": null,
+  "published_at": "2026-05-11T08:51:28",
+  "reason": "Large benchmark for reflective/transparent/low-texture 3D reconstruction; directly relevant to industrial part inspection.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "3DReflecNet: A Large-Scale Dataset for 3D Reconstruction of Reflective, Transparent, and Low-Texture Objects",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.10204v1"
+}

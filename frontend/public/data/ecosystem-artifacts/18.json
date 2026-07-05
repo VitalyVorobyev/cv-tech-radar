@@ -1,0 +1,71 @@
+{
+  "artifact_id": 18,
+  "capability": "build-tooling",
+  "decisions": [],
+  "description": "Declarative GUI toolkit for Rust, C++ and JavaScript.",
+  "events": [
+    {
+      "artifact_id": 18,
+      "artifact_key": "slint",
+      "artifact_name": "Slint",
+      "body": "[\ud83d\udcddRelease Blog\ud83d\udcdd](https://slint.dev/blog/slint-1.17-released)\r\n\r\n [ChangeLog](https://github.com/slint-ui/slint/blob/master/CHANGELOG.md#1170---2026-06-24).\r\n\r\nUpgrading to Slint 1.17.0:\r\n\r\n   * Rust: Run `cargo update`.\r\n   * C++: If you're using `FetchContent` with CMake, update the GIT_TAG entry in CMakeLists.txt to `v1.17.0` or `release/1.17` for automatic tracking of 1.17.x releases.\r\n   * Node.js: Run `npm update slint-ui` to bring your `package.json` up-to-date.\r\n   * ESP-IDF developers: Run `idf.py update-dependencies` to bring your idf_component.yml up-to-date.\r\n   * Python: Run `uv lock --upgrade-package slint` to update your [uv](https://docs.astral.sh/uv/) lock file to the latest version.\r\n\r\n# Assets\r\n\r\n## C++ SDK\r\n\r\nFor C++ developers, this release contains the following pre-packed builds of Slint:\r\n\r\n| Desktop Operating System | Compiler | Architecture | Download |\r\n|--------------------------|----------|--------------|----------|\r\n| Linux                    | gcc      | x86-64       | [Slint-cpp-1.17.0-Linux-x86_64.tar.gz](https://github.com/slint-ui/slint/releases/download/v1.17.0/Slint-cpp-1.17.0-Linux-x86_64.tar.gz) |\r\n| Linux                    | gcc      | arm64        | [Slint-cpp-1.17.0-Linux-arm64.tar.gz](https://github.com/slint-ui/slint/releases/download/v1.17.0/Slint-cpp-1.17.0-Linux-arm64.tar.gz) |\r\n| Linux                    | gcc      | armhf        | [Slint-cpp-1.17.0-Linux-armhf.tar.gz](https://github.com/slint-ui/slint/releases/download/v1.17.0/Slint-cpp-1.17.0-Linux-armhf.tar.gz) |\r\n| Windows                  | MSVC     | x86-64       | [Slint-cpp-1.17.0-win64-MSVC-AMD64.exe](https://github.com/slint-ui/slint/releases/download/v1.17.0/Slint-cpp-1.17.0-win64-MSVC-AMD64.exe) |\r\n| Windows                  | MSVC     | arm64        | [Slint-cpp-1.17.0-win64-MSVC-ARM64.exe](https://github.com/slint-ui/slint/releases/download/v1.17.0/Slint-cpp-1.17.0-win64-MSVC-ARM64.exe) |\r\n\r\n| Templates for Microcontroller Evaluation Board | Download |\r\n|----------------------------------|----------|\r\n| [STM32H747I-DISCO](https://www.st.com/en/evaluation-tools/stm32h747i-disco.html): Dual-core Arm M7/M4 MCU with 4\u201d touch LCD display module | [slint-cpp-template-stm32h747i-disco.zip](https://github.com/slint-ui/slint/releases/download/v1.17.0/slint-cpp-template-stm32h747i-disco.zip) |\r\n| [STM32H735G-DK](https://www.st.com/en/evaluation-tools/stm32h735g-dk.html): Arm M7 MCU with 4\u201d touch LCD display module | [slint-cpp-template-stm32h735g-dk.zip](https://github.com/slint-ui/slint/releases/download/v1.17.0/slint-cpp-template-stm32h735g-dk.zip) |\r\n\r\n## Tool Binaries\r\n\r\n| Add-on    | Linux x86-64 | Windows (x86-64) | Windows (aarch64) | macOS (universal) | Linux aarch64 | Linux armv7 |\r\n|-----------|--------------|---------|-------|-------|-------|-------|\r\n| **slint-lsp** | [slint-lsp-linux.tar.gz](https://github.com/slint-ui/slint/releases/download/v1.17.0/slint-lsp-linux.tar.gz) | [slint-lsp-windows-x86_64.zip](https://github.com/slint-ui/slint/releases/download/v1.17.0/slint-lsp-windows-x86_64.zip) | [slint-lsp-windows-arm64.zip](https://github.com/slint-ui/slint/releases/download/v1.17.0/slint-lsp-windows-arm64.zip) | [slint-lsp-macos.tar.gz](https://github.com/slint-ui/slint/releases/download/v1.17.0/slint-lsp-macos.tar.gz) | [slint-lsp-aarch64-unknown-linux-gnu.tar.gz](https://github.com/slint-ui/slint/releases/download/v1.17.0/slint-lsp-aarch64-unknown-linux-gnu.tar.gz) | [slint-lsp-armv7-unknown-linux-gnueabihf.tar.gz](https://github.com/slint-ui/slint/releases/download/v1.17.0/slint-lsp-armv7-unknown-linux-gnueabihf.tar.gz)\r\n| **slint-viewer** | [slint-viewer-linux.tar.gz](https://github.com/slint-ui/slint/releases/download/v1.17.0/slint-viewer-linux.tar.gz) | [slint-viewer-windows-x86_64.zip](https://github.com/slint-ui/slint/releases/download/v1.17.0/slint-viewer-windows-x86_64.zip) | [slint-viewer-windows-arm64.zip](https://github.com/slint-ui/slint/releases/download/v1.17.0/slint-viewer-windows-arm64.zip) |",
+      "ecosystem": "github",
+      "event_date": "2026-06-24T14:31:27",
+      "event_type": "release",
+      "id": 53,
+      "matched_keywords": [
+        "sdk",
+        "github"
+      ],
+      "relevant": true,
+      "severity": "medium",
+      "summary": "1.17.0",
+      "url": "https://github.com/slint-ui/slint/releases/tag/v1.17.0",
+      "version": "v1.17.0"
+    },
+    {
+      "artifact_id": 18,
+      "artifact_key": "slint",
+      "artifact_name": "Slint",
+      "body": "GUI toolkit to efficiently develop fluid graphical user interfaces for embedded devices and desktop applications",
+      "ecosystem": "crates",
+      "event_date": "2026-06-24T12:42:43.359565",
+      "event_type": "release",
+      "id": 54,
+      "matched_keywords": [
+        "toolkit"
+      ],
+      "relevant": true,
+      "severity": "medium",
+      "summary": "GUI toolkit to efficiently develop fluid graphical user interfaces for embedded devices and desktop applications",
+      "url": "https://crates.io/crates/slint/1.17.0",
+      "version": "1.17.0"
+    }
+  ],
+  "homepage_url": "",
+  "key": "slint",
+  "name": "Slint",
+  "refs": [
+    {
+      "ecosystem": "crates",
+      "last_checked_at": "2026-07-03T13:03:27.426949",
+      "last_release_at": "2026-06-24T12:42:43.359565",
+      "last_status": "ok",
+      "last_version": "1.17.0",
+      "ref": "slint"
+    },
+    {
+      "ecosystem": "github",
+      "last_checked_at": "2026-07-03T13:02:18.550670",
+      "last_release_at": "2026-06-24T14:31:27",
+      "last_status": "ok",
+      "last_version": "v1.17.0",
+      "ref": "slint-ui/slint"
+    }
+  ],
+  "ring": "Watch",
+  "status": "watchlist",
+  "tracks": [
+    "Open-Source CV Tooling"
+  ]
+}

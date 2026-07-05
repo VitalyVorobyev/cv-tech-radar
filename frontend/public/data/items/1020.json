@@ -1,0 +1,26 @@
+{
+  "abstract": "Recent advances have demonstrated that coded aperture snapshot spectral imaging (CASSI) systems show great potential for capturing 3D hyperspectral images (HSIs) from a single 2D measurement. Despite the inherent spectral continuity of scenes captured by CASSI, most existing reconstruction methods are restricted to fixed, discrete spectral outputs, thereby precluding continuous spectral reconstruction or spectral super-resolution. To address this challenge, we propose Phy-CoSF, which synergizes deep unfolding networks with implicit neural representations, establishing a new paradigm for continuous spectral reconstruction and super-resolution in CASSI. Specifically, we propose a two-phase architecture that bridges discrete-wavelength training with continuous spectral rendering, enabling the synthesis of high-fidelity HSIs at arbitrary target wavelengths. At the core of our framework lies the continuous spectral fields (CoSF) module, embedded within each unfolding stage as a dynamic prior, which comprises a triple-branch cross-domain feature mixer for comprehensive spatial-frequency-channel feature fusion, alongside a spectral synthesis head that generates spectral intensities by querying continuous wavelength coordinates. Extensive experimental results demonstrate that Phy-CoSF not only achieves continuous modeling at arbitrary spectral resolutions but also outperforms many state-of-the-art methods in both reconstruction fidelity and spectral detail preservation. Our code and more results are available at: https://github.com/PaiDii/Phy-CoSF.git.",
+  "decided_at": "2026-05-14T07:24:28.539250",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-14T07:24:28.539250",
+      "ring": "Watch"
+    }
+  ],
+  "id": 1020,
+  "movement": null,
+  "published_at": "2026-05-13T14:17:02",
+  "reason": "Continuous-spectrum reconstruction + super-resolution for snapshot compressive (CASSI) hyperspectral. Niche but hyperspectral imaging is a credible inspection sensor; code released.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Phy-CoSF: Physics-Guided Continuous Spectral Fields Reconstruction and Super-Resolution for Snapshot Compressive Imaging",
+  "track": "Sensors",
+  "tracks": [
+    "Sensors",
+    "Cameras & Standards",
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.13583v1"
+}

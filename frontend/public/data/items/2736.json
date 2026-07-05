@@ -1,0 +1,25 @@
+{
+  "abstract": "The selection of an appropriate 3D representation is a fundamental design decision that dictates the efficiency, quality, and capabilities of modern computer vision and graphics pipelines for tasks such as 3D reconstruction, novel-view synthesis and rendering, shape and motion analysis, recognition, and generation. While traditional representations (\\eg meshes, point clouds, and volumetric grids) remain standard outputs of 3D sensors (\\eg LiDAR and 3D scanners) and are widely used in downstream applications (\\eg editing and simulation), recent neural and primitive-based representations (\\eg 3D Gaussian Splatting) offer compact and differentiable alternatives opening a wide range of opportunities in applications such as games, AR/VR, autonomous driving, robot navigation, and medical imaging, to name a few. The goal of this paper is to survey the main families of 3D representations from discrete explicit formats to continuous implicit fields based either on neural rendering or primitive splatting. For each type of representation, we present the general formulation and its variants, discuss its benefits and limitations, and highlight key applications. We conclude the paper by outlining the open challenges and potential directions for future research. Distinct from recent surveys that broadly cover 3D object and scene reconstruction, this paper provides a focused analysis on the evolution of 3D representations themselves. We specifically emphasize the paradigm shift toward implicit representations, offering a novel perspective on how these emerging formats fundamentally alter 3D/4D workflows.",
+  "decided_at": "2026-06-04T13:09:59.723437",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-04T13:09:59.723437",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2736,
+  "movement": null,
+  "published_at": "2026-06-03T13:35:50",
+  "reason": "Focused survey of 3D representation families (meshes, point clouds, implicit fields, Gaussian splatting) and their trade-offs; useful orientation reference for the 3D lane, with no implementation.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Recent Advances and Trends in Learning-based 3D Representations",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "3D Sensors"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.04871v1"
+}

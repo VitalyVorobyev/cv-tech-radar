@@ -1,0 +1,25 @@
+{
+  "abstract": "We revisit the memory update mechanism in SAM2-based visual object tracking and identify confidence-only mask selection as the dominant cause of drift under occlusion, rapid motion, and distractors. We introduce SENTRY, a training-free, plug-and-play, refine-before-write module that validates each memory update for short-horizon temporal consistency before committing it. SENTRY aggregates diverse segmentation hypotheses per frame, backtracks them into short tracklets, and uses neighbor-aware cycle-consistent matching against recent trajectories to favor temporally and geometrically consistent masks. It leaves the base architecture untouched, replacing confidence-driven writes with consistency-validated ones. For fair evaluation, we re-evaluate major open-source SAM2-based trackers across all available scales and datasets, filling gaps in prior reports. Integrated into five strong baselines, SENTRY delivers consistent gains across nine benchmarks, achieving new zero-shot SOTA on LaSOT, LaSOT_ext, GOT-10k, VOT20, VOT22, and DiDi. Despite these checks, the SAM2-L version runs at 32.8 FPS on an A100, and across compatible hosts adds only about 0.4--0.6 GB VRAM. Our results provide the first unified all-scale evaluation of SAM2-based trackers and show that enforcing temporal validity at write time stabilizes memory-augmented tracking without retraining. Project page: https://hamadya.github.io/SENTRY/page/",
+  "decided_at": "2026-06-25T13:24:27.869378",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-25T13:24:27.869378",
+      "ring": "Watch"
+    }
+  ],
+  "id": 4659,
+  "movement": null,
+  "published_at": "2026-06-23T11:35:15",
+  "reason": "Training-free, plug-and-play memory-update validator for SAM2 trackers; zero-shot SOTA on LaSOT/GOT-10k, real-time, project page. A solid object-tracking technique but an incremental add-on to SAM2 trackers.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "SENTRY: SAM2-Enhanced Neighbor-Aware and Temporally Reasoned Memory for Visual Tracking",
+  "track": "Object Tracking",
+  "tracks": [
+    "Object Tracking",
+    "Open-Source CV Tooling"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.24449v2"
+}

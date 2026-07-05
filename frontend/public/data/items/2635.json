@@ -1,0 +1,24 @@
+{
+  "abstract": "Autonomous systems require robust Multi-Object Tracking and Segmentation (MOTS) to operate reliably in dynamic environments, ensuring consistent object identities and precise mask-level delineation. Foundation models such as SAM2 have shown strong zero-shot generalization for segmentation, but their direct application to MOTS is limited by unreliable track association and false-positive propagation. This work introduces Seg2Track++, a framework that integrates instance segmentation with SAM2 and a novel track management module to perform zero-shot MOTS with enhanced temporal consistency. Tracks are associated using Mask Centroid Distance (MCD) and Confidence-Aware Cost Modulation (CCM), while Probabilistic Track Validation (PTV) employs a Bernoulli filter to validate track existence and suppress ghost tracks. Experimental results on KITTI MOTS demonstrate improved identity preservation, reduced false-positive propagation, and robust track management without fine-tuning.",
+  "decided_at": "2026-06-03T13:41:37.645545",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-03T13:41:37.645545",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2635,
+  "movement": null,
+  "published_at": "2026-06-02T16:43:00",
+  "reason": "Zero-shot multi-object tracking and segmentation on SAM2 with a Bernoulli-filter track-validation module to suppress ghost tracks. On-track technique but weak evidence \u2014 KITTI MOTS (driving) only, no released code.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Seg2Track++: Probabilistic Track Validation and Data Association for Multi-Object Tracking and Segmentation",
+  "track": "Object Tracking",
+  "tracks": [
+    "Object Tracking"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.03875v1"
+}

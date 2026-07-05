@@ -1,0 +1,38 @@
+{
+  "abstract": "Reliable displacement measurement is fundamental for structural health monitoring and digital engineering workflows, as it provides direct structural response information. Vision-based measurement has emerged as a promising approach for low-cost, non-contact displacement monitoring. However, its deployment often remains constrained by task-specific model training or on-site preparation, such as marker installation or manual camera calibration. This study presents a Vision Foundation Model-based framework for Structural Displacement Measurement (VFM-SDM) that integrates VFM-inferred camera parameter estimation and point tracking to reconstruct multi-directional structural displacements via triangulation without task-specific training or on-site preparation, enabling efficient non-contact deployment in real-world applications. Structural geometry constraints are incorporated to suppress physically implausible deviations and improve estimation consistency. A multi-modal field dataset collected from an in-service pedestrian bridge is introduced alongside a unified benchmarking protocol to support reproducible evaluation. Representative results show low amplitude errors (NRMSE$_{\\text{range}}$: 0.11/0.12), strong temporal agreement (correlation coefficient: 0.86/0.88), and small peak-to-peak amplitude errors (RPPAE: 0.01/0.02) for vertical and lateral displacements, indicating robust performance under real-world conditions. The proposed framework advances automated, scalable displacement monitoring and lays the groundwork for VFM-enabled structural response measurements in digital twin and data-centric construction workflows.",
+  "decided_at": "2026-05-16T07:33:10.369271",
+  "decided_by": "web-curator",
+  "history": [
+    {
+      "at": "2026-05-12T10:48:51.455391",
+      "ring": "Prototype"
+    },
+    {
+      "at": "2026-05-16T07:33:09.216099",
+      "ring": "Evaluate"
+    },
+    {
+      "at": "2026-05-16T07:33:10.369271",
+      "ring": "Watch"
+    }
+  ],
+  "id": 675,
+  "movement": null,
+  "published_at": "2026-05-10T17:51:05",
+  "reason": "Has code + clear test path \u2014 worth a spike",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "VFM-SDM: A vision foundation model-based framework for training-free, marker-free, and calibration-free structural displacement measurement",
+  "track": "Calibration & Camera Models",
+  "tracks": [
+    "Calibration & Camera Models",
+    "3D Geometry & Reconstruction",
+    "Object Tracking",
+    "Edge AI & Deployment",
+    "Vision Foundation Models",
+    "Synthetic Data & Simulation",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.09677v1"
+}

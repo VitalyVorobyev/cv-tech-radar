@@ -1,0 +1,25 @@
+{
+  "abstract": "Monocular depth estimation has improved significantly in recent years, driven by increasingly powerful models and large-scale training data. Predicted depth is increasingly used as an input signal for downstream tasks such as Structure-from-Motion (SfM), visual localization, and SLAM. However, monocular depth estimators (MDEs) are still primarily evaluated in terms of depth accuracy. Standard metrics aggregate errors globally and may not reflect the usefulness of depth for downstream geometric tasks. We therefore propose Depth2Pose, a framework for evaluating MDEs in the context of downstream tasks. By combining depth predictions with feature correspondences in depth-aware geometric solvers, we use relative camera pose estimation accuracy as a task-driven proxy for depth quality. Traditional benchmarks require dense ground truth in the form of per-pixel depth, which is expensive to obtain. In contrast, our formulation requires only camera poses, which can be estimated efficiently, e.g., using Structure-from-Motion pipelines. As a result, our framework can be applied to scenes where ground-truth depth is difficult to obtain, for example due to large scene scale or heavy occlusions (e.g., vegetated environments). Leveraging this, we introduce the D2P dataset, which contains challenging scenes outside the distribution of commonly used training data. We show that methods performing well under standard depth error metrics on existing benchmarks also perform well under our pose-based metric when evaluated on the same datasets, but do not necessarily generalize to our more challenging dataset. Finally, we provide a simple and extensible evaluation framework. The dataset and code are available at kocurvik.github.io/depth2pose.",
+  "decided_at": "2026-05-20T17:55:24.944544",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-20T17:55:24.944544",
+      "ring": "Watch"
+    }
+  ],
+  "id": 1391,
+  "movement": null,
+  "published_at": "2026-05-19T12:59:11",
+  "reason": "Pose-based monocular-depth evaluation without dense GT depth; useful angle for judging depth quality on real industrial scenes (vegetated, large-scale) where dense GT is impractical. Code + dataset released.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Depth2Pose: A Pose-Based Benchmark for Monocular Depth Estimation without Ground-Truth Depth",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.19797v1"
+}

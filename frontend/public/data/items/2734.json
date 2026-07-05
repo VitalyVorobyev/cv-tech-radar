@@ -1,0 +1,25 @@
+{
+  "abstract": "Generating compact polygonal models from point clouds is a key problem in 3D vision and computer graphics. However, due to inherent limitations of LiDAR scanning (e.g. range constraints and occlusions), critical scene information is often missing, leading to degraded reconstruction accuracy. To address this, we propose a plane assembling strategy that effectively recovers missing details while maintaining model compactness. We classify all the planes extracted from the scene into three categories: highly visible, barely visible, and invisible. The invisible planes, which are recovered by scene structure analysis, indicate the missing details. The three types of planes correspond to the three growth priorities. Each plane grows according to the priority level, and the space is partitioned progressively, namely, the hierarchical partition. Subsequently, we generate a watertight polygonal mesh from the partition via a min-cut-based optimization. Finally, comparisons on public datasets show the effectiveness and superiority of our method against mainstream approaches. The project page is available at https://hsr-3dv.github.io/.",
+  "decided_at": "2026-06-04T13:09:59.718751",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-04T13:09:59.718751",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2734,
+  "movement": null,
+  "published_at": "2026-06-03T13:52:36",
+  "reason": "Occlusion-aware plane-assembly that turns LiDAR point clouds into compact watertight polygonal meshes; practical for 3D-scan reverse-engineering and metrology, with a project page.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Hierarchical Space Partition for Surface Reconstruction",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "3D Sensors"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.04891v1"
+}

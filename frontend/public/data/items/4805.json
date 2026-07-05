@@ -1,0 +1,25 @@
+{
+  "abstract": "Reliable depth perception is critical for robotic manipulation, especially for non-Lambertian objects such as transparent or highly specular surfaces, where raw depth measurements are often corrupted or missing. These failures frequently propagate to motion planning, resulting in invalid grasp poses and execution errors. We propose AISPO, a depth completion framework that improves depth reliability for manipulation in challenging sensing conditions. AISPO combines multi-scale RGB-D feature fusion with an affine-invariant shape prior to enforce geometric consistency and mitigate catastrophic depth failures. Unlike methods that focus primarily on average depth accuracy, our approach emphasizes physical plausibility and structural integrity of the predicted depth maps. Extensive benchmark evaluations demonstrate competitive performance and strong generalization to unseen objects and novel scenes. Real-world grasping experiments further show that enhanced depth reliability significantly improves manipulation success rates, particularly for transparent objects where many existing methods fail to produce physically usable depth estimates.",
+  "decided_at": "2026-06-25T13:24:28.125226",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-25T13:24:28.125226",
+      "ring": "Watch"
+    }
+  ],
+  "id": 4805,
+  "movement": null,
+  "published_at": "2026-06-24T07:37:11",
+  "reason": "Depth completion for non-Lambertian (transparent/specular) objects via an affine-invariant shape prior, RGB-D, improves real grasping success. A concrete robot-guidance / 3D-sensing problem; no code yet.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "AISPO: Enhancing Depth Reliability for Robotic Manipulation of Non-Lambertian Objects via Affine-Invariant Shape Prior",
+  "track": "3D Sensors",
+  "tracks": [
+    "3D Sensors",
+    "Robot Guidance"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.25503v1"
+}

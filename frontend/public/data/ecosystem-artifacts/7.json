@@ -1,0 +1,90 @@
+{
+  "artifact_id": 7,
+  "capability": "ml-runtimes",
+  "decisions": [],
+  "description": "Cross-platform inference and training accelerator.",
+  "events": [
+    {
+      "artifact_id": 7,
+      "artifact_key": "onnxruntime",
+      "artifact_name": "ONNX Runtime",
+      "body": "n.b. This release is targeting ONNX 1.21. ONNX 1.22 will be supported in ORT 1.28.\r\nn.b. This changelog was generated via LLM. Only the contributor list has been verified. As always, only trust the commit history.\r\n\r\n## Announcements & Breaking Changes\r\n\r\n* CUDA 12 package files are now explicitly named as such.\r\n* CUDA 12 packages are deprecated, please move to CUDA 13 ASAP.\r\n\r\n---\r\n\r\n## Security Fixes\r\n\r\n*   Fixed out-of-bounds read in `SoftmaxCrossEntropyLoss` via label bounds validation ([#28004](https://github.com/microsoft/onnxruntime/pull/28004))\r\n*   Hardened `OneHot` input validation and output-size computation ([#28014](https://github.com/microsoft/onnxruntime/pull/28014))\r\n*   Added SafeInt overflow protection in `Expand` and capped constant-folding output sizes ([#28055](https://github.com/microsoft/onnxruntime/pull/28055))\r\n*   Bounded total output allocation size in `Tile` kernel ([#28070](https://github.com/microsoft/onnxruntime/pull/28070))\r\n*   Added mask/input shape consistency checks in `MaxpoolWithMask::Compute` ([#28223](https://github.com/microsoft/onnxruntime/pull/28223))\r\n*   Fixed `BitShift` UB for shift amounts greater than or equal to bit width ([#28272](https://github.com/microsoft/onnxruntime/pull/28272))\r\n*   Validated sequence bounds in GQA (`seqlens_k` vs `cos_cache`) ([#28277](https://github.com/microsoft/onnxruntime/pull/28277))\r\n*   Validated conv bias shape in `WordConvEmbedding` to prevent OOB reads ([#28279](https://github.com/microsoft/onnxruntime/pull/28279))\r\n*   Fixed int32 overflow in CUDA Cast and UnaryElementWise kernels for very large tensors ([#28386](https://github.com/microsoft/onnxruntime/pull/28386))\r\n*   Fixed out-of-bounds read in `CropBase` scale handling ([#28399](https://github.com/microsoft/onnxruntime/pull/28399))\r\n*   Fixed rank-underflow bug in Inverse kernel trailing-dimension indexing ([#28400](https://github.com/microsoft/onnxruntime/pull/28400))\r\n*   Added sparse tensor external file path validation and additional external-path hardening ([#28408](https://github.com/microsoft/onnxruntime/pull/28408), [#28709](https://github.com/microsoft/onnxruntime/pull/28709), [#28725](https://github.com/microsoft/onnxruntime/pull/28725))\r\n*   Switched remaining `torch.load()` calls to `weights_only=True` ([#28421](https://github.com/microsoft/onnxruntime/pull/28421))\r\n*   Added CPU cache-indirection beam-index validation ([#28486](https://github.com/microsoft/onnxruntime/pull/28486))\r\n*   Added additional overflow/bounds checks and test coverage in runtime buffers ([#28713](https://github.com/microsoft/onnxruntime/pull/28713), [#28747](https://github.com/microsoft/onnxruntime/pull/28747))\r\n\r\n---\r\n\r\n## New Features\r\n\r\n### Execution Provider Plugin API\r\n\r\n*   Added zero-copy I/O for plugin EPs with HOST_ACCESSIBLE memory ([#28037](https://github.com/microsoft/onnxruntime/pull/28037))\r\n*   Added `OrtEp::OnSessionInitializationEnd()` callback ([#28319](https://github.com/microsoft/onnxruntime/pull/28319))\r\n*   Added plugin EP session-options getters ([#28377](https://github.com/microsoft/onnxruntime/pull/28377))\r\n*   Added CUDA Plugin EP provider options for streams and external allocators ([#28603](https://github.com/microsoft/onnxruntime/pull/28603))\r\n\r\n### Core APIs & Runtime\r\n\r\n*   Added support for ONNX overloaded functions (IR v10+) ([#28275](https://github.com/microsoft/onnxruntime/pull/28275))\r\n*   Added FLOAT8E8M0 datatype support in ONNX Runtime ([#28381](https://github.com/microsoft/onnxruntime/pull/28381))\r\n*   Added CPU Cast support for FLOAT8E8M0 ([#28435](https://github.com/microsoft/onnxruntime/pull/28435))\r\n*   Added `kOrtEpDevice_EpMetadataKey_OSDriverVersion` example and docs ([#28282](https://github.com/microsoft/onnxruntime/pull/28282))\r\n\r\n### Quantization & Training Tooling\r\n\r\n*   Added calibration cache support to `quantize_static` ([#28221](https://github.com/microsoft/onnxruntime/pull/28221))\r\n*   Added `ActivationRestrictedAsymmetric` quantization option (",
+      "ecosystem": "github",
+      "event_date": "2026-06-19T21:11:07",
+      "event_type": "release",
+      "id": 43,
+      "matched_keywords": [
+        "quantization",
+        "onnx"
+      ],
+      "relevant": true,
+      "severity": "medium",
+      "summary": "ONNX Runtime v1.27.0",
+      "url": "https://github.com/microsoft/onnxruntime/releases/tag/v1.27.0",
+      "version": "v1.27.0"
+    },
+    {
+      "artifact_id": 7,
+      "artifact_key": "onnxruntime",
+      "artifact_name": "ONNX Runtime",
+      "body": "ONNX Runtime is a runtime accelerator for Machine Learning models",
+      "ecosystem": "pypi",
+      "event_date": "2026-06-15T22:43:43.894329",
+      "event_type": "release",
+      "id": 33,
+      "matched_keywords": [
+        "onnx"
+      ],
+      "relevant": true,
+      "severity": "medium",
+      "summary": "ONNX Runtime is a runtime accelerator for Machine Learning models",
+      "url": "https://pypi.org/project/onnxruntime/1.27.0/",
+      "version": "1.27.0"
+    },
+    {
+      "artifact_id": 7,
+      "artifact_key": "onnxruntime",
+      "artifact_name": "ONNX Runtime",
+      "body": "We're excited to ship the first release of the **WebGPU Execution Provider as a plugin EP** for ONNX Runtime. Instead of being baked into the core `onnxruntime` binary, the WebGPU EP is now distributed as a standalone artifact that registers with an existing ONNX Runtime installation at runtime.\r\n\r\n## Highlights\r\n\r\n- **Broad operator coverage on WebGPU.** Native WebGPU kernels for the operators needed by common transformer, vision, and generative workloads \u2014 including Conv variants, MatMul/Gemm, normalizations, attention (Attention, MultiHeadAttention, GroupQueryAttention), rotary embeddings, quantized matmul, quantized Mixture-of-Experts (QMoE), and more. See the Operator coverage section below for a summary.\r\n- **Quantized & accelerated kernels.** DP4A and subgroup-matrix MatMulNBits, a FlashAttention kernel, and vendor-optimized Intel MatMul/Gemm paths. See the Performance features section below.\r\n- **Plugin EP packaging.** WebGPU support now ships as a separate, independently versioned library (`onnxruntime_providers_webgpu`) that plugs into a compatible ONNX Runtime (1.24.4 or newer) at runtime. Users can adopt WebGPU acceleration without switching their core ORT package, and the EP can iterate on its own cadence.\r\n- **Cross-platform native binaries** for Windows x64/arm64 (bundled with `dxil.dll` / `dxcompiler.dll`), Linux x64, and macOS arm64.\r\n- **Language packages.**\r\n  - **Python:** `onnxruntime-ep-webgpu` wheel, installed alongside the `onnxruntime` package, registered via `onnxruntime.register_execution_provider_library(...)`. See package [page](https://pypi.org/project/onnxruntime-ep-webgpu/#description) for details on installation and usage.\r\n  - **.NET:** `Microsoft.ML.OnnxRuntime.EP.WebGpu` NuGet package, referenced alongside `Microsoft.ML.OnnxRuntime`, registered via `OrtEnv.RegisterExecutionProviderLibrary(...)`. See package [page](https://www.nuget.org/packages/Microsoft.ML.OnnxRuntime.EP.WebGpu#readme-body-tab) for details on installation and usage.\r\n\r\n## Operator coverage\r\n\r\nThe WebGPU EP registers kernels for the majority of ONNX standard-domain operators used by mainstream model architectures, plus a curated set of `com.microsoft` contrib operators. Highlights by category:\r\n\r\n- **Math, normalization & reduction:** MatMul, Gemm, Softmax, LayerNormalization, RMSNormalization, InstanceNormalization, BatchNormalization, LpNormalization, unary/binary elementwise ops, all standard reductions (ReduceMean, ReduceSum, ReduceMax, ...), CumSum, Einsum, TopK, ArgMax/ArgMin.\r\n- **Neural network:** Conv, ConvTranspose, MaxPool/AveragePool (and Global* variants), plus a `FusedConv` contrib op.\r\n- **Tensor manipulation:** Transpose, Reshape, Slice, Concat, Split, Gather/GatherElements/GatherND, ScatterElements/ScatterND, Pad, Tile, Cast, Resize, GridSample, Where, Flatten, Squeeze, Identity, Shape, and more.\r\n- **Transformer / LLM contrib ops:** Attention, MultiHeadAttention, GroupQueryAttention, RotaryEmbedding, SkipLayerNormalization, SkipSimplifiedLayerNormalization, SimplifiedLayerNormalization, BiasAdd, BiasGelu, BiasSplitGelu, FastGelu, Gelu, QuickGelu, CausalConvWithState, LinearAttention.\r\n- **Quantization:** DequantizeLinear, MatMulNBits (with DP4A and subgroup-matrix paths), GatherBlockQuantized, QMoE.\r\n\r\nFor the authoritative list, see the kernel registrations in [`webgpu_execution_provider.cc`](https://github.com/microsoft/onnxruntime/blob/d2ede0adeb300958cfb5a256c09d27c66c3a6d71/onnxruntime/core/providers/webgpu/webgpu_execution_provider.cc) and [`webgpu_contrib_kernels.cc`](https://github.com/microsoft/onnxruntime/blob/d2ede0adeb300958cfb5a256c09d27c66c3a6d71/onnxruntime/contrib_ops/webgpu/webgpu_contrib_kernels.cc).\r\n\r\n## Performance features\r\n\r\n- **DP4A and subgroup-matrix MatMulNBits** paths for accelerated quantized matmul on supported hardware.\r\n- **FlashAttention** kernel for attention-heavy workloads.\r\n- **Intel-optimized MatMul/Gemm** code paths for improved performance on Intel GPUs.\r\n- **Program ",
+      "ecosystem": "github",
+      "event_date": "2026-05-29T17:53:51",
+      "event_type": "release",
+      "id": 20,
+      "matched_keywords": [
+        "quantization",
+        "onnx"
+      ],
+      "relevant": true,
+      "severity": "medium",
+      "summary": "ONNX Runtime WebGPU Plugin EP v0.1.0",
+      "url": "https://github.com/microsoft/onnxruntime/releases/tag/plugin-ep-webgpu/v0.1.0",
+      "version": "plugin-ep-webgpu/v0.1.0"
+    }
+  ],
+  "homepage_url": "",
+  "key": "onnxruntime",
+  "name": "ONNX Runtime",
+  "refs": [
+    {
+      "ecosystem": "github",
+      "last_checked_at": "2026-07-03T13:02:08.660309",
+      "last_release_at": "2026-06-19T21:11:07",
+      "last_status": "ok",
+      "last_version": "v1.27.0",
+      "ref": "microsoft/onnxruntime"
+    },
+    {
+      "ecosystem": "pypi",
+      "last_checked_at": "2026-07-03T13:02:08.726726",
+      "last_release_at": "2026-06-15T22:43:43.894329",
+      "last_status": "ok",
+      "last_version": "1.27.0",
+      "ref": "onnxruntime"
+    }
+  ],
+  "ring": "Use",
+  "status": "adopted",
+  "tracks": [
+    "Edge AI & Deployment"
+  ]
+}

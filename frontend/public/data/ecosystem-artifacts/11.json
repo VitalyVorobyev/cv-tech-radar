@@ -1,0 +1,74 @@
+{
+  "artifact_id": 11,
+  "capability": "build-tooling",
+  "decisions": [],
+  "description": "Toolkit for building desktop apps with web frontends.",
+  "events": [
+    {
+      "artifact_id": 11,
+      "artifact_key": "tauri",
+      "artifact_name": "Tauri",
+      "body": "Make tiny, secure apps for all desktop platforms with Tauri",
+      "ecosystem": "crates",
+      "event_date": "2026-07-01T13:56:38.810372",
+      "event_type": "release",
+      "id": 67,
+      "matched_keywords": [],
+      "relevant": true,
+      "severity": "medium",
+      "summary": "Make tiny, secure apps for all desktop platforms with Tauri",
+      "url": "https://crates.io/crates/tauri/2.11.5",
+      "version": "2.11.5"
+    },
+    {
+      "artifact_id": 11,
+      "artifact_key": "tauri",
+      "artifact_name": "Tauri",
+      "body": "Make tiny, secure apps for all desktop platforms with Tauri",
+      "ecosystem": "crates",
+      "event_date": "2026-06-30T15:14:25.757956",
+      "event_type": "release",
+      "id": 62,
+      "matched_keywords": [],
+      "relevant": true,
+      "severity": "medium",
+      "summary": "Make tiny, secure apps for all desktop platforms with Tauri",
+      "url": "https://crates.io/crates/tauri/2.11.4",
+      "version": "2.11.4"
+    },
+    {
+      "artifact_id": 11,
+      "artifact_key": "tauri",
+      "artifact_name": "Tauri",
+      "body": "Make tiny, secure apps for all desktop platforms with Tauri",
+      "ecosystem": "crates",
+      "event_date": "2026-06-17T13:46:40.835406",
+      "event_type": "release",
+      "id": 40,
+      "matched_keywords": [],
+      "relevant": true,
+      "severity": "medium",
+      "summary": "Make tiny, secure apps for all desktop platforms with Tauri",
+      "url": "https://crates.io/crates/tauri/2.11.3",
+      "version": "2.11.3"
+    }
+  ],
+  "homepage_url": "",
+  "key": "tauri",
+  "name": "Tauri",
+  "refs": [
+    {
+      "ecosystem": "crates",
+      "last_checked_at": "2026-07-03T13:02:13.526281",
+      "last_release_at": "2026-07-01T13:56:38.810372",
+      "last_status": "ok",
+      "last_version": "2.11.5",
+      "ref": "tauri"
+    }
+  ],
+  "ring": "Use",
+  "status": "adopted",
+  "tracks": [
+    "Open-Source CV Tooling"
+  ]
+}

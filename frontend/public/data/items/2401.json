@@ -1,0 +1,25 @@
+{
+  "abstract": "Visual odometry (VO) is a fundamental component in robotics and augmented reality. RGB-D direct VO benefits from metric depth measurements, but it can degrade in challenging environments, where dynamic objects, occlusions, illumination changes, and unreliable depth violate the short-horizon photometric and depth-geometric consistency assumptions used by direct alignment. Existing approaches mitigate these issues through semantic filtering, explicit occlusion reasoning, illumination adaptation, or hand-crafted geometric criteria, but often rely on external modules or fixed assumptions tailored to individual failure modes, limiting their flexibility and ability to handle diverse challenges in a unified manner. In this work, we propose Con-DSO, a consistency-aware RGB-D direct sparse odometry framework that predicts dense photometric and depth-geometric consistency uncertainty from temporally adjacent RGB-D frame pairs. The consistency network is trained using flow-guided photometric errors and projective depth-consistency errors, allowing consistency violations to be represented as pixel-level uncertainty. These pairwise uncertainty predictions are converted into a host-side quality prior for keyframe-based tracking. The prior is then applied to VO through quality-aware support-pixel selection and decoupled photometric-geometric weighting during pose estimation, enabling continuous attenuation of unreliable observations rather than hard rejection or threshold-based gating. Experiments on five public RGB-D benchmarks show substantial gains over direct RGB-D VO baselines, with over 20\\% absolute trajectory error reduction on ICL-NUIM and 50\\%--80\\% reductions on RGB-D Scenes V2, TUM/Bonn Dynamic, and OpenLORIS sequences.",
+  "decided_at": "2026-05-28T13:11:32.098104",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-28T13:11:32.098104",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2401,
+  "movement": null,
+  "published_at": "2026-05-27T04:46:52",
+  "reason": "Direct RGB-D VO with learned consistency priors and substantial gains across five benchmarks; on-topic for SLAM/VO trend tracking.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Con-DSO: Learning Short-Horizon Consistency Priors for RGB-D Direct Sparse Odometry",
+  "track": "Robotics Vision",
+  "tracks": [
+    "Robotics Vision",
+    "3D Sensors"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.27952v1"
+}

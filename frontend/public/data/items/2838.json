@@ -1,0 +1,24 @@
+{
+  "abstract": "Recent Anomaly Detection methods achieve perfect detection and segmentation scores on well-established datasets, such as MVTec. However, many of these methods face challenges when foundational assumptions - such as consistent object scale, viewpoint, background, illumination, and centered placement - are violated. Those variations that occur render anomaly detection methods unusable in many real-world scenarios. To address these limitations, we introduce three key contributions: (1) a visual prompting pipeline that isolates objects using foreground-background masking; (2) a mechanism for unfreezing the teacher in student-teacher models to improve domain adaptability; and (3) a data augmentation strategy leveraging diffusion-generated synthetic images to enhance anomaly detection performance. We achieve a 3.5 percentage point improvement over the previous state-of-the-art on the challenging AeBAD dataset by using the Masked Multiscale Reconstruction (MMR) model as our backbone.",
+  "decided_at": "2026-06-09T13:19:31.075252",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-09T13:19:31.075252",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2838,
+  "movement": null,
+  "published_at": "2026-06-08T15:52:05",
+  "reason": "Addresses a real limitation in industrial anomaly detection: existing methods break when object scale, viewpoint, illumination, or placement assumptions are violated. The visual-prompting pipeline (foreground masking) + unfreezing teacher + diffusion-augmented training yields 3.5pp gain on AeBAD. Practical for non-standard industrial inspection setups. No code released.\n",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Visual Prompting Meets Feature Reconstruction-Based Anomaly Detection with Dual-Teacher Supervision",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.09670v1"
+}

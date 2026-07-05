@@ -1,0 +1,37 @@
+{
+  "abstract": "Recent advances in robot imitation learning have yielded powerful visuomotor policies capable of manipulating a wide variety of objects directly from monocular visual inputs. However, monocular observations inherently lack reliable depth cues and spatial awareness, which are critical for precise manipulation in cluttered or geometrically complex scenes. To address this limitation, we introduce StereoPolicy, a new visuomotor policy learning framework that directly leverages synchronized stereo image pairs to strengthen geometric reasoning, without requiring explicit 3D reconstruction or camera calibration. StereoPolicy employs pretrained 2D vision encoders to process each image independently and fuses the resulting representations through a Stereo Transformer. This design implicitly captures spatial correspondence and disparity cues. The framework integrates seamlessly with diffusion-based and pretrained vision-language-action (VLA) policies, delivering consistent improvements over RGB, RGB-D, point cloud, and multi-view baselines across three simulation benchmarks: RoboMimic, RoboCasa, and OmniGibson. We further validate StereoPolicy on real-robot experiments spanning both tabletop and bimanual mobile manipulation settings. Our results underscore stereo vision as a scalable and robust modality that bridges 2D pretrained representations with 3D geometric understanding for robotic manipulation.",
+  "decided_at": "2026-05-12T19:04:17.253968",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-12T10:48:51.455069",
+      "ring": "Use"
+    },
+    {
+      "at": "2026-05-12T10:55:50.005762",
+      "ring": "Prototype"
+    },
+    {
+      "at": "2026-05-12T10:56:05.086233",
+      "ring": "Use"
+    },
+    {
+      "at": "2026-05-12T17:55:52.150886",
+      "ring": "Watch"
+    }
+  ],
+  "id": 633,
+  "movement": null,
+  "published_at": "2026-05-11T05:06:12",
+  "reason": "Stereo VLA policy with implicit geometry; no released code and no clear industrial calibration path.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "StereoPolicy: Improving Robotic Manipulation Policies via Stereo Perception",
+  "track": "Robotics Vision",
+  "tracks": [
+    "Robotics Vision",
+    "Calibration & Camera Models"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.09989v1"
+}

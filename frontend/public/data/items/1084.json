@@ -1,0 +1,24 @@
+{
+  "abstract": "Object-centric scene understanding is a fundamental challenge in computer vision. Existing approaches often rely on multi-stage pipelines that first apply pre-trained segmentors to extract individual objects, followed by per-object 3D reconstruction. Such methods are computationally expensive, fragile to segmentation errors, and scale poorly with scene complexity. We introduce OCH3R, a unified framework for Object-Centric Holistic 3D Reconstruction from a single RGB image. OCH3R performs one forward pass to simultaneously predict all object instances with their 6D poses and detailed 3D reconstructions. The key idea is a transformer architecture that predicts per-pixel attributes, including CLIP-based category embeddings, metric depth, normalized object coordinates (NOCS), and a fixed number of 3D Gaussians representing each object. To supervise these Gaussian reconstructions, we transform them into canonical space using the predicted 6D poses and align them with pre-rendered canonical ground truth, avoiding costly per-image Gaussian label generation. On standard indoor benchmarks, OCH3R achieves state-of-the-art performance across monocular depth estimation, open-vocabulary semantic segmentation, and RGB-only category-level 6D pose estimation, while producing high-fidelity, editable per-object reconstructions. Crucially, inference is fully feed-forward and scales independently of the number of objects, offering orders-of-magnitude speedups over conventional multi-stage pipelines in cluttered scenes.",
+  "decided_at": "2026-05-14T07:24:28.529769",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-14T07:24:28.529769",
+      "ring": "Watch"
+    }
+  ],
+  "id": 1084,
+  "movement": null,
+  "published_at": "2026-05-13T05:17:51",
+  "reason": "Feed-forward monocular 6D pose + per-object Gaussian/NOCS reconstruction in one pass. Indoor-scene focus, no repo link, but the category-level 6D-pose head plus per-object reconstruction is the right shape for bin-picking analogues.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "OCH3R: Object-Centric Holistic 3D Reconstruction",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.13018v1"
+}

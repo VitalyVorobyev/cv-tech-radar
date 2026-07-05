@@ -1,0 +1,29 @@
+{
+  "abstract": "OpenCV is the open-source computer vision toolkit/library that ships C++, Python and Java bindings for image processing, feature detection, camera calibration (camera intrinsic / camera extrinsic estimation, lens distortion / radial distortion correction, pinhole model), stereo, structure from motion (SfM), object tracking, marker detection (aruco, charuco, checkerboard, chessboard) and a large surface area of classical and learning-based vision primitives. Used as a baseline library across calibration, target detection, 3D geometry, and industrial visual inspection pipelines.",
+  "decided_at": "2026-05-15T14:20:10.841451",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-14T07:38:13.917406",
+      "ring": "Use"
+    }
+  ],
+  "id": 1133,
+  "movement": null,
+  "published_at": "2026-05-14T12:00:00",
+  "reason": "Mature, ubiquitous baseline for calibration, fiducials, stereo, and tracking. Already a hard dependency of every pipeline we ship.",
+  "ring": "Use",
+  "source": "Manual",
+  "title": "OpenCV",
+  "track": "Calibration & Camera Models",
+  "tracks": [
+    "Calibration & Camera Models",
+    "Target Detection & Fiducials",
+    "3D Geometry & Reconstruction",
+    "Object Tracking",
+    "Industrial Vision Inspection",
+    "Open-Source CV Tooling"
+  ],
+  "uncertain": false,
+  "url": "https://opencv.org/"
+}

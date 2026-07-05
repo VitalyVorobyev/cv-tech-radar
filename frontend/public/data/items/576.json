@@ -1,0 +1,24 @@
+{
+  "abstract": "Visual anomaly detection (VAD) is crucial in many real-world fields, such as industrial inspection, medical imaging, infrastructure monitoring, and remote sensing. However, the specific anomaly definitions, data modalities, and annotation standards across different domains make it difficult to transfer single-domain trained VAD models. Vision-language models (VLMs), pre-trained on large-scale cross-domain data, can perform visual perception under task instructions, offering a promising solution for cross-domain VAD. However, single-inference VLM judgments are unreliable, since they rely more on prior knowledge than on normal-sample references or fine-grained feature evidence. We therefore present AnomalyClaw, a training-free VAD agent that turns anomaly judgment into a multi-round refutation process. In each round, the agent proposes candidate anomalies and refutes each against normal-sample references, drawing on a 13-tool library for visual verification, reference parsing, and frozen expert probing. On the CrossDomainVAD-12 benchmark (12 datasets), AnomalyClaw achieves consistent macro-AUROC improvements over single-step direct inference with +6.23 pp on GPT-5.5, +7.93 pp on Seed2.0-lite, and +3.52 pp on Qwen3.5-VL-27B. We further introduce an optional verbalized self-evolution extension. It builds an online rulebook from internal-branch disagreement without oracle labels. On Qwen3.5-VL-27B, it delivers a +2.09 pp mean gain, comparable to a K = 10 oracle-label supervised baseline (+1.99 pp). These results show that agentic refutation improve anomaly understanding and reasoning of VLMs, rather than merely aggregating tool outputs.",
+  "decided_at": "2026-05-12T19:04:17.261567",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-12T17:55:52.167218",
+      "ring": "Watch"
+    }
+  ],
+  "id": 576,
+  "movement": null,
+  "published_at": "2026-05-11T11:40:07",
+  "reason": "Training-free VLM-agent anomaly detection; conceptually relevant to inspection but unproven in production.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "AnomalyClaw: A Universal Visual Anomaly Detection Agent via Tool-Grounded Refutation",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.10397v1"
+}

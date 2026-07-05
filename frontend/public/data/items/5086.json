@@ -1,0 +1,28 @@
+{
+  "abstract": "Aerial 6DoF localization typically relies on precise GNSS signals or radiometrically rich 3D reconstructions, limiting scalability and on-board deployment. We propose SemCityLoc, a semantic-geometric alignment system that reframes aerial pose estimation as structured surface registration between foundation-model-derived visual priors and standardized LoD-compliant 3D city models. Instead of matching sparse contours or dense texture, our method aligns semantic surfaces and monocular depth with lightweight semantic 3D building models, increasing pose discriminability in repetitive and occluded urban environments. To enable accurate evaluation, we introduce SemCityLockeD, the first real-world benchmark combining centimeter-accurate UAV poses with standardized LoD1--LoD3 semantic city models and challenging low-altitude imagery. Experiments demonstrate substantial improvements over existing map-based approaches, improving recall by up to 36% and reducing mean positional error from 9.89m to 2.62m in challenging urban canyons. Our results indicate that semantically structured geometry provides sufficient and scalable constraints for high-precision aerial localization without radiometric scene reconstructions. The code and data are available at https://albertchen98.github.io/SemCityLoc.",
+  "decided_at": "2026-06-29T13:33:32.336821",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-29T13:33:32.336821",
+      "ring": "Watch"
+    }
+  ],
+  "id": 5086,
+  "movement": null,
+  "published_at": "2026-06-25T18:13:39",
+  "reason": "Aerial 6DoF localization via semantic-surface registration of foundation-model priors against LoD city models, plus a cm-accurate UAV benchmark; relevant to pose estimation/localization but aerial-specific.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "SemCityLoc: Aerial 6DoF Localization Using Semantic 3D City Models",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Edge AI & Deployment",
+    "Vision Foundation Models",
+    "Open-Source CV Tooling",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.27444v1"
+}

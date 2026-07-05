@@ -1,0 +1,33 @@
+{
+  "artifact_id": 9,
+  "capability": "build-tooling",
+  "decisions": [],
+  "description": "Zero-overhead pub/sub, store and query protocol.",
+  "events": [],
+  "homepage_url": "",
+  "key": "zenoh",
+  "name": "Zenoh",
+  "refs": [
+    {
+      "ecosystem": "crates",
+      "last_checked_at": "2026-07-03T13:02:11.074762",
+      "last_release_at": "2026-04-10T11:52:42.561892",
+      "last_status": "ok",
+      "last_version": "1.9.0",
+      "ref": "zenoh"
+    },
+    {
+      "ecosystem": "github",
+      "last_checked_at": "2026-07-03T13:02:10.546570",
+      "last_release_at": "2026-04-10T11:57:54",
+      "last_status": "ok",
+      "last_version": "1.9.0",
+      "ref": "eclipse-zenoh/zenoh"
+    }
+  ],
+  "ring": "Use",
+  "status": "adopted",
+  "tracks": [
+    "Robotics Vision"
+  ]
+}

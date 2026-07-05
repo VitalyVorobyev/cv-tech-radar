@@ -1,0 +1,26 @@
+{
+  "abstract": "Conventional machine-vision pipelines typically rely on high-quality optics that produce clean, human-interpretable images, and optical design has therefore been driven by image-level criteria such as resolution, aberration correction, and pixel fidelity. However, such optics are often impractical for size-, cost-, or form-factor-constrained applications, where compact meta-optics offer an attractive alternative but operate under strict physical efficiency limits. We propose CODA, a co-design framework that optimizes a continuous-density meta-optic front-end for frozen-model recognition using differentiable image formation and adjoint-gradient updates of Maxwell-based simulations. CODA directly optimizes the cross-entropy loss of a fixed zero-shot CLIP classifier without learned reconstruction, image signal processing, or image-fidelity auxiliary objectives. In a two-dimensional simulated imaging benchmark on ImageNet-100, CODA improves CLIP ViT-L/14 zero-shot accuracy from 53.75 $\\pm$ 3.57$\\%$ with a focal-concentration baseline to 65.41 $\\pm$ 3.99$\\%$. The optimized optics further transfer without re-optimization across CLIP, SigLIP, and DINOv2 on ImageNet-100, CIFAR-100, and Food-101. These results demonstrate that, under constrained meta-optic imaging, downstream recognition can be improved by aligning optical design with frozen vision-model objectives rather than conventional image-formation criteria.",
+  "decided_at": "2026-06-29T13:33:32.588982",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-29T13:33:32.588982",
+      "ring": "Watch"
+    }
+  ],
+  "id": 5059,
+  "movement": null,
+  "published_at": "2026-06-26T01:54:22",
+  "reason": "Differentiable co-design of a meta-optic front-end for frozen recognition models (adjoint-gradient Maxwell simulation, no learned ISP), improving zero-shot accuracy under compact optics; a novel computational-imaging/optics direction relevant to sensor/camera front-ends, though tied to frozen VLMs.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "VLM-Aware Meta-Optic Front-End Design for Frozen Vision-Language Models",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection",
+    "Vision Foundation Models",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.27646v1"
+}

@@ -1,0 +1,26 @@
+{
+  "abstract": "Motion degradation, manifested as blur in global shutter (GS) images or rolling shutter (RS) distortion in RS counterparts, remains a fundamental challenge in computational imaging, especially under fast motion or low-light conditions. While prior works have treated blur decomposition and RS temporal super-resolution as separate tasks, this separation fails to exploit their intrinsic complementarity. In this paper, we propose a unified framework to invert motion degradation and reenact imaging moment by jointly leveraging the complementary characteristics of GS blur and RS distortion. To this end, we introduce a novel dual-shutter setup that captures synchronized blur-RS image pairs and demonstrate that this combination effectively resolves temporal and spatial ambiguities inherent in both modalities. For allowing flexible performance-cost trade-offs, we further extend this dual-shutter setup to a stereo Blur-RS configuration with a narrow baseline. In addition, we construct a triaxial imaging system to collect a real-world dataset with aligned GS-RS pairs and ground-truth high-speed frames, enabling robust training and evaluation beyond synthetic data. Our proposed network explicitly disentangles motion into context-aware and temporally-sensitive representations via a dual-stream motion interpretation module, followed by a self-prompted frame reconstruction stage. Extensive experiments validate the superiority and generalizability of our approach, establishing a new paradigm for realistic high-speed video reconstruction under complex motion degradations. Codes and more resources are available at https://jixiang2016.github.io/dualBR_site/.",
+  "decided_at": "2026-05-22T19:29:02.213167",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-22T19:29:02.213167",
+      "ring": "Watch"
+    }
+  ],
+  "id": 1947,
+  "movement": null,
+  "published_at": "2026-05-21T12:43:02",
+  "reason": "Rolling-shutter / global-shutter geometric modeling is in-scope for camera models, and there is code plus a real-world synchronized GS-RS dataset. But the core contribution is high-speed video reconstruction (a restoration task) and reproducing it needs a custom dual/triaxial shutter rig.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Moment-Reenacting: Inverse Motion Degradation with Cross-shutter Guidance",
+  "track": "Calibration & Camera Models",
+  "tracks": [
+    "Calibration & Camera Models",
+    "Sensors",
+    "Cameras & Standards"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.22423v1"
+}

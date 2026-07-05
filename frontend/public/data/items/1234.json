@@ -1,0 +1,25 @@
+{
+  "abstract": "Camera calibration is a fundamental prerequisite for reliable geometric perception, yet classical approaches rely on controlled acquisition setups that are impractical for in-the-wild imagery. Recent learning-based methods have shown promising results for single-view calibration, but inherently neglect geometric consistency across multiple views. We introduce CalibAnyView, a unified formulation that supports an arbitrary number of input views ($N \\geq 1$) by explicitly modeling cross-view geometric consistency. To facilitate this, we construct a large-scale multi-view video dataset covering diverse real-world scenarios, including multiple camera models, dynamic scenes, realistic motion trajectories, and heterogeneous lens distortions. Building on this dataset, we develop a multi-view transformer that predicts dense perspective fields, which are further integrated into a geometric optimization framework to jointly estimate camera intrinsics and gravity direction. Extensive experiments demonstrate that CalibAnyView consistently outperforms state-of-the-art methods, achieves strong robustness under single-view settings, and further improves with multi-view inference, providing a reliable foundation for downstream tasks such as 3D reconstruction and robotic perception in the wild.",
+  "decided_at": "2026-05-16T07:34:57.439485",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-16T07:34:57.439485",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 1234,
+  "movement": null,
+  "published_at": "2026-05-14T09:32:12",
+  "reason": "Learning-based multi-view camera calibration (N>=1 views) predicting dense perspective fields, then geometric optimization for intrinsics + gravity. In-the-wild rather than target-based, but intrinsic estimation is a core track and the cross-view-consistency angle is worth comparing.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "CalibAnyView: Beyond Single-View Camera Calibration in the Wild",
+  "track": "Calibration & Camera Models",
+  "tracks": [
+    "Calibration & Camera Models",
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.14615v1"
+}

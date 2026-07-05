@@ -1,0 +1,25 @@
+{
+  "abstract": "While monocular depth estimation has achieved significant progress, achieving generalized metric depth estimation for both narrow field-of-view (FoV) perspectives and $360^\\circ$ panoramas remains an unsolved challenge. Existing methods are often tailored to specific camera types and struggle to produce accurate metric depth that generalizes across diverse settings. This limitation stems from two key challenges: the inherent geometric discrepancy between perspective and panoramic cameras, and the scarcity of panoramic training data with metric annotations. In this work, we introduce DepthMaster, a unified metric depth estimation framework. Rather than employing specialized networks to learn spherical distortions, we reformulate the problem by decomposing panoramic images into overlapping perspective patches. Crucially, distinct from prior projection-based methods that rely on ad-hoc architectural modifications to handle boundaries, we introduce a novel Correspondence Consistency Loss (CCL) and inject virtual projection cameras as geometric priors, allowing us to seamlessly stitch the patches while avoiding specialized operators and keeping the backbone largely compatible with standard Transformer designs. This strategy also resolves the geometric differences by unifying all inputs into a canonical perspective representation, and effectively circumvents data scarcity by directly unlocking powerful metric priors from vast perspective datasets. Trained on a mixed dataset that contains only one panorama dataset, DepthMaster achieves state-of-the-art zero-shot performance on 13 diverse datasets, outperforming not only universal methods but also leading specialist models in both perspective and panoramic domains.",
+  "decided_at": "2026-06-11T13:59:44.482044",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-11T13:59:44.482044",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3422,
+  "movement": null,
+  "published_at": "2026-06-10T17:35:23",
+  "reason": "Unified monocular metric depth across perspective and 360-degree panoramic images using virtual-projection-camera geometric priors; relevant to 3D geometry but no released code and broad zero-shot claims, so track only.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "DepthMaster: Unified Monocular Depth Estimation for Perspective and Panoramic Images",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.12368v1"
+}

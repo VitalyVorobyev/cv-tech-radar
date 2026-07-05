@@ -1,0 +1,25 @@
+{
+  "abstract": "Estimating the 9D pose of everyday objects from a single real-world image remains challenging. This is largely due to the lack of large-scale supervision. Most existing datasets either rely heavily on synthetic renderings or provide limited coverage of real-world objects: the largest real-world 9D pose dataset to date contains only 17K annotated objects across 9 categories. We address this gap with Every9D-21M, a dataset of 9D pose annotations for 21.8M real-world images from 109K object- centric videos spanning 700 everyday object categories - two orders of magnitude larger than prior real-world 9D pose benchmarks in both image and category count. To achieve this scale, we leverage object-centric videos by reconstructing object- level point clouds via multi-view geometry and aligning similar instances into a shared canonical coordinate frame. Canonical poses are manually annotated for only a small set of reference objects (fewer than 0.01% of all images) and propagated to the remaining instances via cross-instance alignment. All propagated canonical poses are then verified from multiple viewpoints. We further introduce cross-category orientation rules that induce category-level symmetries, enabling symmetry-aware evaluation. Beyond establishing dedicated training and evaluation splits as a benchmark for 9D pose foundation models, we show that training on Every9D-21M improves performance on ImageNet3D and PASCAL3D+, and generalizes to HANDAL substantially better than training on ImageNet3D. Data and code are available at https://github.com/GenIntel/Every9D.",
+  "decided_at": "2026-05-28T13:11:32.098726",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-28T13:11:32.098726",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2363,
+  "movement": null,
+  "published_at": "2026-05-27T10:16:17",
+  "reason": "21.8M real-world 9D pose annotations across 700 categories with public dataset+code; could serve as an evaluation set for category-level pose, but household-object domain is a soft fit.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Every9D-21M: Large-Scale Real-World 9D Canonicalization of Everyday Objects",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.28270v1"
+}

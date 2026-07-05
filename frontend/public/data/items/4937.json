@@ -1,0 +1,26 @@
+{
+  "abstract": "Point clouds are an important carrier of three-dimensional spatial information, and their quality directly affects the performance of downstream perception tasks such as object detection and tracking. However, millimeter-wave radar point clouds are typically sparse, noisy, and structurally incomplete. To address these limitations, this paper proposes a multimodal point cloud generation method based on vision-radar fusion. The proposed method leverages image semantic information to impose structural constraints and achieve spatial alignment for radar point clouds, while incorporating a sparse completion strategy to enhance point density and recover missing structures. The generated point clouds are further evaluated in object detection and tracking tasks. Experimental results demonstrate that the proposed method effectively improves point cloud quality and enhances the detection accuracy and robustness of perception models in complex environments, providing a practical solution for multisensor point cloud generation and intelligent perception systems.",
+  "decided_at": "2026-06-29T13:33:32.340906",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-29T13:33:32.340906",
+      "ring": "Watch"
+    }
+  ],
+  "id": 4937,
+  "movement": null,
+  "published_at": "2026-06-25T08:28:18",
+  "reason": "Vision-radar fusion to densify sparse, noisy mmWave-radar point clouds with image semantic priors; relevant to radar 3D sensing, no code released.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Depth-Semantic Alignment and Affinity-Guided Fusion for Structured Radar Point Cloud Generation",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Object Tracking",
+    "Vision Foundation Models"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.26743v1"
+}

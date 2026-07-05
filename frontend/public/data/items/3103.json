@@ -1,0 +1,26 @@
+{
+  "abstract": "Standard dynamic vision sensors approximate retinal processing by detecting temporal contrast changes, offering high speed and high dynamic range. In this work, we explore whether incorporating additional biologically inspired processing stages - specifically spatial filtering and gain control - can offer advantages for certain downstream tasks such as saliency prediction. We present the first implementation of a multi-stage Silicon Retina model on the SCAMP-5 Pixel Processor Array, along with a GPU-based simulation framework. We evaluate the performance of our model on Video Intensity Reconstruction and Video Saliency Prediction. While the bio-inspired model is less effective at reconstructing absolute intensity frames, it achieves a 13\\% reduction in saliency prediction loss in comparison to standard DVS event representation, while reducing the event rate by approximately 47\\%. These experiments are obtained using a lightweight $\\approx 100$k-parameter FireNet-style network, adapted from event-based reconstruction to saliency prediction. These results suggest that the silicon retina's \"information distillation\" mechanism can achieve a more efficient representation for downstream neural networks, particularly in bandwidth-constrained edge applications.",
+  "decided_at": "2026-06-10T13:23:03.386317",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-10T13:23:03.386317",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3103,
+  "movement": null,
+  "published_at": "2026-06-06T23:10:48",
+  "reason": "Programmable in-pixel silicon-retina vision sensor (SCAMP-5); novel sensor + edge-efficiency signal.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Programmable Silicon Retina on Pixel Processor Array",
+  "track": "Sensors",
+  "tracks": [
+    "Sensors",
+    "Cameras & Standards",
+    "Edge AI & Deployment"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.08370v1"
+}

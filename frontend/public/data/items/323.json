@@ -1,0 +1,26 @@
+{
+  "abstract": "We present egenioussBench, a visual localisation benchmark built on geospatial reference data: a city-scale airborne 3D mesh and a CityGML LoD2 model. This pairing reflects deployable mapping assets and supports true scalability beyond traditional SfM-based approaches. The query data comprise smartphone images with centimetre-accurate, map-independent ground truth obtained via PPK and GCP/CP-aided adjustment. From 2,709 images, we derive a non-co-visible subset by estimating the full co-visibility matrix from rendered depth and selecting a maximum independent set; the released data include a test split of 42 non-co-visible images with withheld ground truth and a validation split of 412 sequential images with poses, e.g. for training of pose regressors and self-validation. The benchmark features a public leaderboard evaluated with binning metrics at multiple pose-error thresholds alongside global statistics (median, RMSE, outlier ratio), ensuring fair, like-for-like comparison across mesh- and LoD2-based methods. Together, these design choices expose realistic cross-view and cross-domain challenges while providing a rigorous, scalable path for advancing large-scale visual localisation. We make the evaluation code and data availeable at https://github.com/fratopa/egenioussBench and https://www.egeniouss.eu/",
+  "decided_at": "2026-05-12T10:48:51.456124",
+  "decided_by": "seed-script",
+  "history": [
+    {
+      "at": "2026-05-12T10:48:51.456124",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 323,
+  "movement": null,
+  "published_at": "2026-05-06T18:23:39",
+  "reason": "Implementation-worthy but needs benchmark check",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "egenioussBench: A New Dataset for Geospatial Visual Localisation",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Open-Source CV Tooling",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.05351v1"
+}

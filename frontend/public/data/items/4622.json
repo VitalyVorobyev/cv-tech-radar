@@ -1,0 +1,25 @@
+{
+  "abstract": "Advanced semiconductor nodes drastically increased demand for Transmission Electron Microscopy (TEM), yet destructive sample preparation, slow imaging and high costs severely limit the availability of diverse datasets needed for downstream machine learning (ML). Synthetic data generation is becoming essential, but current generative models often miss TEM-specific noise, structural detail, and stochastic variability crucial for evaluation. We present a Denoising Diffusion Probabilistic Model (DDPM) framework for synthetic TEM image generation under extreme data scarcity. A progressive patch-based training strategy scales from low-resolution patches to full images, enabling from-scratch training with only 15 samples. We integrate a custom TrivialAugment adaptation, cross-process domain transfer, classifier guidance, and RePaint-style inpainting, culminating in full-image generation that preserves global structural and spatial relationships in compliance with FAB metrology requirements. Beyond synthesis, we repurpose DDPM feature representations for segmentation, partitioning encoder feature maps to obtain coherent region masks. Our synthetic images achieve up to MS-SSIM > 0.98 and qualitative expert assessment consistent with structural similarity results, facilitating downstream ML training for defect detection, segmentation, and metrology while preserving statistical and physical realism.",
+  "decided_at": "2026-06-25T13:24:27.876291",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-25T13:24:27.876291",
+      "ring": "Watch"
+    }
+  ],
+  "id": 4622,
+  "movement": null,
+  "published_at": "2026-06-23T17:02:58",
+  "reason": "DDPM synthetic TEM-image generation for data-limited semiconductor metrology/defect detection from 15 samples. An in-scope industrial-inspection + synthetic-data niche; generation-heavy, no code.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "High-Fidelity Synthetic Transmission Electron Microscopy Image Generation Using Diffusion Probabilistic Models for Data-Limited Semiconductor Metrology",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection",
+    "Synthetic Data & Simulation"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.24817v1"
+}

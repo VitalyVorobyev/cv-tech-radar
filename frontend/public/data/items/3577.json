@@ -1,0 +1,26 @@
+{
+  "abstract": "Multi-camera tracking with overlapping fields of view typically relies on centralized fusion, which creates computational bottlenecks that prevent deployment at scale. We present MV3DT, a fully distributed framework for real-time multi-view 3D tracking that achieves accurate identity propagation and occlusion recovery through peer-to-peer coordination, eliminating the need for central aggregation. Each camera node executes a lightweight modular pipeline comprising monocular 3D perception, distributed multi-view association, and collaborative fusion via lightweight messaging. MV3DT achieves 94.3% IDF1 and 93.3% MOTA on WILDTRACK, competitive with state-of-the-art centralized methods, while demonstrating superior scalability by sustaining 30 FPS on 100 cameras with less than 10 ms inter-camera latency and only 2.2% communication overhead. MV3DT operates in a zero-shot regime given camera calibrations, requiring no scene-specific learning and making it directly deployable in new environments. These results establish MV3DT as a practical solution for real-time multi-view tracking in large-scale overlapping camera networks.",
+  "decided_at": "2026-06-12T13:04:19.988198",
+  "decided_by": "codex",
+  "history": [
+    {
+      "at": "2026-06-12T13:04:19.988198",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3577,
+  "movement": null,
+  "published_at": "2026-06-11T09:51:55",
+  "reason": "MV3DT: fully distributed real-time multi-view 3D tracking, 94.3% IDF1 / 93.3% MOTA on WILDTRACK with peer-to-peer fusion (no central aggregator). Object tracking + edge deployment, but no code link yet \u2014 early.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Fully Distributed Multi-View 3D Tracking in Real-Time",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Object Tracking",
+    "Edge AI & Deployment"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.13127v1"
+}

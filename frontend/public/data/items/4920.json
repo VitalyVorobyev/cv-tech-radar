@@ -1,0 +1,28 @@
+{
+  "abstract": "Rolling shutter (RS) cameras equip virtually all consumer devices, yet RS-aware relative pose estimation has remained impractical: the state-of-the-art solver requires a minimum of 20 point correspondences, making RANSAC-based robust estimation prohibitively expensive due to the exponential dependence of the iteration count on the sample size. We make RS relative pose estimation practical by introducing affine correspondences (ACs) into the RS two-view geometry. We derive novel \\emph{RS-corrected affine constraints} that account for the coupling between point perturbations and the row-dependent essential matrix, providing two equations per correspondence beyond the standard epipolar constraint. Building on these constraints, we develop a linearized algebraic solver that estimates pose and RS motion from only 7 ACs. The solver exploits the physical smallness of RS parameters to linearize the constraints, eliminates the 12 RS unknowns via null-space projection, and solves the remaining degree-20 system via action matrices in 1.2\\,ms. On the TUM RS benchmark, our method achieves the best pose and RS parameter accuracy among all tested methods and, uniquely among RS solvers, provides accurate translational velocity estimates -- which are poorly conditioned from point correspondences alone due to a $\\vec{v}$-$\\vec{t}$ coupling. On the global-shutter EuRoC MAV dataset, the solver achieves comparable accuracy to the standard 5-point algorithm, demonstrating that it generalizes well to the GS setting. Code is at https://github.com/danini/rolling_shutter_made_practical.",
+  "decided_at": "2026-06-29T13:33:32.330655",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-29T13:33:32.330655",
+      "ring": "Prototype"
+    }
+  ],
+  "id": 4920,
+  "movement": "new",
+  "published_at": "2026-06-25T10:47:53",
+  "reason": "Novel RS-aware relative-pose solver from only 7 affine correspondences (RS unknowns eliminated via null-space projection, degree-20 system via action matrices, 1.2 ms); released code, best pose/RS accuracy on TUM RS and matches the 5-point algorithm in the global-shutter limit. Squarely in the calibration / epipolar-geometry core.",
+  "ring": "Prototype",
+  "source": "arXiv cs.CV",
+  "title": "Rolling Shutter Relative Pose Estimation Made Practical",
+  "track": "Calibration & Camera Models",
+  "tracks": [
+    "Calibration & Camera Models",
+    "3D Geometry & Reconstruction",
+    "Open-Source CV Tooling",
+    "Sensors, Cameras & Standards",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.26863v1"
+}

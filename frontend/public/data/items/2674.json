@@ -1,0 +1,24 @@
+{
+  "abstract": "Printed circuit board (PCB) defect detection is an essential part of automated optical inspection (AOI); yet it remains challenging in practice because many defects are tiny, low-contrast, and embedded in dense circuit backgrounds. To address these issues, this paper presents a two-phase PCB defect detection framework that combines structure-guided mixed masked pretraining with spatial continuity regularization. In the pretraining stage, we design a sparse convolutional masked pretraining scheme to exploit unlabeled PCB images, where structure-guided mixed masking is used to construct informative masked inputs. The sparse convolutional reconstruction pipeline suppresses invalid responses from masked regions and enables the detector backbone to infer missing PCB structures from visible conductive patterns, thereby learning PCB structural priors. In the fine-tuning stage, the pretrained backbone is transferred to the downstream defect detection task. For the task, a spatial continuity regularization term is introduced during fine-tuning. This term constrains dispersed positive predictions assigned to the same defect instance and promotes more compact localization on elongated defect regions. Experiments on the DsPCBSD+ dataset show that the proposed method achieves 85.5% mAP0.5 and 52.3% mAP0.5:0.95, outperforming several strong baseline detectors. Ablation studies and qualitative results further confirm the effectiveness of the proposed framework for robust PCB defect detection in industrial AOI scenarios.",
+  "decided_at": "2026-06-03T13:41:37.652729",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-03T13:41:37.652729",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2674,
+  "movement": null,
+  "published_at": "2026-06-02T11:26:07",
+  "reason": "Structure-guided masked pretraining plus spatial-continuity regularization for PCB defect detection in automated optical inspection (DsPCBSD+, 85.5% mAP50). Core industrial-AOI fit but incremental and no released code.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Structure-Guided Mixed Masked Pretraining and Spatial Continuity Regularization for Printed Circuit Board Defect Detection",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.03508v1"
+}

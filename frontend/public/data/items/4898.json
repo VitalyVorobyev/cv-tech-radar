@@ -1,0 +1,25 @@
+{
+  "abstract": "Panoramic sensing offers wide field-of-view coverage, yet 3D reconstruction from sparse panoramas remains challenging under rotation-dominant, weak-parallax motion. In such regimes, SfM/SLAM initialization is often ill-conditioned and unreliable. We present PanoImager, an SfM-free framework that combines feed-forward pose/depth priors, geometry-conditioned diffusion view completion, and depth-guided 3DGS optimization. Given only a few panoramic images, PanoImager decomposes them into local perspective views, synthesizes auxiliary observations to enrich sparse evidence, and stabilizes Gaussian optimization for improved cross-view consistency. Experiments on multiple benchmarks show improved stability under extreme sparsity, suggesting PanoImager as an offline/background component for map refinement when SfM/SLAM fails to initialize.",
+  "decided_at": "2026-06-29T13:33:32.341291",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-29T13:33:32.341291",
+      "ring": "Watch"
+    }
+  ],
+  "id": 4898,
+  "movement": null,
+  "published_at": "2026-06-25T14:15:09",
+  "reason": "SfM-free 3D reconstruction from sparse panoramas (feed-forward pose/depth + geometry-conditioned diffusion + depth-guided 3DGS) for rotation-dominant weak-parallax regimes where SfM/SLAM fails to initialize; relevant to pose-free reconstruction.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "PanoImager: Geometry-Guided Novel View Synthesis and Reconstruction from Sparse Panoramic Views",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Robotics Vision"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.27071v1"
+}

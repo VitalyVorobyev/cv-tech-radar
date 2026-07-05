@@ -1,0 +1,73 @@
+{
+  "artifact_id": 16,
+  "capability": "cv-imaging",
+  "decisions": [],
+  "description": "Differentiable computer vision library for PyTorch.",
+  "events": [
+    {
+      "artifact_id": 16,
+      "artifact_key": "kornia",
+      "artifact_name": "Kornia",
+      "body": "Open Source Differentiable Computer Vision Library for PyTorch",
+      "ecosystem": "pypi",
+      "event_date": "2026-05-19T20:23:33.209146",
+      "event_type": "release",
+      "id": 8,
+      "matched_keywords": [
+        "open-source",
+        "open source",
+        "library"
+      ],
+      "relevant": true,
+      "severity": "medium",
+      "summary": "Open Source Differentiable Computer Vision Library for PyTorch",
+      "url": "https://pypi.org/project/kornia/0.8.3/",
+      "version": "0.8.3"
+    },
+    {
+      "artifact_id": 16,
+      "artifact_key": "kornia",
+      "artifact_name": "Kornia",
+      "body": "## Summary\n\nKornia v0.8.3 is a patch release rolling up ~175 commits since v0.8.2. Highlights:\nnew feature detectors and descriptors (XFeat, ALIKED), VisualPrompter batched\ninference, half-precision (float16/bfloat16) support and test infrastructure,\nperformance improvements to core geometry ops (depth_to_normals ~3x, transform\npoints, denormalize_points_with_intrinsics ~2x), MPS device fixes, ONNX export\nfixes, and broad documentation/docstring coverage. Several deprecated utilities\nin kornia.utils begin emitting DeprecationWarning targeting future removal.\n\n### Features\n\n- add missing docstrings to color module (#3712) (9ffbca8b)\n- feat: enable batched inference and add tests for VisualPrompter (#3671) (bbb581f3)\n- Add XFeat, add new weights to  (#3654) (67e6c128)\n- Add missing docstrings to kornia/color/sepia.py (#3628) (45c0b8e3)\n- Add small sr test suite (#3557) (5af8116c)\n- Add unit tests and improve RGB\u2194YUV conversion accuracy (#3539) (dd1568eb)\n- feat: add AdaptiveQuadInterp3d and scale-space detector speedups (#3623) (398665c7)\n- feat: add ALIKED local feature detector and descriptor (#3617) (42e4f78c)\n- feat: add iterative_quad_interp3d with Cramer's rule  (#3616) (1940cf59)\n- feat(image): add KORNIA_CHECK_IMAGE_LAYOUT for layout validation (#3549) (af4419f6)\n- feat(geometry): implement closed-form solve_quartic (#3536) (4b3f2168)\n- Enable grouping for GitHub Actions in Dependabot (#3506) (0a6d9104)\n- Add GitHub Actions updates to Dependabot config (#3497) (4c5a843d)\n- Add SmolVLM2 model scaffold (#3475) (74d33541)\n- feat: add rectangular and gaussian kernels for mutual information loss (#3478) (8856d821)\n- feat(contrib):  add 3D volume support to distance_transform (#3470) (e8164508)\n- feat: add initial skeleton for paligemma mode (#3477) (a38cf3d0)\n- feat(sam3): Implement Phase 2 architecture (PromptEncoder + MaskDecoder) (#3433) (e912db63)\n- Add gradcheck for RandomVerticalFlip (#3476) (b0900e48)\n- feat: Add KimiVL Vision-Language Model implementation (#3448) (ee23688c)\n- New features: Mutual information losses and normalized mutual information losses. (#3398) (feb79cf0)\n- add more instructions and development protocol (#3438) (39824895)\n- Implement Siglip2 in kornia.models (#3412) (5c04bfc8)\n- implement ai policy for contributors (#3435) (240c0786)\n- implement custom errors (#3430) (e68ac757)\n- Add GitHub Copilot repository instructions (#3425) (d416945e)\n- Add tests for augmentation parameter validation utilities (#3417) (85226997)\n- Add parametrized_test decorator and framework files (3a98a57d)\n- feat: automate simple test cases with parametrized_tester decorator (#3367) (40023827)\n- feat: support padding_mode=\"fill\" and fill_value in RandomAffine (#3391) (c809fbda)\n\n### Bug Fixes\n\n- fix(tests): verify gradients through distCoeff and K in distort_point\u2026 (#3685) (430ecc4c)\n- fix(geometry): harmonise dtypes in transform_points bmm (#3707) (1a3af2a3)\n- fix: propagate device and dtype in get_shear_matrix2d and get_shear_matrix3d (#3652) (631a0824)\n- Fix BgrToRgba calling wrong conversion function (#3677) (d5bb50c3)\n- fix xfeat dynamo (#3659) (6f03716d)\n- fix(onnx): fix io_name_conversion bug and update variadic type hints (#3644) (35f78164)\n- fix: skip MPS-unsupported tests and fix MPS-specific runtime errors (#3649) (85017908)\n- fix: correct logic bugs in augmentation and crop validation (#3605) (5fa12081)\n- Fix typo in index.rst (out \u2192 our) (#3633) (f9535c91)\n- fix: resolve two CI failures in coverage workflow (#3639) (bf56558a)\n- fix doctest warnings (#3632) (37ac9674)\n- fix: fix doctest failures for ALIKED and fft_conv (#3630) (4c9c0b62)\n- Fix/rgba png loading (#3608) (90193306)\n- fix: use StrEnum instead of string and enum (#3573) (d66489b2)\n- fix(siglip2): clamp logit_scale to avoid overflow (#3480) (f4ee06ce)\n- fix: correct Thin Plate Spline warp normalization for grid_sample (#3468) (33307959)\n- Fix RandomThinPlateSpline same_on_batch behaviour and add unit tests (#3465) (f99683df)\n- fix(augmentation): reso",
+      "ecosystem": "github",
+      "event_date": "2026-05-19T20:21:06",
+      "event_type": "release",
+      "id": 7,
+      "matched_keywords": [
+        "github"
+      ],
+      "relevant": true,
+      "severity": "medium",
+      "summary": "v0.8.3",
+      "url": "https://github.com/kornia/kornia/releases/tag/v0.8.3",
+      "version": "v0.8.3"
+    }
+  ],
+  "homepage_url": "",
+  "key": "kornia",
+  "name": "Kornia",
+  "refs": [
+    {
+      "ecosystem": "github",
+      "last_checked_at": "2026-07-03T13:02:17.146816",
+      "last_release_at": "2026-05-19T20:21:06",
+      "last_status": "ok",
+      "last_version": "v0.8.3",
+      "ref": "kornia/kornia"
+    },
+    {
+      "ecosystem": "pypi",
+      "last_checked_at": "2026-07-03T13:02:17.270703",
+      "last_release_at": "2026-05-19T20:23:33.209146",
+      "last_status": "ok",
+      "last_version": "0.8.3",
+      "ref": "kornia"
+    }
+  ],
+  "ring": "Watch",
+  "status": "watchlist",
+  "tracks": [
+    "Open-Source CV Tooling",
+    "3D Geometry & Reconstruction"
+  ]
+}

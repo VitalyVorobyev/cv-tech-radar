@@ -1,0 +1,454 @@
+{
+  "counts": {
+    "Evaluate": 1,
+    "Ignore": 0,
+    "Prototype": 0,
+    "Use": 11,
+    "Watch": 6
+  },
+  "include_ignore": false,
+  "rings": {
+    "Evaluate": [
+      {
+        "artifact_id": 1,
+        "capability": "cv-imaging",
+        "decided_at": "2026-06-11T13:05:27.427903",
+        "description": "Core open-source computer vision library.",
+        "ecosystems": [
+          "github",
+          "pypi"
+        ],
+        "key": "opencv",
+        "latest_event": {
+          "event_date": "2026-07-02T05:50:25.466711",
+          "event_type": "major_release",
+          "summary": "Wrapper package for OpenCV python bindings.",
+          "url": "https://pypi.org/project/opencv-python/5.0.0.93/",
+          "version": "5.0.0.93"
+        },
+        "movement": null,
+        "name": "OpenCV",
+        "recent_event_count": 1,
+        "ring": "Evaluate",
+        "status": "adopted",
+        "tracks": [
+          "Open-Source CV Tooling",
+          "Calibration & Camera Models"
+        ]
+      }
+    ],
+    "Ignore": [],
+    "Prototype": [],
+    "Use": [
+      {
+        "artifact_id": 7,
+        "capability": "ml-runtimes",
+        "decided_at": null,
+        "description": "Cross-platform inference and training accelerator.",
+        "ecosystems": [
+          "github",
+          "pypi"
+        ],
+        "key": "onnxruntime",
+        "latest_event": {
+          "event_date": "2026-06-19T21:11:07",
+          "event_type": "release",
+          "summary": "ONNX Runtime v1.27.0",
+          "url": "https://github.com/microsoft/onnxruntime/releases/tag/v1.27.0",
+          "version": "v1.27.0"
+        },
+        "movement": null,
+        "name": "ONNX Runtime",
+        "recent_event_count": 0,
+        "ring": "Use",
+        "status": "adopted",
+        "tracks": [
+          "Edge AI & Deployment"
+        ]
+      },
+      {
+        "artifact_id": 6,
+        "capability": "ml-runtimes",
+        "decided_at": null,
+        "description": "Deep learning framework.",
+        "ecosystems": [
+          "github",
+          "pypi"
+        ],
+        "key": "pytorch",
+        "latest_event": {
+          "event_date": "2026-06-18T00:41:17",
+          "event_type": "release",
+          "summary": "PyTorch 2.12.1 Release, bug fix release",
+          "url": "https://github.com/pytorch/pytorch/releases/tag/v2.12.1",
+          "version": "v2.12.1"
+        },
+        "movement": null,
+        "name": "PyTorch",
+        "recent_event_count": 0,
+        "ring": "Use",
+        "status": "adopted",
+        "tracks": [
+          "Vision Foundation Models",
+          "Edge AI & Deployment"
+        ]
+      },
+      {
+        "artifact_id": 8,
+        "capability": "viz-3d-sensors",
+        "decided_at": null,
+        "description": "Multimodal data visualization for CV and robotics.",
+        "ecosystems": [
+          "crates",
+          "github",
+          "pypi"
+        ],
+        "key": "rerun",
+        "latest_event": {
+          "event_date": "2026-06-22T11:58:12",
+          "event_type": "release",
+          "summary": "0.33.1",
+          "url": "https://github.com/rerun-io/rerun/releases/tag/0.33.1",
+          "version": "0.33.1"
+        },
+        "movement": null,
+        "name": "Rerun",
+        "recent_event_count": 3,
+        "ring": "Use",
+        "status": "adopted",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ]
+      },
+      {
+        "artifact_id": 11,
+        "capability": "build-tooling",
+        "decided_at": null,
+        "description": "Toolkit for building desktop apps with web frontends.",
+        "ecosystems": [
+          "crates"
+        ],
+        "key": "tauri",
+        "latest_event": {
+          "event_date": "2026-07-01T13:56:38.810372",
+          "event_type": "release",
+          "summary": "Make tiny, secure apps for all desktop platforms with Tauri",
+          "url": "https://crates.io/crates/tauri/2.11.5",
+          "version": "2.11.5"
+        },
+        "movement": null,
+        "name": "Tauri",
+        "recent_event_count": 2,
+        "ring": "Use",
+        "status": "adopted",
+        "tracks": [
+          "Open-Source CV Tooling"
+        ]
+      },
+      {
+        "artifact_id": 10,
+        "capability": "build-tooling",
+        "decided_at": null,
+        "description": "Frontend build tool used by the radar UI.",
+        "ecosystems": [
+          "npm"
+        ],
+        "key": "vite",
+        "latest_event": {
+          "event_date": "2026-07-02T04:45:03.337000",
+          "event_type": "release",
+          "summary": "Native-ESM powered web dev build tool",
+          "url": "https://www.npmjs.com/package/vite/v/8.1.3",
+          "version": "8.1.3"
+        },
+        "movement": null,
+        "name": "Vite",
+        "recent_event_count": 0,
+        "ring": "Use",
+        "status": "adopted",
+        "tracks": [
+          "Open-Source CV Tooling"
+        ]
+      },
+      {
+        "artifact_id": 9,
+        "capability": "build-tooling",
+        "decided_at": null,
+        "description": "Zero-overhead pub/sub, store and query protocol.",
+        "ecosystems": [
+          "crates",
+          "github"
+        ],
+        "key": "zenoh",
+        "latest_event": null,
+        "movement": null,
+        "name": "Zenoh",
+        "recent_event_count": 0,
+        "ring": "Use",
+        "status": "adopted",
+        "tracks": [
+          "Robotics Vision"
+        ]
+      },
+      {
+        "artifact_id": 5,
+        "capability": "cv-imaging",
+        "decided_at": null,
+        "description": "Pure-Rust image encoding, decoding and processing.",
+        "ecosystems": [
+          "crates"
+        ],
+        "key": "image-rs",
+        "latest_event": null,
+        "movement": null,
+        "name": "image",
+        "recent_event_count": 0,
+        "ring": "Use",
+        "status": "adopted",
+        "tracks": [
+          "Open-Source CV Tooling"
+        ]
+      },
+      {
+        "artifact_id": 3,
+        "capability": "cv-imaging",
+        "decided_at": null,
+        "description": "Rust linear algebra library for geometry and transforms.",
+        "ecosystems": [
+          "crates"
+        ],
+        "key": "nalgebra",
+        "latest_event": {
+          "event_date": "2026-05-24T16:12:14.939059",
+          "event_type": "release",
+          "summary": "General-purpose linear algebra library with transformations and statically-sized or dynamically-sized matrices.",
+          "url": "https://crates.io/crates/nalgebra/0.35.0",
+          "version": "0.35.0"
+        },
+        "movement": null,
+        "name": "nalgebra",
+        "recent_event_count": 0,
+        "ring": "Use",
+        "status": "adopted",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Open-Source CV Tooling"
+        ]
+      },
+      {
+        "artifact_id": 4,
+        "capability": "cv-imaging",
+        "decided_at": null,
+        "description": "N-dimensional array container for Rust.",
+        "ecosystems": [
+          "crates",
+          "github"
+        ],
+        "key": "ndarray",
+        "latest_event": null,
+        "movement": null,
+        "name": "ndarray",
+        "recent_event_count": 0,
+        "ring": "Use",
+        "status": "adopted",
+        "tracks": [
+          "Open-Source CV Tooling"
+        ]
+      },
+      {
+        "artifact_id": 2,
+        "capability": "cv-imaging",
+        "decided_at": null,
+        "description": "Rust bindings for OpenCV.",
+        "ecosystems": [
+          "crates"
+        ],
+        "key": "opencv-rust",
+        "latest_event": {
+          "event_date": "2026-06-23T10:56:55.070597",
+          "event_type": "release",
+          "summary": "Rust bindings for OpenCV",
+          "url": "https://crates.io/crates/opencv/0.99.0",
+          "version": "0.99.0"
+        },
+        "movement": null,
+        "name": "opencv-rust",
+        "recent_event_count": 1,
+        "ring": "Use",
+        "status": "adopted",
+        "tracks": [
+          "Open-Source CV Tooling"
+        ]
+      },
+      {
+        "artifact_id": 12,
+        "capability": "ml-runtimes",
+        "decided_at": "2026-07-05T06:40:16.337205",
+        "description": "Rust wrapper for ONNX Runtime.",
+        "ecosystems": [
+          "crates",
+          "github"
+        ],
+        "key": "ort",
+        "latest_event": null,
+        "movement": "new",
+        "name": "ort",
+        "recent_event_count": 0,
+        "ring": "Use",
+        "status": "watchlist",
+        "tracks": [
+          "Edge AI & Deployment"
+        ]
+      }
+    ],
+    "Watch": [
+      {
+        "artifact_id": 14,
+        "capability": "ml-runtimes",
+        "decided_at": null,
+        "description": "Deep learning framework for Rust.",
+        "ecosystems": [
+          "crates",
+          "github"
+        ],
+        "key": "burn",
+        "latest_event": null,
+        "movement": null,
+        "name": "Burn",
+        "recent_event_count": 0,
+        "ring": "Watch",
+        "status": "watchlist",
+        "tracks": [
+          "Edge AI & Deployment"
+        ]
+      },
+      {
+        "artifact_id": 13,
+        "capability": "ml-runtimes",
+        "decided_at": null,
+        "description": "Minimalist ML framework for Rust.",
+        "ecosystems": [
+          "crates"
+        ],
+        "key": "candle",
+        "latest_event": {
+          "event_date": "2026-06-26T21:14:33.439715",
+          "event_type": "release",
+          "summary": "Minimalist ML framework.",
+          "url": "https://crates.io/crates/candle-core/0.11.0",
+          "version": "0.11.0"
+        },
+        "movement": null,
+        "name": "Candle",
+        "recent_event_count": 0,
+        "ring": "Watch",
+        "status": "watchlist",
+        "tracks": [
+          "Edge AI & Deployment",
+          "Vision Foundation Models"
+        ]
+      },
+      {
+        "artifact_id": 16,
+        "capability": "cv-imaging",
+        "decided_at": null,
+        "description": "Differentiable computer vision library for PyTorch.",
+        "ecosystems": [
+          "github",
+          "pypi"
+        ],
+        "key": "kornia",
+        "latest_event": {
+          "event_date": "2026-05-19T20:23:33.209146",
+          "event_type": "release",
+          "summary": "Open Source Differentiable Computer Vision Library for PyTorch",
+          "url": "https://pypi.org/project/kornia/0.8.3/",
+          "version": "0.8.3"
+        },
+        "movement": null,
+        "name": "Kornia",
+        "recent_event_count": 0,
+        "ring": "Watch",
+        "status": "watchlist",
+        "tracks": [
+          "Open-Source CV Tooling",
+          "3D Geometry & Reconstruction"
+        ]
+      },
+      {
+        "artifact_id": 17,
+        "capability": "viz-3d-sensors",
+        "decided_at": null,
+        "description": "Library for 3D data processing and visualization.",
+        "ecosystems": [
+          "github",
+          "pypi"
+        ],
+        "key": "open3d",
+        "latest_event": null,
+        "movement": null,
+        "name": "Open3D",
+        "recent_event_count": 0,
+        "ring": "Watch",
+        "status": "watchlist",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "3D Sensors"
+        ]
+      },
+      {
+        "artifact_id": 18,
+        "capability": "build-tooling",
+        "decided_at": null,
+        "description": "Declarative GUI toolkit for Rust, C++ and JavaScript.",
+        "ecosystems": [
+          "crates",
+          "github"
+        ],
+        "key": "slint",
+        "latest_event": {
+          "event_date": "2026-06-24T14:31:27",
+          "event_type": "release",
+          "summary": "1.17.0",
+          "url": "https://github.com/slint-ui/slint/releases/tag/v1.17.0",
+          "version": "v1.17.0"
+        },
+        "movement": null,
+        "name": "Slint",
+        "recent_event_count": 2,
+        "ring": "Watch",
+        "status": "watchlist",
+        "tracks": [
+          "Open-Source CV Tooling"
+        ]
+      },
+      {
+        "artifact_id": 15,
+        "capability": "ml-runtimes",
+        "decided_at": null,
+        "description": "YOLO object detection and tracking models.",
+        "ecosystems": [
+          "github",
+          "pypi"
+        ],
+        "key": "ultralytics",
+        "latest_event": {
+          "event_date": "2026-07-02T21:18:23.360919",
+          "event_type": "release",
+          "summary": "Ultralytics YOLO \ud83d\ude80 for SOTA object detection, multi-object tracking, instance segmentation, pose estimation, classification, and oriented object detection.",
+          "url": "https://pypi.org/project/ultralytics/8.4.86/",
+          "version": "8.4.86"
+        },
+        "movement": null,
+        "name": "Ultralytics",
+        "recent_event_count": 8,
+        "ring": "Watch",
+        "status": "watchlist",
+        "tracks": [
+          "Object Tracking",
+          "Vision Foundation Models"
+        ]
+      }
+    ]
+  }
+}
