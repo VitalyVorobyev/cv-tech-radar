@@ -2,7 +2,7 @@
 // Left rail: list of tracks (with rename and delete).
 // Right pane: keyword lists for the selected track.
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ApiError, api } from "../lib/api";
 import type { QuadrantId, TopicsConfig, TrackConfig } from "../lib/api";
@@ -39,13 +39,17 @@ export function SettingsTopicsView() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (data) {
-      setTracks(data.tracks);
-      setBaseline(data.tracks);
-      setSelectedIdx(0);
-    }
-  }, [data]);
+  const [seeded, setSeeded] = useState(data?.tracks);
+
+  // Seed the editable tracks + baseline when the config first arrives or is
+  // refetched. Adjusting state during render (guarded by identity) avoids a
+  // setState-in-effect.
+  if (data && data.tracks !== seeded) {
+    setSeeded(data.tracks);
+    setTracks(data.tracks);
+    setBaseline(data.tracks);
+    setSelectedIdx(0);
+  }
 
   const dirty = !tracksEqual(tracks, baseline);
 

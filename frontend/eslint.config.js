@@ -23,14 +23,6 @@ export default [
     rules: {
       ...tsPlugin.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
-      // eslint-plugin-react-hooks v7 introduced new opinionated rules. We adopt
-      // the major version now but defer these three (they flag the common
-      // "sync state from fetched data in an effect" and latest-ref patterns
-      // across the radar views). Re-enabling them + refactoring is tracked as a
-      // follow-up; keeping lint behavior equivalent to v5 for now.
-      "react-hooks/set-state-in-effect": "off",
-      "react-hooks/refs": "off",
-      "react-hooks/use-memo": "off",
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     },

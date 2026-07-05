@@ -1,6 +1,6 @@
 // Negative topics editor — one flat array of penalty terms.
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ApiError, api } from "../lib/api";
 import type { NegativeTopicsConfig } from "../lib/api";
@@ -28,12 +28,15 @@ export function SettingsNegativeTopicsView() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (data) {
-      setTerms(data.negative_topics);
-      setBaseline(data.negative_topics);
-    }
-  }, [data]);
+  const [seeded, setSeeded] = useState(data?.negative_topics);
+
+  // Seed terms + baseline when the config first arrives or is refetched.
+  // Adjusting state during render (guarded by identity) avoids a setState-in-effect.
+  if (data && data.negative_topics !== seeded) {
+    setSeeded(data.negative_topics);
+    setTerms(data.negative_topics);
+    setBaseline(data.negative_topics);
+  }
 
   const dirty = !listsEqual(terms, baseline);
 

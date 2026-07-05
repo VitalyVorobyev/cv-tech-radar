@@ -34,11 +34,17 @@ import { useTweaks } from "../lib/tweaks";
 export type EcoSurface = "radar" | "releases" | "artifacts";
 
 function usePrefersReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
+  // Seed from the media query lazily so the effect only subscribes (no
+  // synchronous setState in the effect body).
+  const [reduced, setReduced] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      !!window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
     const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mql.matches);
     const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
     mql.addEventListener("change", handler);
     return () => mql.removeEventListener("change", handler);
@@ -87,7 +93,7 @@ function searchMatches(it: ArtifactBoardItem, ql: string): boolean {
 
 export function EcosystemView({ surface }: { surface: EcoSurface }) {
   const reducedMotion = usePrefersReducedMotion();
-  const initial = useMemo(readInitialFilters, []);
+  const initial = useMemo(() => readInitialFilters(), []);
   const [focusedQuad, setFocusedQuad] = useState<string | null>(initial.quad);
   const [focusedRing, setFocusedRing] = useState<Ring | null>(initial.ring);
   const [capabilityFilter, setCapabilityFilter] = useState<string | null>(null);

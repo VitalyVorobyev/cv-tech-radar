@@ -1,7 +1,7 @@
 // Scoring editor — weights, thresholds, and the candidate-queue cap.
 // Numbers only for v1; sliders are a future enhancement.
 
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ApiError, api } from "../lib/api";
 import type { ScoringConfig } from "../lib/api";
@@ -43,13 +43,16 @@ export function SettingsScoringView() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [seeded, setSeeded] = useState(data);
 
-  useEffect(() => {
-    if (data) {
-      setDraft(data);
-      setBaseline(data);
-    }
-  }, [data]);
+  // Seed the editable draft + baseline when the config first arrives or is
+  // refetched. Adjusting state during render (guarded by identity) keeps them
+  // in sync without a setState-in-effect.
+  if (data && data !== seeded) {
+    setSeeded(data);
+    setDraft(data);
+    setBaseline(data);
+  }
 
   const dirty = !configsEqual(draft, baseline);
 
