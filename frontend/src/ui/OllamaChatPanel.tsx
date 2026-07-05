@@ -113,6 +113,10 @@ export function OllamaChatPanel({
   }, []);
 
   useEffect(() => {
+    // One-shot health probe on mount. checkHealth flips `healthChecking`
+    // synchronously; this curator-only panel intentionally doesn't route the
+    // probe through a query library, so the setState-in-effect is deliberate.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void checkHealth();
   }, [checkHealth]);
 

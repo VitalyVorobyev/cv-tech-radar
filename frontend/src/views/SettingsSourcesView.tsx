@@ -1,7 +1,7 @@
 // Sources editor. Table of arXiv / RSS feeds with inline editing.
 // Save writes config/sources.yaml; the backend reloads its in-memory cache.
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ApiError, api } from "../lib/api";
 import type { SourceConfig, SourcesConfig } from "../lib/api";
@@ -40,12 +40,15 @@ export function SettingsSourcesView() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (data) {
-      setRows(data.sources);
-      setBaseline(data.sources);
-    }
-  }, [data]);
+  const [seeded, setSeeded] = useState(data?.sources);
+
+  // Seed rows + baseline when the config first arrives or is refetched.
+  // Adjusting state during render (guarded by identity) avoids a setState-in-effect.
+  if (data && data.sources !== seeded) {
+    setSeeded(data.sources);
+    setRows(data.sources);
+    setBaseline(data.sources);
+  }
 
   const dirty = !rowsEqual(rows, baseline);
 

@@ -38,9 +38,13 @@ export interface HotkeyMap {
  * or <select> element — except for mod+s and Escape, which always fire.
  */
 export function useHotkeys(map: HotkeyMap): void {
-  // Keep a stable ref so the effect doesn't re-run when handlers change.
+  // Keep a stable ref so the keydown effect doesn't re-run when handlers change.
+  // Update it in an effect (not during render) so the listener always reads the
+  // latest handlers; a keydown fires long after commit, so the timing is safe.
   const mapRef = useRef(map);
-  mapRef.current = map;
+  useEffect(() => {
+    mapRef.current = map;
+  });
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent): void {

@@ -1,7 +1,7 @@
 // Expanded decision panel shown inline beneath a CandidateRow.
 // Contains: abstract, ring picker, reason field, action field, uncertain checkbox, save button.
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Candidate, Ring, Decision } from "../lib/api";
 import { api, ApiError } from "../lib/api";
@@ -28,15 +28,17 @@ export function CandidatePanel({ candidate, onSave }: CandidatePanelProps) {
   const [reasonError, setReasonError] = useState<string | undefined>();
   const [rowError, setRowError] = useState<string | undefined>();
 
-  // Re-seed if the candidate's existing decision changes (optimistic update resolved)
-  useEffect(() => {
-    if (existing) {
-      setRing(existing.ring);
-      setReason(existing.reason);
-      setAction(existing.action ?? "");
-      setUncertain(existing.uncertain);
-    }
-  }, [existing]);
+  // Re-seed if the candidate's existing decision changes (optimistic update
+  // resolved). Adjusting state during render (guarded by identity) avoids a
+  // setState-in-effect; useState above already seeds the first render.
+  const [seededDecision, setSeededDecision] = useState(existing);
+  if (existing && existing !== seededDecision) {
+    setSeededDecision(existing);
+    setRing(existing.ring);
+    setReason(existing.reason);
+    setAction(existing.action ?? "");
+    setUncertain(existing.uncertain);
+  }
 
   const mutation = useMutation({
     mutationFn: () =>

@@ -40,14 +40,12 @@ export function TracksView() {
 
   // Once the track list arrives, settle on a valid track. Empty / unknown
   // values get replaced with the first track in the first non-empty quadrant.
-  useEffect(() => {
-    if (quadrants.length === 0) return;
-    const isKnown = quadrantOfTrack(track, quadrants) !== null;
-    if (isKnown) return;
-    const fallback =
-      quadrants.find((q) => q.tracks.length > 0)?.tracks[0] ?? "";
+  // Adjusting state during render (rather than in an effect) is the React-blessed
+  // pattern here; the condition is self-terminating once `track` is valid.
+  if (quadrants.length > 0 && quadrantOfTrack(track, quadrants) === null) {
+    const fallback = quadrants.find((q) => q.tracks.length > 0)?.tracks[0] ?? "";
     if (fallback && fallback !== track) setTrack(fallback);
-  }, [quadrants, track]);
+  }
 
   useEffect(() => {
     writeUrlParams({ track });
