@@ -1,0 +1,26 @@
+{
+  "abstract": "Panoramic images capture the complete visual sphere in a single frame, providing spatial context unattainable by conventional cameras. Yet this completeness comes at a geometric cost: the 2-sphere cannot be faithfully mapped to the plane, and every planar representation introduces distortions that violate the assumptions underlying standard vision architectures. This survey traces the evolution of panoramic scene analysis along a methodological trajectory, from projection-based adaptation, through distortion-aware engineering, to sphere-native modeling and geometry-aware tokenization for foundation models, and argues that this evolution reflects a progressive deepening of geometric commitment rather than a simple accumulation of techniques. We organize the literature along two orthogonal dimensions: architectural design (how operators interact with spherical geometry) and training paradigm (how knowledge is transferred across domains). Covering dense prediction (semantic segmentation, depth estimation, and room layout estimation), unified multi-task understanding, open-world perception, vision-language reasoning, and dynamic video analysis, we identify a central unresolved tension: among the methods surveyed, none simultaneously delivers strict spherical equivariance and full reuse of perspective-pretrained foundation-model weights, and we argue that this is a structural rather than incidental gap. We further expose five systematic gaps in current evaluation protocols, namely the absence of spherical-area-weighted metrics, seam-consistency testing, polar-robustness stratification, cross-projection generalization, and open-world protocol standardization, and propose a six-point research roadmap toward general-purpose panoramic intelligence. The corresponding repository is publicly available at: https://github.com/zhuqinfeng1999/Awesome-Panoramic-Scene-Analysis.",
+  "decided_at": "2026-06-29T13:33:32.592027",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-29T13:33:32.592027",
+      "ring": "Watch"
+    }
+  ],
+  "id": 5044,
+  "movement": null,
+  "published_at": "2026-06-26T05:54:38",
+  "reason": "Survey + curated 'Awesome' repo on panoramic/spherical scene analysis, from distortion-aware engineering to sphere-native foundation models; useful reference for distortion-aware panoramic geometry.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Panoramic Scene Analysis: A Survey from Distortion-Aware Engineering to Sphere-Native Foundation Modeling",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Vision Foundation Models",
+    "Open-Source CV Tooling"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.27745v1"
+}

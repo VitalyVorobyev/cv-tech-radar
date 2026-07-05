@@ -1,0 +1,27 @@
+{
+  "abstract": "Automated instance segmentation of forest LiDAR point clouds is increasingly critical as forest monitoring moves toward scalable, detailed, 3D measurement. Yet, progress is constrained by label scarcity for tree instances; a single hectare can hold millions of points and hundreds of overlapping, complex crowns, making manual annotation from scratch with raw data laborious and error-prone. Annotations are often corrected from automatic pre-segmentations, but remain costly as these provide no interactive or AI-assisted refinement. Inspired by the promptable paradigm of foundation segmentation models, we propose SelectAnyTree, a promptable instance segmentation model that delineates any individual tree in a 3D forest point cloud from a few clicks. It introduces two key components: Click-to-query prompt encoder and Canopy Height Model (CHM)-guided first prompt. The former turns each click into a single content query, encoding its 3D position and positive/negative polarity together with a pooled local backbone feature. The latter provides treetops as a geometry- and ecologically guided first prompt without any user input. The resulting prompt query is then decoded into one tree mask by a state-space query decoder to efficiently capture long-range context in large-scale forest scenes with linear-time complexity. We evaluate SelectAnyTree in interactive and instance-level settings across seven diverse forest regions and an independent held-out test dataset, demonstrating strong generalization beyond the training domains. It segments a target tree to 78.2 Intersection over Union (IoU) from a single click, 24.8 points above the strongest promptable baseline, and reaches every accuracy target with the fewest clicks, while using far fewer parameters and less inference time than prior promptable models. The source code is available at https://github.com/thanhhff/SelectAnyTree.",
+  "decided_at": "2026-06-29T13:33:32.333859",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-29T13:33:32.333859",
+      "ring": "Watch"
+    }
+  ],
+  "id": 5084,
+  "movement": null,
+  "published_at": "2026-06-25T19:15:36",
+  "reason": "Promptable (SAM-style click-to-query) instance segmentation for 3D forest LiDAR point clouds with released code; forestry-specific, but the interactive 3D point-cloud segmentation method could generalize to industrial point clouds.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "SelectAnyTree: A Promptable Instance Segmentation Model for 3D Forest LiDAR Point Clouds",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "3D Sensors",
+    "Open-Source CV Tooling",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.27491v1"
+}

@@ -1,0 +1,24 @@
+{
+  "abstract": "The tracking-by-detection paradigm in multi-object tracking (MOT) typically relies on static appearance descriptors to complement motion estimation. However, these descriptors are frame-independent, limiting their robustness as visual cues. Since such descriptors are often obtained from computationally intensive pretrained backbones, real-time MOT systems frequently abandon appearance cues altogether and rely solely on motion prediction and geometric association. In this work, we introduce Polycepta, an object-centric appearance state estimation framework that reformulates appearance modeling as a recursive estimation problem rather than a frame-wise matching task. Polycepta constructs and continuously updates an independent appearance state for each tracked object, enabling future appearance representations to be estimated from accumulated observations. Polycepta is encouraged to learn the appearance-state construction of object-specific representations rather than memorize them through a proposed learning strategy, enabling appearance estimation for unseen classes. A key property of Polycepta is that the quality of appearance estimation improves as object states evolve during inference. While conventional appearance descriptors remain static or degrade over time, Polycepta progressively refines appearance estimates as additional observations are accumulated. Extensive experiments on KITTI, the Waymo Open Dataset, and MOT17 demonstrate consistent reductions in identity switches and improvements in tracking performance when integrated into the tracking-by-detection pipelines. Polycepta operates at 90.57 Hz and delivers state-of-the-art performance on the KITTI benchmark when integrated into the RobMOT framework, achieving a MOTA of 92.27\\%.",
+  "decided_at": "2026-06-23T13:14:23.943632",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-23T13:14:23.943632",
+      "ring": "Watch"
+    }
+  ],
+  "id": 4294,
+  "movement": null,
+  "published_at": "2026-06-22T17:06:32",
+  "reason": "Recursive object-centric appearance-state estimation for real-time MOT (90 Hz, SOTA on KITTI), generalizing to unseen classes. AV-centric datasets, no clear code.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Polycepta: Object-Centric Appearance Estimation for Multi-Object Tracking",
+  "track": "Object Tracking",
+  "tracks": [
+    "Object Tracking"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.23604v2"
+}

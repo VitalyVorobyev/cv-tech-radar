@@ -1,0 +1,25 @@
+{
+  "abstract": "Rolling-shutter cameras introduce characteristic distortions when imaging fast moving objects, and these effects are typically treated as artifacts to be corrected. In this work, we instead leverage rolling-shutter distortions as a valuable source of temporal information to estimate the 3D translational and angular velocities of rapidly moving spherical objects from a single rolling-shutter frame. We design a robust and easily detectable spherical pattern and propose a correspondence-free formulation that recovers motion by enforcing geometric consistency in a back-projection framework. By exploiting the geometry of the sphere, translational and rotational motions are decoupled and estimated through a two-stage optimization process, enabling reliable velocity recovery even for textureless objects. Extensive experiments on both synthetic and real datasets demonstrate accurate and robust estimation of motion parameters under challenging high-speed conditions.",
+  "decided_at": "2026-07-02T13:13:10.362699",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-07-02T13:13:10.362699",
+      "ring": "Watch"
+    }
+  ],
+  "id": 5397,
+  "movement": null,
+  "published_at": "2026-06-30T14:49:26",
+  "reason": "Uses rolling-shutter distortion as signal to recover 3D sphere velocity via back-projection, with a robust detectable spherical pattern \u2014 genuine camera-model/sensor-geometry work, niche but on-topic. No code; low relevance score but real domain fit.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Estimating Velocity of Spheres from Rolling-Shutter Image(s)",
+  "track": "Calibration & Camera Models",
+  "tracks": [
+    "Calibration & Camera Models",
+    "Sensors, Cameras & Standards"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.31760v1"
+}

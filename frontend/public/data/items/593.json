@@ -1,0 +1,24 @@
+{
+  "abstract": "This work explores a simple yet powerful lightweight adapter design for feed-forward 3D Gaussian Splatting (3DGS). Existing methods typically apply complex, architecture-specific designs on top of the generic pipeline of image feature extraction $\\rightarrow$ multi-view interaction $\\rightarrow$ feature decoding. However, constrained by the scale bottleneck of 3D training data and the low-pass filtering effect of deep networks, these methods still fall short in cross-domain generalization and high-frequency geometric fidelity. To address these problems, we propose AdaptSplat, which demonstrates that without complex component engineering, introducing a single adapter of only 1.5M parameters into the generic architecture is sufficient to achieve superior performance. Specifically, we design a lightweight Frequency-Preserving Adapter (FPA) that extracts direction-aware high-frequency structural priors from the shallow features of a powerful vision foundation model backbone, and seamlessly integrates them into the generic pipeline via high-frequency positional encodings and adaptive residual modulation. This effectively compensates for the high-frequency attenuation caused by over-smoothing in deep features, improving the fitting accuracy of Gaussian primitives on complex surfaces and sharp boundaries. Extensive experiments demonstrate that AdaptSplat achieves state-of-the-art feed-forward reconstruction performance on multiple standard benchmarks, with stable generalization across domains. Code available at: https://github.com/xmw666/AdaptSplat.",
+  "decided_at": "2026-05-12T19:04:17.259548",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-12T17:55:52.162385",
+      "ring": "Watch"
+    }
+  ],
+  "id": 593,
+  "movement": null,
+  "published_at": "2026-05-11T09:14:05",
+  "reason": "Compact VFM adapter for feed-forward 3DGS; interesting but feed-forward 3DGS is not yet industrial-grade.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "AdaptSplat: Adapting Vision Foundation Models for Feed-Forward 3D Gaussian Splatting",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.10239v1"
+}

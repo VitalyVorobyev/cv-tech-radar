@@ -1,0 +1,95 @@
+{
+  "ecosystem_artifact_count": 18,
+  "ecosystem_artifacts_dir": "ecosystem-artifacts",
+  "ecosystem_event_count": 69,
+  "ecosystem_ring_counts": {
+    "Evaluate": 1,
+    "Ignore": 0,
+    "Prototype": 0,
+    "Use": 11,
+    "Watch": 6
+  },
+  "generated_at": "2026-07-05T08:38:03.874424+00:00",
+  "item_count": 172,
+  "items_dir": "items",
+  "ring_counts": {
+    "Evaluate": 33,
+    "Ignore": 0,
+    "Prototype": 3,
+    "Use": 3,
+    "Watch": 133
+  },
+  "tracks": [
+    {
+      "id": "calibration-camera-models",
+      "name": "Calibration & Camera Models",
+      "quadrant": "perception"
+    },
+    {
+      "id": "target-detection-fiducials",
+      "name": "Target Detection & Fiducials",
+      "quadrant": "perception"
+    },
+    {
+      "id": "3d-geometry-reconstruction",
+      "name": "3D Geometry & Reconstruction",
+      "quadrant": "scene"
+    },
+    {
+      "id": "3d-sensors",
+      "name": "3D Sensors",
+      "quadrant": "perception"
+    },
+    {
+      "id": "robotics-vision",
+      "name": "Robotics Vision",
+      "quadrant": "scene"
+    },
+    {
+      "id": "robot-guidance",
+      "name": "Robot Guidance",
+      "quadrant": "scene"
+    },
+    {
+      "id": "object-tracking",
+      "name": "Object Tracking",
+      "quadrant": "models"
+    },
+    {
+      "id": "industrial-vision-inspection",
+      "name": "Industrial Vision Inspection",
+      "quadrant": "tooling"
+    },
+    {
+      "id": "edge-ai-deployment",
+      "name": "Edge AI & Deployment",
+      "quadrant": "tooling"
+    },
+    {
+      "id": "vision-foundation-models",
+      "name": "Vision Foundation Models",
+      "quadrant": "models"
+    },
+    {
+      "id": "open-source-cv-tooling",
+      "name": "Open-Source CV Tooling",
+      "quadrant": "tooling"
+    },
+    {
+      "id": "sensors-cameras-standards",
+      "name": "Sensors, Cameras & Standards",
+      "quadrant": "perception"
+    },
+    {
+      "id": "synthetic-data-simulation",
+      "name": "Synthetic Data & Simulation",
+      "quadrant": "scene"
+    },
+    {
+      "id": "datasets-benchmarks",
+      "name": "Datasets & Benchmarks",
+      "quadrant": "models"
+    }
+  ],
+  "weeks": 26
+}

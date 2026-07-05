@@ -1,0 +1,24 @@
+{
+  "abstract": "Visual anomaly detection (AD) for industrial inspection is a highly relevant task in modern production environments. The problem becomes particularly challenging when training and deployment data differ due to changes in acquisition conditions during production. In the VAND 4.0 Industrial Track, models must remain robust under distribution shifts such as varying illumination and their performance is assessed on the MVTec AD 2 dataset. To address this setting, we propose a training-free and class-agnostic anomaly detection pipeline based on the work of SuperAD. Our approach improves generalization through several modifications designed to enhance robustness under distribution shifts. These adaptations include using a DINOv3 backbone, overlapping patch-wise processing, intensity-based augmentations, improved memory-bank subsampling for better coverage of the data distribution, and iterative morphological closing for cleaner and more spatially consistent anomaly maps. Unlike methods that rely on class-specific architectures or per-class hyperparameter tuning, our method uses a single architecture and one shared hyperparameter configuration across all object classes. This makes the approach well suited for industrial deployment, where product variants and appearance changes must be handled with minimal adaptation effort. We achieve segmentation F1 scores of $62.61\\%$, $57.42\\%$, and $54.35\\%$ on test public, private, and private mixed of MVTec AD 2 respectively, thereby outperforming SuperAD and other state-of-the-art methods. Code is available at https://github.com/LukasRoom/SuperADD.",
+  "decided_at": "2026-05-16T07:34:57.438426",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-16T07:34:57.438426",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 1201,
+  "movement": null,
+  "published_at": "2026-05-14T13:22:02",
+  "reason": "Training-free, class-agnostic anomaly segmentation on MVTec AD 2 (CVPR 2026 VAND 4.0 challenge entry). DINOv3 backbone, one shared config across all classes, code released, concrete F1 numbers \u2014 directly on-topic for inspection and explicitly targets robustness to acquisition drift.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "SuperADD: Training-free Class-agnostic Anomaly Segmentation -- CVPR 2026 VAND 4.0 Workshop Challenge Industrial Track",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.14808v1"
+}

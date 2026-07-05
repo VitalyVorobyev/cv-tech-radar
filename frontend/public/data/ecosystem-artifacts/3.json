@@ -1,0 +1,45 @@
+{
+  "artifact_id": 3,
+  "capability": "cv-imaging",
+  "decisions": [],
+  "description": "Rust linear algebra library for geometry and transforms.",
+  "events": [
+    {
+      "artifact_id": 3,
+      "artifact_key": "nalgebra",
+      "artifact_name": "nalgebra",
+      "body": "General-purpose linear algebra library with transformations and statically-sized or dynamically-sized matrices.",
+      "ecosystem": "crates",
+      "event_date": "2026-05-24T16:12:14.939059",
+      "event_type": "release",
+      "id": 12,
+      "matched_keywords": [
+        "library"
+      ],
+      "relevant": true,
+      "severity": "medium",
+      "summary": "General-purpose linear algebra library with transformations and statically-sized or dynamically-sized matrices.",
+      "url": "https://crates.io/crates/nalgebra/0.35.0",
+      "version": "0.35.0"
+    }
+  ],
+  "homepage_url": "https://nalgebra.org",
+  "key": "nalgebra",
+  "name": "nalgebra",
+  "refs": [
+    {
+      "ecosystem": "crates",
+      "last_checked_at": "2026-07-03T13:02:05.496004",
+      "last_release_at": "2026-05-24T16:12:14.939059",
+      "last_status": "ok",
+      "last_version": "0.35.0",
+      "ref": "nalgebra"
+    }
+  ],
+  "ring": "Use",
+  "status": "adopted",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Open-Source CV Tooling"
+  ]
+}

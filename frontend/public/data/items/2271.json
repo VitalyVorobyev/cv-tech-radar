@@ -1,0 +1,24 @@
+{
+  "abstract": "Recent feed-forward geometry foundation models have demonstrated impressive generalization by recovering depth and poses in a single forward pass. However, these models are typically constrained by a global coordinate frame assumption. This dependency becomes a significant bottleneck for long-context and streaming reconstruction, as it forces the network to maintain an arbitrary temporal origin and handle translation magnitudes that grow unbounded over time. Our solution, which we call $R^3$, employs relative regression. We employ a lightweight MLP to predict confidence-weighted relative constraints. These confidences serve as a unified anchor: weighting losses during training and guiding pose aggregation during inference. $R^3$ supports both full-context offline reconstruction and causal, bounded-memory streaming. Our evaluation in both offline and streaming settings validates the effectiveness of our relative mechanism. Project page: https://kevinxu02.github.io/r3-site",
+  "decided_at": "2026-05-27T13:22:57.154666",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-27T13:22:57.154666",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2271,
+  "movement": null,
+  "published_at": "2026-05-26T04:03:38",
+  "reason": "Feed-forward 3D foundation model that abandons the global-frame assumption for streaming/long-context reconstruction via relative regression. Interesting trajectory for the geometry-foundation-model line; only a project page so far.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "$R^3$: 3D Reconstruction via Relative Regression",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.26519v1"
+}

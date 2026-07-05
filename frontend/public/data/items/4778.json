@@ -1,0 +1,25 @@
+{
+  "abstract": "3D anomaly detection in point clouds is critical for high-precision industrial manufacturing. Reconstruction-based methods have laid a strong foundation by detecting 3D anomalies through comparisons between defective inputs and their reconstructed normal counterparts. However, existing methods still suffer from two challenges: 1) the foreground weak defective regions such as scratches are hard to reconstruct and detect, where the anomaly deviations in normalized point clouds can be as small as $10^{-3}$; 2) the background non-defective regions are prone to get positional bias in reconstruction, which leads to false positives. To address these challenges, we propose \\textbf{PCDiff}, a point cloud diffusion framework for instance-level 3D anomaly generation and detection. In the generation phase, an instance-level multi-modal attention is embedded into the generation framework, where anomalies are conditioned with texture gradient, image patch, text and mask. The instance-level condition enables the high-quality generation of weak-defective anomalies. In the detection phase, a joint local-global reconstruction algorithm is introduced to ensure local anomaly restoration and global geometric consistency, which preserves background normal structure while restoring the foreground defect. Extensive experiments demonstrate that the proposed PCDiff significantly outperforms state-of-the-art methods in both 3D anomaly generation fidelity and reconstruction quality, leading to substantial improvements in anomaly detection accuracy.",
+  "decided_at": "2026-06-25T13:24:28.130396",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-25T13:24:28.130396",
+      "ring": "Watch"
+    }
+  ],
+  "id": 4778,
+  "movement": null,
+  "published_at": "2026-06-24T12:11:05",
+  "reason": "Point-cloud diffusion for instance-level 3D anomaly detection in manufacturing; in-scope industrial 3D inspection but no code and generation-heavy. Pairs with CoGeoAD as a 3D-anomaly-inspection cluster this week.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Point Cloud Diffusion with Global and Local Reconstruction for Instance-Level 3D Anomaly Detection",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection",
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.25740v1"
+}

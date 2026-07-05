@@ -1,0 +1,26 @@
+{
+  "abstract": "Reliable multi-modal calibration requires identifying which observations truly constrain the extrinsic parameters and which ones mainly add noise or ambiguity. In this paper, we propose a support-map-driven approach to multi-modal calibration that decouples four functional blocks: initial calibration, cross-modal residual extraction, support-map estimation, and support-aware refinement. We instantiate this formulation for online LiDAR--camera calibration using MDPCalib, a target-less LiDAR--camera calibration method based on motion and deep point correspondences, and CMRNext, a dense LiDAR--camera matching model that predicts optical-flow-like image-plane residuals. The key contribution is a dense calibration support map that aggregates cross-modal agreement over aligned observations and highlights where calibration evidence is consistently reliable. Across the Bacchus Long-Term (BLT) dataset and KITTI, we show that calibration evidence is spatially and semantically non-uniform, indicating that some semantic regions provide stronger cues for calibration than others. On KITTI, support-guided refinement improves the calibration performance with better translation accuracy while rotational gains remain limited.",
+  "decided_at": "2026-05-25T13:10:52.236925",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-25T13:10:52.236925",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 2030,
+  "movement": null,
+  "published_at": "2026-05-22T12:48:56",
+  "reason": "Targetless online LiDAR-camera calibration with a dense support map that weights cross-modal agreement; directly on the Calibration & Camera Models track. Agricultural setting is incidental \u2014 the technique generalizes. Translation gains modest, rotation gains \"limited\" per their own evaluation.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "Calibration-Informative Region Selection for Online LiDAR--Camera Calibration in Agricultural Environments",
+  "track": "Calibration & Camera Models",
+  "tracks": [
+    "Calibration & Camera Models",
+    "3D Sensors",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.23580v1"
+}

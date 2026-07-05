@@ -1,0 +1,44 @@
+{
+  "artifact_id": 2,
+  "capability": "cv-imaging",
+  "decisions": [],
+  "description": "Rust bindings for OpenCV.",
+  "events": [
+    {
+      "artifact_id": 2,
+      "artifact_key": "opencv-rust",
+      "artifact_name": "opencv-rust",
+      "body": "Rust bindings for OpenCV",
+      "ecosystem": "crates",
+      "event_date": "2026-06-23T10:56:55.070597",
+      "event_type": "release",
+      "id": 49,
+      "matched_keywords": [
+        "opencv"
+      ],
+      "relevant": true,
+      "severity": "medium",
+      "summary": "Rust bindings for OpenCV",
+      "url": "https://crates.io/crates/opencv/0.99.0",
+      "version": "0.99.0"
+    }
+  ],
+  "homepage_url": "",
+  "key": "opencv-rust",
+  "name": "opencv-rust",
+  "refs": [
+    {
+      "ecosystem": "crates",
+      "last_checked_at": "2026-07-03T13:02:04.446669",
+      "last_release_at": "2026-06-23T10:56:55.070597",
+      "last_status": "ok",
+      "last_version": "0.99.0",
+      "ref": "opencv"
+    }
+  ],
+  "ring": "Use",
+  "status": "adopted",
+  "tracks": [
+    "Open-Source CV Tooling"
+  ]
+}

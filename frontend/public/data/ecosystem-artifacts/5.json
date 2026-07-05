@@ -1,0 +1,25 @@
+{
+  "artifact_id": 5,
+  "capability": "cv-imaging",
+  "decisions": [],
+  "description": "Pure-Rust image encoding, decoding and processing.",
+  "events": [],
+  "homepage_url": "",
+  "key": "image-rs",
+  "name": "image",
+  "refs": [
+    {
+      "ecosystem": "crates",
+      "last_checked_at": "2026-07-03T13:02:07.212323",
+      "last_release_at": "2026-03-10T16:29:18.250581",
+      "last_status": "ok",
+      "last_version": "0.25.10",
+      "ref": "image"
+    }
+  ],
+  "ring": "Use",
+  "status": "adopted",
+  "tracks": [
+    "Open-Source CV Tooling"
+  ]
+}

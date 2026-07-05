@@ -1,0 +1,43 @@
+{
+  "artifact_id": 13,
+  "capability": "ml-runtimes",
+  "decisions": [],
+  "description": "Minimalist ML framework for Rust.",
+  "events": [
+    {
+      "artifact_id": 13,
+      "artifact_key": "candle",
+      "artifact_name": "Candle",
+      "body": "Minimalist ML framework.",
+      "ecosystem": "crates",
+      "event_date": "2026-06-26T21:14:33.439715",
+      "event_type": "release",
+      "id": 55,
+      "matched_keywords": [],
+      "relevant": false,
+      "severity": "low",
+      "summary": "Minimalist ML framework.",
+      "url": "https://crates.io/crates/candle-core/0.11.0",
+      "version": "0.11.0"
+    }
+  ],
+  "homepage_url": "",
+  "key": "candle",
+  "name": "Candle",
+  "refs": [
+    {
+      "ecosystem": "crates",
+      "last_checked_at": "2026-07-03T13:02:15.192895",
+      "last_release_at": "2026-06-26T21:14:33.439715",
+      "last_status": "ok",
+      "last_version": "0.11.0",
+      "ref": "candle-core"
+    }
+  ],
+  "ring": "Watch",
+  "status": "watchlist",
+  "tracks": [
+    "Edge AI & Deployment",
+    "Vision Foundation Models"
+  ]
+}

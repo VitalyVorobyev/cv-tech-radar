@@ -1,0 +1,24 @@
+{
+  "abstract": "We introduce a new approach to high-fidelity 3D scene reconstruction from multi-view RGB images that tightly couples reconstruction with a strong generative 3D prior. We cast scene reconstruction as conditional 3D generation over a set of spatially-localized, overlapping chunks that together tile the scene, scaling generation to large scene extents. Crucially, we inherit the fidelity and completeness of state-of-the-art generative shape models -- we use Trellis.2 as an example -- which we generalize to the scene level. To this end, we propose a projection-based conditioning mechanism that lifts posed multi-view image features into a coherent 3D representation aligned with the generative model, independent of view ordering and spatially anchored to the scene, yielding high-fidelity, multi-view consistent generated geometry. This enables lifting the strong object-level prior of Trellis.2 to multi-view, scene-scale generation, producing faithful, editable PBR mesh reconstructions of indoor environments. As a result, we obtain high-fidelity results that outperform cutting-edge reconstruction methods by 16%.",
+  "decided_at": "2026-05-25T13:10:52.237838",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-25T13:10:52.237838",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2005,
+  "movement": null,
+  "published_at": "2026-05-22T17:49:59",
+  "reason": "Multi-view 3D scene reconstruction conditioned on a generative shape prior (Trellis.2). Interesting direction for indoor reconstruction but heavily tied to a specific generative backbone and indoor scenes; not aligned with our calibrated/industrial reconstruction needs today.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "GenRecon: Bridging Generative Priors for Multi-View 3D Scene Reconstruction",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.23888v1"
+}

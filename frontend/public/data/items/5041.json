@@ -1,0 +1,26 @@
+{
+  "abstract": "Vehicle license plate recognition is an integral component of intelligent transportation systems. In this work, we present an embedded real-time license plate recognition system customized for developing countries. We address the challenge of handling complex, unstructured traffic scenes with diverse vehicle types while implementing the system on an embedded platform for low-cost deployment. Our method consists of license plate detection on a multi-vehicle image, followed by character recognition on the detected license plates. Both steps use lightweight convolutional neural networks to balance accuracy and efficiency. We also introduce the SL-LPR dataset of Sri Lankan road images, which contains a variety of vehicle types and traffic conditions typically seen in developing countries. On this dataset, the license plate detection and character recognition models achieved 93.6% mAP and 87.88% accuracy, respectively, and were competitive against larger models on several public datasets. To achieve real-time performance in a resource-constrained embedded environment, we applied low-bitwidth quantization using the Brevitas library and implemented FPGA acceleration for the models using the FINN framework. The end-to-end system can operate at 11.5~FPS when implemented on the Xilinx Kria KV260 platform. These results demonstrate that our system is effective for real-time license plate recognition on an embedded device, even in complex traffic scenarios. The SL-LPR dataset is available for research use at: https://github.com/sl-lpr-uom/SL-LPR.git.",
+  "decided_at": "2026-06-29T13:33:32.579183",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-29T13:33:32.579183",
+      "ring": "Watch"
+    }
+  ],
+  "id": 5041,
+  "movement": null,
+  "published_at": "2026-06-26T06:58:56",
+  "reason": "Embedded real-time license-plate recognition on a Xilinx Kria KV260 via low-bitwidth quantization (Brevitas) + FPGA acceleration (FINN) at 11.5 FPS; the LPR/OCR task is off-radar but the Brevitas+FINN FPGA-quantization recipe is a concrete edge-deployment data point.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "An Embedded Real-Time License Plate Recognition System for Complex Traffic Scenes",
+  "track": "Edge AI & Deployment",
+  "tracks": [
+    "Edge AI & Deployment",
+    "Open-Source CV Tooling",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.27772v1"
+}

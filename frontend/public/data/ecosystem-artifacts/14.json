@@ -1,0 +1,33 @@
+{
+  "artifact_id": 14,
+  "capability": "ml-runtimes",
+  "decisions": [],
+  "description": "Deep learning framework for Rust.",
+  "events": [],
+  "homepage_url": "",
+  "key": "burn",
+  "name": "Burn",
+  "refs": [
+    {
+      "ecosystem": "crates",
+      "last_checked_at": "2026-07-03T13:02:16.222801",
+      "last_release_at": "2026-05-07T20:55:45.180247",
+      "last_status": "ok",
+      "last_version": "0.21.0",
+      "ref": "burn"
+    },
+    {
+      "ecosystem": "github",
+      "last_checked_at": "2026-07-03T13:02:15.613247",
+      "last_release_at": "2026-05-07T21:17:26",
+      "last_status": "ok",
+      "last_version": "v0.21.0",
+      "ref": "tracel-ai/burn"
+    }
+  ],
+  "ring": "Watch",
+  "status": "watchlist",
+  "tracks": [
+    "Edge AI & Deployment"
+  ]
+}

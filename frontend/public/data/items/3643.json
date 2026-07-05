@@ -1,0 +1,24 @@
+{
+  "abstract": "Remanufacturing large white goods is essential for a circular economy, yet visual quality assessment remains a manual bottleneck for training and pricing. Conventional detection methods require extensive annotation and struggle with small defects in high-resolution multi-view data. We present a multi-view framework based on Deformable-DETR for automated quality scoring that aggregates information across redundant views to extract fine-grained features. To enhance robustness with limited labels, we employ self-supervised pretraining followed by supervised fine-tuning on expert-annotated scores. Additionally, a linear projection over frozen feature maps identifies regions of interest to explain model decisions. Evaluated on an industrial multi-view dataset, our approach delivers precise quality assessments while reducing reliance on manual annotation and per-part customization, enabling scalable and transparent inspection for remanufacturing lines.",
+  "decided_at": "2026-06-15T13:10:54.723818",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-15T13:10:54.723818",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3643,
+  "movement": null,
+  "published_at": "2026-06-12T15:35:41",
+  "reason": "Multi-view Deformable-DETR for automated visual quality scoring on a real remanufacturing line \u2014 squarely industrial inspection (classifier missed that track) \u2014 but no code/data release and a single bespoke dataset.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Visual Quality Score Assessment of Large White Goods in Remanufacture with Multi-View Deformable-DETR",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.14556v1"
+}

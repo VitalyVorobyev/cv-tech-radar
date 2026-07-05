@@ -1,0 +1,24 @@
+{
+  "abstract": "Stereo matching has advanced through foundation models trained on large-scale datasets, yet this paradigm suffers from a scalability bottleneck: incorporating new data requires costly joint retraining. Model merging offers a scalable post-hoc alternative by integrating knowledge from specialized models after source checkpoints are available. However, existing merging methods typically retain all available models or rely on greedy inclusion, which can preserve harmful task-vector interference. We propose StereoFactory, a coarse-to-fine evolutionary framework for adaptive model merging. Stage~1 employs a genetic algorithm to search the combinatorial space of model subsets, determining which models should participate. Stage~2 addresses module-level knowledge specialization (different functional modules exhibit distinct preferences for knowledge sources) through CMA-ES optimization of architecture-adaptive routing over the selected task vectors, with optional module-level scaling. Experiments across two architectures and four benchmarks demonstrate that StereoFactory consistently achieves the best four-benchmark average under the same checkpoint pool, reducing the average error from 3.80 to 3.30 on NMRF and from 2.88 to 2.19 on FoundationStereo relative to the strongest controlled baseline. The post-hoc search requires only 2.7--3.7\\% of the corresponding joint-retraining wall-clock time. Analysis reveals that knowledge contributions are inherently module-specific, and selected subsets can transfer across architectures with minimal degradation. Code will be publicly released upon acceptance at: https://github.com/XiandaGuo/StereoFactory.",
+  "decided_at": "2026-06-17T13:10:07.440312",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-17T13:10:07.440312",
+      "ring": "Watch"
+    }
+  ],
+  "id": 4017,
+  "movement": null,
+  "published_at": "2026-06-16T03:36:59",
+  "reason": "Post-hoc checkpoint-merging (GA + CMA-ES) over stereo foundation models; cuts error on FoundationStereo/NMRF. On-core topic, but the contribution is a merging recipe, not a stereo method we'd adopt. Code on acceptance.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "StereoFactory: A Unified Merging Framework for Robust Stereo Matching",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.17475v1"
+}

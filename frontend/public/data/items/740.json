@@ -1,0 +1,31 @@
+{
+  "abstract": "Multi-camera multi-object tracking (MCMOT) faces significant challenges in maintaining consistent object identities across varying camera perspectives, particularly when precise calibration and extensive annotations are required. In this paper, we present CalibFree, a self-supervised representation learning framework that does not need any calibration or manual labeling for the MCMOT task. By promoting feature separation between view-agnostic and view-specific representations through single-view distillation and cross-view reconstruction, our method adapts to complex, dynamic scenarios with minimal overhead. Experiments on the MMP-MvMHAT dataset show a 3% improvement in overall accuracy and a 7.5% increase in the average F1 score over state-of-the-art approaches, confirming the effectiveness of our calibration-free design. Moreover, on the more diverse MvMHAT dataset, our approach demonstrates superior over-time tracking and strong cross-view performance, highlighting its adaptability to a wide range of camera configurations. Code will be publicly available upon acceptance.",
+  "decided_at": "2026-05-16T07:20:33.384555",
+  "decided_by": "web-curator",
+  "history": [
+    {
+      "at": "2026-05-12T10:48:51.455700",
+      "ring": "Prototype"
+    },
+    {
+      "at": "2026-05-16T07:20:33.384555",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 740,
+  "movement": null,
+  "published_at": "2026-05-10T01:04:12",
+  "reason": "Has code + clear test path \u2014 worth a spike",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "CalibFree: Self-Supervised View Feature Separation for Calibration-Free Multi-Camera Multi-Object Tracking",
+  "track": "Calibration & Camera Models",
+  "tracks": [
+    "Calibration & Camera Models",
+    "3D Geometry & Reconstruction",
+    "Object Tracking",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.09245v1"
+}

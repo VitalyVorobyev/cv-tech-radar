@@ -1,0 +1,25 @@
+{
+  "abstract": "We present StructSplat, a feed-forward and generalizable 3D Gaussian reconstruction framework that operates directly on uncalibrated images without requiring camera parameters. Existing methods either rely on per-scene optimization or assume known camera poses, and often entangle geometry and appearance within a unified backbone, limiting reconstruction fidelity and generalization. Our key idea is to adopt a structured representation that organizes geometry, semantic, and texture cues with explicit roles in the reconstruction process. Specifically, we introduce a pixel-aligned feature injection mechanism to enable accurate texture modeling from 2D observations, incorporate semantic-aware priors to improve global consistency, and design a camera alignment strategy to prevent information leakage and improve generalization. Experiments show that our method significantly outperforms prior approaches on challenging benchmarks. On DL3DV, our method achieves 28.045 PSNR, surpassing AnySplat (22.377) by +5.67 dB. In cross-dataset evaluation, our method achieves +1.94 dB over AnySplat on ACID and +1.72 dB on RealEstate10K. Project page: https://structsplat.github.io Code: https://github.com/J-C-Zhao/StructSplat",
+  "decided_at": "2026-06-29T13:33:32.590147",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-29T13:33:32.590147",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 4986,
+  "movement": "new",
+  "published_at": "2026-06-26T17:59:06",
+  "reason": "Feed-forward, generalizable 3D Gaussian Splatting from uncalibrated sparse views \u2014 no camera parameters, with an explicit camera-alignment strategy to prevent information leakage; +5.67 dB PSNR over AnySplat with released code. Pose-free reconstruction is directly relevant to calibration-free 3D.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "StructSplat: Generalizable 3D Gaussian Splatting from Uncalibrated Sparse Views",
+  "track": "Open-Source CV Tooling",
+  "tracks": [
+    "Open-Source CV Tooling",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.28321v1"
+}

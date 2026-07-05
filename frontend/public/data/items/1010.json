@@ -1,0 +1,24 @@
+{
+  "abstract": "Accurate and efficient battery detection is increasingly important for applications in electronic waste recycling, industrial quality control, and automated sorting systems. In this paper, we present both a comprehensive benchmark and a novel method for multi-class battery detection. We systematically compare three CNN-based detectors (YOLOv8n, YOLOv8s, YOLO11n) and two transformer-based detectors (RT-DETR-L, RT-DETR-X) on a publicly available dataset of approximately 8,591 annotated images under identical experimental conditions, and further propose PaQ-RT-DETR, which introduces pattern-based dynamic query generation into RT-DETR to alleviate query activation imbalance with negligible computational overhead. Among baselines, YOLO11n achieves the best CNN-based accuracy (mAP@50: 0.779) at only 2.6M parameters, while YOLOv8n delivers the fastest inference at ~1,667 FPS. PaQ-RT-DETR-X achieves the highest overall mAP@50 of 0.782, surpassing RT-DETR-X by +2.8% with consistent per-class gains across all six battery categories including the data-scarce Bike Battery class. Our findings provide practical guidance for selecting object detection models in battery-related industrial applications.",
+  "decided_at": "2026-05-14T07:24:28.541203",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-14T07:24:28.541203",
+      "ring": "Watch"
+    }
+  ],
+  "id": 1010,
+  "movement": null,
+  "published_at": "2026-05-13T15:29:52",
+  "reason": "Real industrial QC use case \u2014 battery sorting/recycling \u2014 with side-by-side YOLOv8/YOLO11/RT-DETR numbers on ~8.5k images. Architectural contribution (pattern-based dynamic queries on RT-DETR) is minor; the benchmark snapshot is the usable artifact.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Pattern-Enhanced RT-DETR for Multi-Class Battery Detection",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.13670v1"
+}

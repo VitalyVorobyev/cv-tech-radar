@@ -1,0 +1,3119 @@
+{
+  "counts": {
+    "Evaluate": 33,
+    "Ignore": 0,
+    "Prototype": 3,
+    "Use": 3,
+    "Watch": 133
+  },
+  "decided_since": null,
+  "include_ignore": false,
+  "rings": {
+    "Evaluate": [
+      {
+        "action": "Read PDF; watch for a code release before considering a prototype.",
+        "decided_at": "2026-07-02T13:13:10.349091",
+        "decided_by": "claude-curator",
+        "item_id": 5372,
+        "llm_judgment": null,
+        "movement": "new",
+        "reason": "Homography decomposition + pose-graph spectral filtering for planar-scene pose recovery \u2014 squarely calibration/3D-geometry, relevant to planar-target and multi-view calibration. Concrete method with IMC-Phototourism results.",
+        "ring": "Evaluate",
+        "score": 52.04,
+        "title": "Planar-SfM: Camera Pose Estimation via Homography Graph Embeddings",
+        "tracks": [
+          "Calibration & Camera Models",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.31979v1"
+      },
+      {
+        "action": "Read PDF; compare the uncalibrated/pose-free reconstruction quality and camera-alignment strategy against our calibration-dependent pipeline.",
+        "decided_at": "2026-06-29T13:33:32.590147",
+        "decided_by": "claude-curator",
+        "item_id": 4986,
+        "llm_judgment": null,
+        "movement": "new",
+        "reason": "Feed-forward, generalizable 3D Gaussian Splatting from uncalibrated sparse views \u2014 no camera parameters, with an explicit camera-alignment strategy to prevent information leakage; +5.67 dB PSNR over AnySplat with released code. Pose-free reconstruction is directly relevant to calibration-free 3D.",
+        "ring": "Evaluate",
+        "score": 23.3,
+        "title": "StructSplat: Generalizable 3D Gaussian Splatting from Uncalibrated Sparse Views",
+        "tracks": [
+          "Open-Source CV Tooling",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.28321v1"
+      },
+      {
+        "action": "Read PDF; compare against our 3D defect-inspection baselines.",
+        "decided_at": "2026-06-25T13:24:28.121436",
+        "decided_by": "claude-curator",
+        "item_id": 4838,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Zero-shot 3D anomaly detection fusing color+geometry, SOTA on MVTec3D-AD/Eyecandies, open code. Squarely industrial 3D inspection; worth a read/compare.",
+        "ring": "Evaluate",
+        "score": 40.94,
+        "title": "CoGeoAD: Hierarchical Color-Geometric Fusion with Multi-View Attention for Zero-Shot 3D Anomaly Detection",
+        "tracks": [
+          "Industrial Vision Inspection",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.25273v1"
+      },
+      {
+        "action": "Read PDF/code; evaluate LAS2 for edge stereo-depth on our hardware.",
+        "decided_at": "2026-06-25T13:24:27.875177",
+        "decided_by": "claude-curator",
+        "item_id": 4658,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Ultra-fast zero-shot stereo matching tuned for real inference latency; runs on Jetson Orin, beats Fast-FoundationStereo, project page + code. Directly relevant to edge depth sensing / 3D; one of the week's strongest practical items.",
+        "ring": "Evaluate",
+        "score": 27.8,
+        "title": "Lite Any Stereo V2: Faster and Stronger Efficient Zero-Shot Stereo Matching",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Edge AI & Deployment",
+          "3D Sensors"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.24457v1"
+      },
+      {
+        "action": "Read PDF; benchmark REDI-Match vs RoMa for our matching/SfM pipelines.",
+        "decided_at": "2026-06-25T13:24:27.874620",
+        "decided_by": "claude-curator",
+        "item_id": 4674,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Rotation-equivariant distillation of a VFM into a lightweight equivariant dense matcher; 1.9x faster than RoMa v2 at ~41 FPS, open code, strong pose accuracy under in-plane rotation. A practical correspondence tool for SfM/pose; the classifier under-scored it on keywords.",
+        "ring": "Evaluate",
+        "score": 28.1,
+        "title": "REDI-Match: Rotation-Equivariant Distillation for Efficient and Robust Dense Matching",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Edge AI & Deployment"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.24330v1"
+      },
+      {
+        "action": "Read PDF; track MASt3R-SfM robustness techniques for our SfM/calibration work.",
+        "decided_at": "2026-06-23T13:14:23.943113",
+        "decided_by": "claude-curator",
+        "item_id": 4384,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Graph-based view pruning + multi-stage optimization to make MASt3R-SfM robust to bad correspondences; ETH3D SOTA on pose + reconstruction. No code yet and incremental, but the learned-SfM/MASt3R line is core to calibration-free 3D.",
+        "ring": "Evaluate",
+        "score": 53.14,
+        "title": "G-MASt3R-SfM: Graph-based View Pruning and Multi-stage Optimization for Robust SfM",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Calibration & Camera Models"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.22856v1"
+      },
+      {
+        "action": "Skim repo + datasets; assess as a synthetic-data/SLAM eval harness.",
+        "decided_at": "2026-06-23T13:14:23.941482",
+        "decided_by": "claude-curator",
+        "item_id": 4395,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Open-source UE5/AirSim simulator + data pipeline for heterogeneous multi-robot SLAM/perception; ROS2, physics-based LWIR, km-scale SLAM benchmark, released code+datasets. Heavy UE5 dependency and field/AV framing, but a concrete simulation tool.",
+        "ring": "Evaluate",
+        "score": 71.68,
+        "title": "HERCULES: An Open-Source Simulation Framework for Heterogeneous Multi-Robot SLAM, Collaborative Perception, and Exploration",
+        "tracks": [
+          "Synthetic Data & Simulation",
+          "Robotics Vision",
+          "Open-Source CV Tooling"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.22756v1"
+      },
+      {
+        "action": "Read PDF; note the geometry-preservation trick; compare against prior 3DGS targetless LiDAR-camera calibration; check for released code.",
+        "decided_at": "2026-06-19T13:07:24.465285",
+        "decided_by": "claude-curator",
+        "item_id": 4110,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Targetless LiDAR-camera extrinsic calibration that preserves the metric geometry of a 3DGS proxy (LiDAR depth supervision + blocking photometric gradients on the Gaussian spatial params); a concrete method in a core track that beats prior targetless methods on driving data.",
+        "ring": "Evaluate",
+        "score": 44.54,
+        "title": "Geometry-Preserving in 3D Gaussian Splatting for LiDAR-Camera Extrinsic Calibration",
+        "tracks": [
+          "Calibration & Camera Models",
+          "3D Sensors",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.20103v1"
+      },
+      {
+        "action": "Read PDF; assess the fringe-projection-on-silicone calibration approach for our structured-light / reflective-surface measurement work.",
+        "decided_at": "2026-06-17T13:10:07.448436",
+        "decided_by": "claude-curator",
+        "item_id": 4021,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Digital fringe-projection (structured-light) contact 3D metrology for reflective/transparent surfaces, with calibration over larger areas and triangulation accuracy benchmarked against GelSight. Squarely on the 3D-sensors / industrial-metrology core, yet ranked last (no code, low relevance) \u2014 a false negative the scoring under-ranks.",
+        "ring": "Evaluate",
+        "score": 24.3,
+        "title": "Contact-Based Fringe Projection Profilometry for High-Resolution 3-D Surface Measurement of Reflective and Transparent Objects",
+        "tracks": [
+          "3D Sensors",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.17438v1"
+      },
+      {
+        "action": "read PDF; assess whether the dataset + reference poses/point clouds can serve as an eval benchmark for 3D-reconstruction and pose accuracy on industrial parts.",
+        "decided_at": "2026-06-16T13:07:34.410280",
+        "decided_by": "claude-curator",
+        "item_id": 3739,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "MVM-IOD \u2014 industrial machine-vision metrology dataset (robot-arm hemisphere capture) with reference camera poses and 3D point clouds, benchmarking SfM/MVS/VGGT/pi3/2DGS on realistic industrial objects; finds feed-forward methods go out-of-distribution on industrial captures. Squarely on the calibration/3D/industrial-metrology core and usable as an internal evaluation benchmark.",
+        "ring": "Evaluate",
+        "score": 62.38,
+        "title": "MVM-IOD: An Industrial Object-Centric Benchmark Dataset for the Evaluation of 3D Reconstruction Methods",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Industrial Vision Inspection",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.16638v1"
+      },
+      {
+        "action": "read PDF; compare extrinsic/intrinsic accuracy vs GeoCalib and classical pattern-based stereo calibration.",
+        "decided_at": "2026-06-15T13:10:54.717071",
+        "decided_by": "claude-curator",
+        "item_id": 3638,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Deep end-to-end stereo calibration (focal, gravity, relative extrinsics) extending GeoCalib with a differentiable optimizer; partial dataset public. Calibration is the top track; deep pattern-free methods usually trail classical accuracy, so read with that lens.",
+        "ring": "Evaluate",
+        "score": 45.74,
+        "title": "StereoGeo: an end-to-end stereo camera calibration method",
+        "tracks": [
+          "Calibration & Camera Models"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.14619v1"
+      },
+      {
+        "action": "read PDF; assess reconstruction + pose accuracy on real bin-picking vs learned-depth baselines; note SAM3+SfM init cost.",
+        "decided_at": "2026-06-15T13:10:54.714514",
+        "decided_by": "claude-curator",
+        "item_id": 3648,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Monocular 3D reconstruction + per-instance 6D pose for bin-picking by inverting Gaussian splatting (multiple instances as implicit multi-view); true geometry, not learned-depth hallucination. Directly on a priority robot-guidance use case.",
+        "ring": "Evaluate",
+        "score": 53.1,
+        "title": "MooMIns -- Monocular 3D Reconstruction and Object Pose Estimation from Multiple Instances",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Robot Guidance"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.14389v1"
+      },
+      {
+        "action": "read PDF; extract per-sensor accuracy on hard surface types for sensor-selection notes",
+        "decided_at": "2026-06-12T13:04:19.755015",
+        "decided_by": "codex",
+        "item_id": 3587,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Direct accuracy benchmark of 4 commercial depth sensors (RealSense D405, PMD Flexx2, ZED 2i, Zivid 2M+) on specular/homogeneous/subsurface surfaces with stylus references \u2014 exactly the kind of practical 3D-sensor evidence the radar tracks; medical framing is incidental.",
+        "ring": "Evaluate",
+        "score": 31.15,
+        "title": "Comparing Commercial Depth Sensor Accuracy for Medical Applications",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "3D Sensors",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.13028v1"
+      },
+      {
+        "action": "read PDF; assess assignment-uncertainty trigger + benchmark numbers vs base trackers",
+        "decided_at": "2026-06-12T13:04:19.520608",
+        "decided_by": "codex",
+        "item_id": 3584,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Selective mask propagation dispatches a base MOT tracker to an expensive VOS model only on uncertain windows \u2014 a practical compute/accuracy tradeoff for multi-object tracking, a priority track.",
+        "ring": "Evaluate",
+        "score": 50.94,
+        "title": "SAM-Deep-EIoU: Selective Mask Propagation for Multi-Object Tracking",
+        "tracks": [
+          "Object Tracking",
+          "Vision Foundation Models",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.13033v1"
+      },
+      {
+        "action": "Read PDF; compare BA-style latent refinement against classic two-view BA and the VGGT/DUSt3R lineage; watch github.com/zhangganlin/BA-T for the release.",
+        "decided_at": "2026-06-03T13:41:37.645151",
+        "decided_by": "claude-curator",
+        "item_id": 2697,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Iterative Transformer that injects classical bundle-adjustment structure into feed-forward two-view 3D reconstruction, matching larger models at 16% decoder params. Squarely in the calibration/SfM lane; code promised (not yet released). Scoring under-rated it (relevance 47).",
+        "ring": "Evaluate",
+        "score": 40.24,
+        "title": "BA-T: An Iterative Transformer for Two-View Bundle Adjustment",
+        "tracks": [
+          "Calibration & Camera Models",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.03287v1"
+      },
+      {
+        "action": "Read PDF; compare against VGGT/MoGe and check for released weights.",
+        "decided_at": "2026-05-29T13:08:05.190550",
+        "decided_by": "claude-curator",
+        "item_id": 2492,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Feed-forward foundation model for dense, temporally-consistent video geometry (depth, point maps, surface normals) \u2014 DUSt3R/VGGT lineage, directly relevant to 3D reconstruction. Scoring under-rated it (relevance 26).",
+        "ring": "Evaluate",
+        "score": 26.3,
+        "title": "Towards Consistent Video Geometry Estimation",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Vision Foundation Models"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.30060v1"
+      },
+      {
+        "action": "Read PDF; check whether SFPN code is released and if it runs on our edge target.",
+        "decided_at": "2026-05-29T13:08:05.186795",
+        "decided_by": "claude-curator",
+        "item_id": 2556,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Lightweight online 3D instance segmentation for no-GPU edge with concrete numbers \u2014 3x faster, 2x smaller than ESAM. Core edge+3D fit; scoring under-rated it (relevance 28).",
+        "ring": "Evaluate",
+        "score": 28.9,
+        "title": "ESAM++: Efficient Online 3D Perception on the Edge",
+        "tracks": [
+          "Edge AI & Deployment",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.29505v1"
+      },
+      {
+        "action": "read paper; compare MeDS robustness vs. our current AD baseline on a contaminated set",
+        "decided_at": "2026-05-27T13:22:57.152597",
+        "decided_by": "claude-curator",
+        "item_id": 2251,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Robust industrial anomaly-detection method under contaminated training data \u2014 MVTecAD/VisA/Real-IAD, 99.16% AUROC at 40% noise. Directly on-radar for industrial inspection.",
+        "ring": "Evaluate",
+        "score": 35.2,
+        "title": "Memory-Distilled Selection for Noise-Robust Anomaly Detection",
+        "tracks": [
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.26676v1"
+      },
+      {
+        "action": "Skim the PDF and inspect github.com/colmap/gluemap for API + dependency footprint.",
+        "decided_at": "2026-05-26T13:10:02.549157",
+        "decided_by": "claude-curator",
+        "item_id": 2056,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "COLMAP-team release (gluemap) combining classical SfM with feedforward 3D \u2014 directly relevant to our reconstruction track and has open-source code under the COLMAP org.",
+        "ring": "Evaluate",
+        "score": 58.7,
+        "title": "Global Structure-from-Motion Meets Feedforward Reconstruction",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Open-Source CV Tooling"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.26103v1"
+      },
+      {
+        "action": "Read PDF; compare the support-map approach against the existing CMRNext baseline; note in calibration track if the support-map idea is reusable.",
+        "decided_at": "2026-05-25T13:10:52.236925",
+        "decided_by": "claude-curator",
+        "item_id": 2030,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Targetless online LiDAR-camera calibration with a dense support map that weights cross-modal agreement; directly on the Calibration & Camera Models track. Agricultural setting is incidental \u2014 the technique generalizes. Translation gains modest, rotation gains \"limited\" per their own evaluation.",
+        "ring": "Evaluate",
+        "score": 29.14,
+        "title": "Calibration-Informative Region Selection for Online LiDAR--Camera Calibration in Agricultural Environments",
+        "tracks": [
+          "Calibration & Camera Models",
+          "3D Sensors",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.23580v1"
+      },
+      {
+        "action": "Read PDF; capture the per-dataset numbers in track notes for the Industrial Vision Inspection track.",
+        "decided_at": "2026-05-25T13:10:52.235477",
+        "decided_by": "claude-curator",
+        "item_id": 2042,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Direct empirical comparison of DINOv3 vs ImageNet pretraining for industrial defect inspection across RGB and X-ray \u2014 concrete answer to a real backbone choice for inspection systems. Finding (DINOv3 helps RGB on full finetune, ImageNet still wins for X-ray) is actionable.",
+        "ring": "Evaluate",
+        "score": 30.9,
+        "title": "Rethinking Transfer Learning for Industrial Inspection: DINOv3 vs. ImageNet Pretraining Across RGB and X-ray Tasks",
+        "tracks": [
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.23472v1"
+      },
+      {
+        "action": "Read PDF; check whether uncertainty signal is calibrated enough to gate downstream geometry decisions (e.g., dropping unreliable pointmap regions before pose solve).",
+        "decided_at": "2026-05-20T17:55:24.953563",
+        "decided_by": "claude-curator",
+        "item_id": 1428,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Evidential uncertainty head bolted onto feed-forward 3D reconstruction (MASt3R-style). Reports +25%/+41% AURC/AUSE on ScanNet++ with closed-form per-point Student-t. Uncertainty on geometric foundation models is a real gap for industrial 3D use. Code released.",
+        "ring": "Evaluate",
+        "score": 35.1,
+        "title": "Trust It or Not: Evidential Uncertainty for Feed-Forward 3D Reconstruction with Trust3R",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.19539v1"
+      },
+      {
+        "action": "Read PDF; check github.com/hito2448/Res2CLIP and compare against MVTec/VisA baselines.",
+        "decided_at": "2026-05-18T14:12:49.811042",
+        "decided_by": "claude-curator",
+        "item_id": 1312,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Few-shot generalist anomaly detection in a core radar track, with public code. Residual-space alignment is incremental novelty in a crowded CLIP-AD field, so read before committing prototype effort.",
+        "ring": "Evaluate",
+        "score": 39.14,
+        "title": "Res$^2$CLIP: Few-Shot Generalist Anomaly Detection with Residual-to-Residual Alignment",
+        "tracks": [
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.16171v1"
+      },
+      {
+        "action": "read PDF; assess whether the perspective-field prior is useful as an initializer for target-based calibration. Watch for code/dataset release.",
+        "decided_at": "2026-05-16T07:34:57.439485",
+        "decided_by": "claude-curator",
+        "item_id": 1234,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Learning-based multi-view camera calibration (N>=1 views) predicting dense perspective fields, then geometric optimization for intrinsics + gravity. In-the-wild rather than target-based, but intrinsic estimation is a core track and the cross-view-consistency angle is worth comparing.",
+        "ring": "Evaluate",
+        "score": 37.74,
+        "title": "CalibAnyView: Beyond Single-View Camera Calibration in the Wild",
+        "tracks": [
+          "Calibration & Camera Models",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.14615v1"
+      },
+      {
+        "action": "read PDF; compare the DINOv3 + memory-bank pipeline against current MVTec AD 2 baselines.",
+        "decided_at": "2026-05-16T07:34:57.438426",
+        "decided_by": "claude-curator",
+        "item_id": 1201,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Training-free, class-agnostic anomaly segmentation on MVTec AD 2 (CVPR 2026 VAND 4.0 challenge entry). DINOv3 backbone, one shared config across all classes, code released, concrete F1 numbers \u2014 directly on-topic for inspection and explicitly targets robustness to acquisition drift.",
+        "ring": "Evaluate",
+        "score": 39.4,
+        "title": "SuperADD: Training-free Class-agnostic Anomaly Segmentation -- CVPR 2026 VAND 4.0 Workshop Challenge Industrial Track",
+        "tracks": [
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.14808v1"
+      },
+      {
+        "action": "",
+        "decided_at": "2026-05-16T07:20:33.384555",
+        "decided_by": "web-curator",
+        "item_id": 740,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Has code + clear test path \u2014 worth a spike",
+        "ring": "Evaluate",
+        "score": 46.3,
+        "title": "CalibFree: Self-Supervised View Feature Separation for Calibration-Free Multi-Camera Multi-Object Tracking",
+        "tracks": [
+          "Calibration & Camera Models",
+          "3D Geometry & Reconstruction",
+          "Object Tracking",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.09245v1"
+      },
+      {
+        "action": "Read PDF; check Lite3R repo for FP8 QAT recipe and confirm reproducibility before any prototype.",
+        "decided_at": "2026-05-13T06:09:13.589227",
+        "decided_by": "claude-curator",
+        "item_id": 961,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "FP8 QAT + sparse linear attention applied to VGGT/DA3 feed-forward 3D pipelines, 1.7\u20132x latency, 1.9\u20132.4x memory; concrete edge deployment angle for 3D foundation models.",
+        "ring": "Evaluate",
+        "score": 49.7,
+        "title": "Lite3R: A Model-Agnostic Framework for Efficient Feed-Forward 3D Reconstruction",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Edge AI & Deployment"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.11354v1"
+      },
+      {
+        "action": "Read the MicroFlow extension and the latency / memory-footprint figures.",
+        "decided_at": "2026-05-12T19:04:17.257824",
+        "decided_by": "claude-curator",
+        "item_id": 595,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "TinyML segmentation on ESP32 via a Rust compiler-based engine; concrete edge-deployment numbers worth a read.",
+        "ring": "Evaluate",
+        "score": 41.8,
+        "title": "Nano-U: Efficient Terrain Segmentation for Tiny Robot Navigation",
+        "tracks": [
+          "Edge AI & Deployment",
+          "Robotics Vision"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.10210v1"
+      },
+      {
+        "action": "Read the benchmark section; note SOTA numbers on reflective surfaces.",
+        "decided_at": "2026-05-12T19:04:17.255828",
+        "decided_by": "claude-curator",
+        "item_id": 596,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Large benchmark for reflective/transparent/low-texture 3D reconstruction; directly relevant to industrial part inspection.",
+        "ring": "Evaluate",
+        "score": 52.04,
+        "title": "3DReflecNet: A Large-Scale Dataset for 3D Reconstruction of Reflective, Transparent, and Low-Texture Objects",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.10204v1"
+      },
+      {
+        "action": "Bookmark MMVIAD; revisit when next inspection prototype starts.",
+        "decided_at": "2026-05-12T19:04:17.255278",
+        "decided_by": "claude-curator",
+        "item_id": 518,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Continuous multi-view video anomaly dataset with released code; usable as an inspection benchmark.",
+        "ring": "Evaluate",
+        "score": 56.28,
+        "title": "MMVIAD: Multi-view Multi-task Video Understanding for Industrial Anomaly Detection",
+        "tracks": [
+          "Industrial Vision Inspection",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.10833v1"
+      },
+      {
+        "action": "Skim the heatmap + PnP-RANSAC pipeline and the RGB-D fusion ablation.",
+        "decided_at": "2026-05-12T19:04:08.101996",
+        "decided_by": "claude-curator",
+        "item_id": 16,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "6D pose with RGB-D and released code; LINEMOD is the canonical industrial pose benchmark.",
+        "ring": "Evaluate",
+        "score": 36.94,
+        "title": "6D Pose Estimation via Keypoint Heatmap Regression with RGB-D Residual Neural Networks",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "3D Sensors"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.08059v1"
+      },
+      {
+        "action": "compare against current pipeline",
+        "decided_at": "2026-05-12T10:48:51.456124",
+        "decided_by": "seed-script",
+        "item_id": 323,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Implementation-worthy but needs benchmark check",
+        "ring": "Evaluate",
+        "score": 47.5,
+        "title": "egenioussBench: A New Dataset for Geospatial Visual Localisation",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Open-Source CV Tooling",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.05351v1"
+      },
+      {
+        "action": "compare against current pipeline",
+        "decided_at": "2026-05-12T10:48:51.455861",
+        "decided_by": "seed-script",
+        "item_id": 496,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Implementation-worthy but needs benchmark check",
+        "ring": "Evaluate",
+        "score": 50.9,
+        "title": "Mix3R: Mixing Feed-forward Reconstruction and Generative 3D Priors for Joint Multi-view Aligned 3D Reconstruction and Pose Estimation",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Open-Source CV Tooling"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.03359v1"
+      }
+    ],
+    "Ignore": [],
+    "Prototype": [
+      {
+        "action": "Clone github.com/danini/rolling_shutter_made_practical; benchmark the 7-AC RS solver against our 5-point baseline on a rolling-shutter rig.",
+        "decided_at": "2026-06-29T13:33:32.330655",
+        "decided_by": "claude-curator",
+        "item_id": 4920,
+        "llm_judgment": null,
+        "movement": "new",
+        "reason": "Novel RS-aware relative-pose solver from only 7 affine correspondences (RS unknowns eliminated via null-space projection, degree-20 system via action matrices, 1.2 ms); released code, best pose/RS accuracy on TUM RS and matches the 5-point algorithm in the global-shutter limit. Squarely in the calibration / epipolar-geometry core.",
+        "ring": "Prototype",
+        "score": 54.98,
+        "title": "Rolling Shutter Relative Pose Estimation Made Practical",
+        "tracks": [
+          "Calibration & Camera Models",
+          "3D Geometry & Reconstruction",
+          "Open-Source CV Tooling",
+          "Sensors, Cameras & Standards",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.26863v1"
+      },
+      {
+        "action": "Export a YOLO26 scale to ONNX/TensorRT and benchmark accuracy-latency on our edge target; evaluate the NMS-free head for deployment simplification.",
+        "decided_at": "2026-06-03T13:41:37.653472",
+        "decided_by": "claude-curator",
+        "item_id": 2648,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "New Ultralytics YOLO26 family \u2014 NMS-free end-to-end detection (dual-head, DFL removed), 40.9-57.5 mAP COCO at 1.7-11.8 ms T4 TensorRT, code and models released. Most actionable item in the queue with a clear edge-deployment test path; keyword scoring badly under-rated it (relevance 22).",
+        "ring": "Prototype",
+        "score": 28.1,
+        "title": "Ultralytics YOLO26: Unified Real-Time End-to-End Vision Models",
+        "tracks": [
+          "Edge AI & Deployment",
+          "Open-Source CV Tooling"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.03748v1"
+      },
+      {
+        "action": "schedule a 1-day prototype",
+        "decided_at": "2026-05-12T10:48:51.455615",
+        "decided_by": "seed-script",
+        "item_id": 152,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Has code + clear test path \u2014 worth a spike",
+        "ring": "Prototype",
+        "score": 55.32,
+        "title": "Real-IAD MVN: A Multi-View Normal Vector Dataset and Benchmark for High-Fidelity Industrial Anomaly Detection",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Industrial Vision Inspection",
+          "Vision Foundation Models",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.07149v1"
+      }
+    ],
+    "Use": [
+      {
+        "action": "Keep as the default NLLS engine; revisit only if a Rust-native solver matches Ceres on a real BA workload.",
+        "decided_at": "2026-05-15T14:20:10.842565",
+        "decided_by": "claude-curator",
+        "item_id": 1135,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "De-facto non-linear least-squares engine for bundle adjustment, hand-eye, and calibration refinement. Production-grade with autodiff and robust losses.",
+        "ring": "Use",
+        "score": 65.4,
+        "title": "Ceres Solver",
+        "tracks": [
+          "Calibration & Camera Models",
+          "3D Geometry & Reconstruction",
+          "Robotics Vision",
+          "Robot Guidance",
+          "Open-Source CV Tooling"
+        ],
+        "uncertain": false,
+        "url": "http://ceres-solver.org/"
+      },
+      {
+        "action": "Keep as the canonical baseline; only override per-module when a domain-specific tool wins on a concrete bench.",
+        "decided_at": "2026-05-15T14:20:10.841451",
+        "decided_by": "claude-curator",
+        "item_id": 1133,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Mature, ubiquitous baseline for calibration, fiducials, stereo, and tracking. Already a hard dependency of every pipeline we ship.",
+        "ring": "Use",
+        "score": 68.5,
+        "title": "OpenCV",
+        "tracks": [
+          "Calibration & Camera Models",
+          "Target Detection & Fiducials",
+          "3D Geometry & Reconstruction",
+          "Object Tracking",
+          "Industrial Vision Inspection",
+          "Open-Source CV Tooling"
+        ],
+        "uncertain": false,
+        "url": "https://opencv.org/"
+      },
+      {
+        "action": "Keep as default calibration target alongside checkerboard; revisit if a new variant supersedes it.",
+        "decided_at": "2026-05-14T07:38:13.921827",
+        "decided_by": "curator",
+        "item_id": 1134,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Calibration target with subpixel-accurate corner detection plus a position code per cell \u2014 handles partial-view and partially-occluded boards while staying compatible with checkerboard pipelines. In Use as a practical alternative to plain checkerboards / ChArUco for camera calibration.",
+        "ring": "Use",
+        "score": 55.14,
+        "title": "PuzzleBoard: A New Camera Calibration Pattern with Position Encoding",
+        "tracks": [
+          "Target Detection & Fiducials",
+          "Calibration & Camera Models"
+        ],
+        "uncertain": false,
+        "url": "https://arxiv.org/abs/2409.20127v1"
+      }
+    ],
+    "Watch": [
+      {
+        "action": "Watch; note the geometric formulation, re-check for a code drop.",
+        "decided_at": "2026-07-02T13:13:10.362699",
+        "decided_by": "claude-curator",
+        "item_id": 5397,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Uses rolling-shutter distortion as signal to recover 3D sphere velocity via back-projection, with a robust detectable spherical pattern \u2014 genuine camera-model/sensor-geometry work, niche but on-topic. No code; low relevance score but real domain fit.",
+        "ring": "Watch",
+        "score": 27.84,
+        "title": "Estimating Velocity of Spheres from Rolling-Shutter Image(s)",
+        "tracks": [
+          "Calibration & Camera Models",
+          "Sensors, Cameras & Standards"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.31760v1"
+      },
+      {
+        "action": "Bookmark the Awesome-Panoramic-Scene-Analysis repo as a distortion-aware-geometry reference.",
+        "decided_at": "2026-06-29T13:33:32.592027",
+        "decided_by": "claude-curator",
+        "item_id": 5044,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Survey + curated 'Awesome' repo on panoramic/spherical scene analysis, from distortion-aware engineering to sphere-native foundation models; useful reference for distortion-aware panoramic geometry.",
+        "ring": "Watch",
+        "score": 20.85,
+        "title": "Panoramic Scene Analysis: A Survey from Distortion-Aware Engineering to Sphere-Native Foundation Modeling",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Vision Foundation Models",
+          "Open-Source CV Tooling"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.27745v1"
+      },
+      {
+        "action": "Track BNN LiDAR localization; relevant to edge 3D sensing.",
+        "decided_at": "2026-06-29T13:33:32.590699",
+        "decided_by": "claude-curator",
+        "item_id": 5046,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "First binary-neural-network framework for 6-DoF LiDAR localization with an information-bottleneck auxiliary objective; relevant to edge 3D-sensing compute budgets, though AD-flavored and no code.",
+        "ring": "Watch",
+        "score": 23.2,
+        "title": "Learning 1-Bit LiDAR-based Localization with Auxiliary Objective",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "3D Sensors"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.27729v1"
+      },
+      {
+        "action": "Skim the differentiable meta-optic co-design; relevant to computational-imaging sensor front-ends.",
+        "decided_at": "2026-06-29T13:33:32.588982",
+        "decided_by": "claude-curator",
+        "item_id": 5059,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Differentiable co-design of a meta-optic front-end for frozen recognition models (adjoint-gradient Maxwell simulation, no learned ISP), improving zero-shot accuracy under compact optics; a novel computational-imaging/optics direction relevant to sensor/camera front-ends, though tied to frozen VLMs.",
+        "ring": "Watch",
+        "score": 23.85,
+        "title": "VLM-Aware Meta-Optic Front-End Design for Frozen Vision-Language Models",
+        "tracks": [
+          "Industrial Vision Inspection",
+          "Vision Foundation Models",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.27646v1"
+      },
+      {
+        "action": "Skim for the Brevitas/FINN FPGA-quantization workflow; relevant to edge AI deployment.",
+        "decided_at": "2026-06-29T13:33:32.579183",
+        "decided_by": "claude-curator",
+        "item_id": 5041,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Embedded real-time license-plate recognition on a Xilinx Kria KV260 via low-bitwidth quantization (Brevitas) + FPGA acceleration (FINN) at 11.5 FPS; the LPR/OCR task is off-radar but the Brevitas+FINN FPGA-quantization recipe is a concrete edge-deployment data point.",
+        "ring": "Watch",
+        "score": 36.9,
+        "title": "An Embedded Real-Time License Plate Recognition System for Complex Traffic Scenes",
+        "tracks": [
+          "Edge AI & Deployment",
+          "Open-Source CV Tooling",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.27772v1"
+      },
+      {
+        "action": "Track prompt-free open-vocab anomaly recognition; relevant to industrial inspection + edge.",
+        "decided_at": "2026-06-29T13:33:32.342436",
+        "decided_by": "claude-curator",
+        "item_id": 4924,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Prompt-free open-vocabulary anomaly/object recognition, real-time on a robot workspace, beating YOLO-World-v2/OWLv2/YOLOE; touches industrial-inspection anomaly detection + edge, though tabletop-robot framed.",
+        "ring": "Watch",
+        "score": 23.6,
+        "title": "Identifying the Unknown: Prompt-Free Open Vocabulary Anomaly Recognition for Robot-Object Interaction",
+        "tracks": [
+          "Industrial Vision Inspection",
+          "Edge AI & Deployment",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.26829v1"
+      },
+      {
+        "action": "Track SfM-free sparse-view reconstruction.",
+        "decided_at": "2026-06-29T13:33:32.341291",
+        "decided_by": "claude-curator",
+        "item_id": 4898,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "SfM-free 3D reconstruction from sparse panoramas (feed-forward pose/depth + geometry-conditioned diffusion + depth-guided 3DGS) for rotation-dominant weak-parallax regimes where SfM/SLAM fails to initialize; relevant to pose-free reconstruction.",
+        "ring": "Watch",
+        "score": 24.3,
+        "title": "PanoImager: Geometry-Guided Novel View Synthesis and Reconstruction from Sparse Panoramic Views",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Robotics Vision"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.27071v1"
+      },
+      {
+        "action": "Track mmWave-radar point-cloud densification.",
+        "decided_at": "2026-06-29T13:33:32.340906",
+        "decided_by": "claude-curator",
+        "item_id": 4937,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Vision-radar fusion to densify sparse, noisy mmWave-radar point clouds with image semantic priors; relevant to radar 3D sensing, no code released.",
+        "ring": "Watch",
+        "score": 24.5,
+        "title": "Depth-Semantic Alignment and Affinity-Guided Fusion for Structured Radar Point Cloud Generation",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Object Tracking",
+          "Vision Foundation Models"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.26743v1"
+      },
+      {
+        "action": "Track semantic-3D-model-based 6DoF localization.",
+        "decided_at": "2026-06-29T13:33:32.336821",
+        "decided_by": "claude-curator",
+        "item_id": 5086,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Aerial 6DoF localization via semantic-surface registration of foundation-model priors against LoD city models, plus a cm-accurate UAV benchmark; relevant to pose estimation/localization but aerial-specific.",
+        "ring": "Watch",
+        "score": 28.7,
+        "title": "SemCityLoc: Aerial 6DoF Localization Using Semantic 3D City Models",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Edge AI & Deployment",
+          "Vision Foundation Models",
+          "Open-Source CV Tooling",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.27444v1"
+      },
+      {
+        "action": "Track; relevant if we generate synthetic event-camera data.",
+        "decided_at": "2026-06-29T13:33:32.335313",
+        "decided_by": "claude-curator",
+        "item_id": 4953,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Event-camera simulator using fractional-relaxation pixel dynamics to improve event-timing fidelity and downstream transfer; relevant to event sensors + synthetic data, no code.",
+        "ring": "Watch",
+        "score": 31.34,
+        "title": "FracEvent: Event-Camera Simulation via Fractional-Relaxation Pixel Dynamics",
+        "tracks": [
+          "3D Sensors",
+          "Synthetic Data & Simulation"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.26636v1"
+      },
+      {
+        "action": "Track LiDAR-anchored 3DGS; relevant to LiDAR-camera fused reconstruction.",
+        "decided_at": "2026-06-29T13:33:32.334425",
+        "decided_by": "claude-curator",
+        "item_id": 5079,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "LiDAR-anchored 3D Gaussian Splatting from LiDAR-inertial-visual SLAM with a custom hardware-synced LiDAR-camera scanner; relevant to LiDAR-camera fused reconstruction, no code released.",
+        "ring": "Watch",
+        "score": 33.54,
+        "title": "Structured-Li-GS: Structured 3D Gaussians Splatting with LiDAR Incorporation and Spatial Constraints",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "3D Sensors",
+          "Robotics Vision",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.27509v1"
+      },
+      {
+        "action": "Skim the click-to-query 3D prompt encoder if we need interactive point-cloud labeling.",
+        "decided_at": "2026-06-29T13:33:32.333859",
+        "decided_by": "claude-curator",
+        "item_id": 5084,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Promptable (SAM-style click-to-query) instance segmentation for 3D forest LiDAR point clouds with released code; forestry-specific, but the interactive 3D point-cloud segmentation method could generalize to industrial point clouds.",
+        "ring": "Watch",
+        "score": 34.3,
+        "title": "SelectAnyTree: A Promptable Instance Segmentation Model for 3D Forest LiDAR Point Clouds",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "3D Sensors",
+          "Open-Source CV Tooling",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.27491v1"
+      },
+      {
+        "action": "Bookmark the dataset/code; revisit if multi-sensor fusion becomes a priority.",
+        "decided_at": "2026-06-29T13:33:32.332161",
+        "decided_by": "claude-curator",
+        "item_id": 4881,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Open multi-sensor platform + 59 h dataset (stereo RGB, event, LiDAR, thermal, IMU, RTK) with an edge-deployable late-fusion MAE (6.7 ms on 5090, 112 ms on Orin NX) that beats image-only foundation models on flow/depth/segmentation/ego-motion. Relevant to 3D sensors + edge, but primarily a dataset/platform announcement.",
+        "ring": "Watch",
+        "score": 41.64,
+        "title": "OctoSense: Self-Supervised Learning for Multimodal Robot Perception",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "3D Sensors",
+          "Robotics Vision",
+          "Vision Foundation Models",
+          "Open-Source CV Tooling",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.27317v1"
+      },
+      {
+        "action": "Track 3D point-cloud anomaly detection for manufacturing; revisit if code lands.",
+        "decided_at": "2026-06-25T13:24:28.130396",
+        "decided_by": "claude-curator",
+        "item_id": 4778,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Point-cloud diffusion for instance-level 3D anomaly detection in manufacturing; in-scope industrial 3D inspection but no code and generation-heavy. Pairs with CoGeoAD as a 3D-anomaly-inspection cluster this week.",
+        "ring": "Watch",
+        "score": 25.84,
+        "title": "Point Cloud Diffusion with Global and Local Reconstruction for Instance-Level 3D Anomaly Detection",
+        "tracks": [
+          "Industrial Vision Inspection",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.25740v1"
+      },
+      {
+        "action": "Note as a synthetic-data caveat for stereo training pipelines.",
+        "decided_at": "2026-06-25T13:24:28.129690",
+        "decided_by": "claude-curator",
+        "item_id": 4807,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Identifies a correlated-variance shortcut in path-traced synthetic stereo data that acts as a hidden matching cue (Mitsuba 3). A useful caution for anyone training stereo/disparity nets on synthetic data; analysis only, no method.",
+        "ring": "Watch",
+        "score": 26.5,
+        "title": "Cross-View Variance Correlation in Path-Traced Stereo:A Hidden Shortcut in Synthetic Training Data",
+        "tracks": [
+          "Synthetic Data & Simulation",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.25483v1"
+      },
+      {
+        "action": "Watch transparent-object depth completion; revisit if code/data drop.",
+        "decided_at": "2026-06-25T13:24:28.125226",
+        "decided_by": "claude-curator",
+        "item_id": 4805,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Depth completion for non-Lambertian (transparent/specular) objects via an affine-invariant shape prior, RGB-D, improves real grasping success. A concrete robot-guidance / 3D-sensing problem; no code yet.",
+        "ring": "Watch",
+        "score": 31.8,
+        "title": "AISPO: Enhancing Depth Reliability for Robotic Manipulation of Non-Lambertian Objects via Affine-Invariant Shape Prior",
+        "tracks": [
+          "3D Sensors",
+          "Robot Guidance"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.25503v1"
+      },
+      {
+        "action": "Skim repo; note the fisheye-LiDAR fusion approach for sensor-fusion work.",
+        "decided_at": "2026-06-25T13:24:28.117510",
+        "decided_by": "claude-curator",
+        "item_id": 4760,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Object-SLAM extension (async mapping) for a monocular fisheye-LiDAR rig; open code, real-time multi-class. AV/manipulation framing and incremental over DSP-SLAM, but the fisheye-LiDAR sensor fusion is the relevant angle.",
+        "ring": "Watch",
+        "score": 46.59,
+        "title": "DSP-SLAM++: A Unified Framework for Multi-Class, High-Fidelity Object SLAM in the Wild",
+        "tracks": [
+          "3D Sensors",
+          "Robotics Vision",
+          "Calibration & Camera Models"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.25953v1"
+      },
+      {
+        "action": "Note synthetic-TEM-for-metrology as a synthetic-data signal for inspection.",
+        "decided_at": "2026-06-25T13:24:27.876291",
+        "decided_by": "claude-curator",
+        "item_id": 4622,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "DDPM synthetic TEM-image generation for data-limited semiconductor metrology/defect detection from 15 samples. An in-scope industrial-inspection + synthetic-data niche; generation-heavy, no code.",
+        "ring": "Watch",
+        "score": 26.95,
+        "title": "High-Fidelity Synthetic Transmission Electron Microscopy Image Generation Using Diffusion Probabilistic Models for Data-Limited Semiconductor Metrology",
+        "tracks": [
+          "Industrial Vision Inspection",
+          "Synthetic Data & Simulation"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.24817v1"
+      },
+      {
+        "action": "Note the ERP-rectification trick for fisheye/360 stereo.",
+        "decided_at": "2026-06-25T13:24:27.869766",
+        "decided_by": "claude-curator",
+        "item_id": 4619,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Spherical-to-ERP rectification to restore 1-D disparity for 360/fisheye stereo (RAFT+EACS). Core calibration/geometry, but incremental over the authors' prior work and evaluated only on synthetic fisheye data.",
+        "ring": "Watch",
+        "score": 36.6,
+        "title": "Spherical-to-ERP Epipolar Rectification for Single-Axis Disparity in 360 Stereo",
+        "tracks": [
+          "Calibration & Camera Models",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.24847v1"
+      },
+      {
+        "action": "Skim project page; note the consistency-validated memory-write idea for tracking.",
+        "decided_at": "2026-06-25T13:24:27.869378",
+        "decided_by": "claude-curator",
+        "item_id": 4659,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Training-free, plug-and-play memory-update validator for SAM2 trackers; zero-shot SOTA on LaSOT/GOT-10k, real-time, project page. A solid object-tracking technique but an incremental add-on to SAM2 trackers.",
+        "ring": "Watch",
+        "score": 37.24,
+        "title": "SENTRY: SAM2-Enhanced Neighbor-Aware and Temporally Reasoned Memory for Visual Tracking",
+        "tracks": [
+          "Object Tracking",
+          "Open-Source CV Tooling"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.24449v2"
+      },
+      {
+        "action": "Check project page/code; candidate for a robot-guidance pose eval.",
+        "decided_at": "2026-06-23T13:14:23.946815",
+        "decided_by": "claude-curator",
+        "item_id": 4318,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Category-level 6D pose via discrete-to-continuous flow matching, real-time (70 FPS), project page (likely code), extends to articulated objects. Relevant to robot guidance/bin-picking; verify code + real-data results.",
+        "ring": "Watch",
+        "score": 33.3,
+        "title": "Flow6D: Discrete-to-Continuous Flow Matching for Efficient and Accurate Category-Level 6D Pose Estimation",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Robotics Vision"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.23293v1"
+      },
+      {
+        "action": "Watch the recursive-appearance MOT idea; revisit if code drops.",
+        "decided_at": "2026-06-23T13:14:23.943632",
+        "decided_by": "claude-curator",
+        "item_id": 4294,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Recursive object-centric appearance-state estimation for real-time MOT (90 Hz, SOTA on KITTI), generalizing to unseen classes. AV-centric datasets, no clear code.",
+        "ring": "Watch",
+        "score": 49.8,
+        "title": "Polycepta: Object-Centric Appearance Estimation for Multi-Object Tracking",
+        "tracks": [
+          "Object Tracking"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.23604v2"
+      },
+      {
+        "action": "Read for synthetic-data lighting guidance; consider for industrial detection data gen.",
+        "decided_at": "2026-06-23T13:14:23.667980",
+        "decided_by": "claude-curator",
+        "item_id": 4412,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Systematic study of synthetic-data lighting (Isaac Sim PBR) for industrial object detection, with actionable guidelines (avoid direct specular peaks, use indirect light) and a new industrial benchmark. No code, but directly in the synthetic-data track.",
+        "ring": "Watch",
+        "score": 26.3,
+        "title": "The Power of Light: Improving Synthetic-to-Real Domain Adaptation through Physically-Based Indirect Illumination",
+        "tracks": [
+          "Synthetic Data & Simulation",
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.22574v1"
+      },
+      {
+        "action": "Note the RealSense intrinsics-after-align gotcha; skim code for the alignment fix.",
+        "decided_at": "2026-06-23T13:14:23.660932",
+        "decided_by": "claude-curator",
+        "item_id": 4433,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "RGB-D arc-length metrology that flags a real RealSense pitfall: depth-vs-colour-stream intrinsics after rs.align cause 12-18% metric error. Open source; cucumber app is niche but the calibration gotcha is transferable.",
+        "ring": "Watch",
+        "score": 41.64,
+        "title": "Curvature-aware 3D length estimation of greenhouse cucumbers using RGB-D imaging and cubic spline arc-length integration",
+        "tracks": [
+          "Calibration & Camera Models",
+          "3D Sensors"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.22439v1"
+      },
+      {
+        "action": "Skim for the sensor-config-vs-SLAM-accuracy tables; check whether dataset/code is released.",
+        "decided_at": "2026-06-19T13:07:24.215891",
+        "decided_by": "claude-curator",
+        "item_id": 4206,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Systematic study of how sensor config (mono/stereo/RGB-D/LiDAR, rolling vs global shutter) affects SLAM under quadruped locomotion dynamics; useful sensor-selection evidence but legged-robot scope and no confirmed released benchmark.",
+        "ring": "Watch",
+        "score": 59.74,
+        "title": "Sensor Configuration Matters: A Systematic Evaluation of Multimodal SLAM on Quadruped Robots",
+        "tracks": [
+          "3D Sensors",
+          "Robotics Vision",
+          "Calibration & Camera Models"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.19067v1"
+      },
+      {
+        "action": "Track if we deploy FoundationStereo; revisit when code lands.",
+        "decided_at": "2026-06-17T13:10:07.440312",
+        "decided_by": "claude-curator",
+        "item_id": 4017,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Post-hoc checkpoint-merging (GA + CMA-ES) over stereo foundation models; cuts error on FoundationStereo/NMRF. On-core topic, but the contribution is a merging recipe, not a stereo method we'd adopt. Code on acceptance.",
+        "ring": "Watch",
+        "score": 33.0,
+        "title": "StereoFactory: A Unified Merging Framework for Robust Stereo Matching",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.17475v1"
+      },
+      {
+        "action": "track; read if a CAD-free symmetric-part pose-estimation need arises.",
+        "decided_at": "2026-06-16T13:07:34.416260",
+        "decided_by": "claude-curator",
+        "item_id": 3743,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Object pose from point clouds using rotational symmetry without known 3D/CAD models; a real bin-picking constraint (CAD-free, symmetric parts).",
+        "ring": "Watch",
+        "score": 30.7,
+        "title": "Rotational Symmetry based Object Pose Estimation from Point Clouds in the Absence of Known 3D Models",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Robot Guidance"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.16593v1"
+      },
+      {
+        "action": "track; skim method and compare against specialized anomaly localizers if revisited.",
+        "decided_at": "2026-06-16T13:07:34.415543",
+        "decided_by": "claude-curator",
+        "item_id": 3742,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "DifferAD-R1 \u2014 difference-guided industrial anomaly localization with an MLLM/reasoning model; on-domain but MLLM-based localization is immature versus specialized anomaly methods.",
+        "ring": "Watch",
+        "score": 33.0,
+        "title": "DifferAD-R1: A Difference-Guided IndustrialAnomaly Localization with Multimodal LargeLanguage Models",
+        "tracks": [
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.16601v1"
+      },
+      {
+        "action": "track; verify released code and latency/accuracy numbers before treating as actionable.",
+        "decided_at": "2026-06-16T13:07:34.414864",
+        "decided_by": "claude-curator",
+        "item_id": 3807,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "EdgeZSAD \u2014 zero-shot anomaly detection targeted at edge devices; both tracks are priorities, but edge zero-shot anomaly is a crowded claim space.",
+        "ring": "Watch",
+        "score": 36.0,
+        "title": "EdgeZSAD: Practical Zero-Shot Anomaly Detection on Edge Devices",
+        "tracks": [
+          "Industrial Vision Inspection",
+          "Edge AI & Deployment"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.16119v1"
+      },
+      {
+        "action": "track; skim if adopting VGGT/feed-forward reconstruction with uncertainty estimates.",
+        "decided_at": "2026-06-16T13:07:34.413458",
+        "decided_by": "claude-curator",
+        "item_id": 3755,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Analysis of VGGT uncertainty quality on the DTU benchmark; useful context if relying on feed-forward MVS uncertainty, but analysis-only on a single benchmark.",
+        "ring": "Watch",
+        "score": 39.9,
+        "title": "Uncertainty Quality of VGGT: An Analysis on the DTU Benchmark Dataset",
+        "tracks": [
+          "Calibration & Camera Models",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.16479v1"
+      },
+      {
+        "action": "track; read if a multi-view defect-scoring need arises.",
+        "decided_at": "2026-06-15T13:10:54.723818",
+        "decided_by": "claude-curator",
+        "item_id": 3643,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Multi-view Deformable-DETR for automated visual quality scoring on a real remanufacturing line \u2014 squarely industrial inspection (classifier missed that track) \u2014 but no code/data release and a single bespoke dataset.",
+        "ring": "Watch",
+        "score": 23.2,
+        "title": "Visual Quality Score Assessment of Large White Goods in Remanufacture with Multi-View Deformable-DETR",
+        "tracks": [
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.14556v1"
+      },
+      {
+        "action": "track the one-for-all anomaly direction; revisit if code or stronger numbers appear.",
+        "decided_at": "2026-06-15T13:10:54.721057",
+        "decided_by": "claude-curator",
+        "item_id": 3667,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "One-for-all (multi-class) reconstruction-based anomaly detection on MVTec AD / VisA / Real-IAD \u2014 a priority inspection direction \u2014 but results are competitive-not-leading and no code is released.",
+        "ring": "Watch",
+        "score": 25.4,
+        "title": "BoRAD: Bootstrap your Own Representations for Multi-class Anomaly Detection",
+        "tracks": [
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.14129v1"
+      },
+      {
+        "action": "track; skim code/dataset if an event-camera tracking need appears.",
+        "decided_at": "2026-06-15T13:10:54.716240",
+        "decided_by": "claude-curator",
+        "item_id": 3671,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "RGB-event multi-object tracking with released code + dataset (github Event-AHU/FEMOT). Object tracking is a priority track, but frequency-domain RGB-event fusion is niche and event hardware is not our current path.",
+        "ring": "Watch",
+        "score": 57.4,
+        "title": "FEMOT: Multi-Object Tracking using Frame and Event Cameras",
+        "tracks": [
+          "Object Tracking"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.14094v1"
+      },
+      {
+        "action": "watch for code/release; revisit if a public impl appears",
+        "decided_at": "2026-06-12T13:04:19.988198",
+        "decided_by": "codex",
+        "item_id": 3577,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "MV3DT: fully distributed real-time multi-view 3D tracking, 94.3% IDF1 / 93.3% MOTA on WILDTRACK with peer-to-peer fusion (no central aggregator). Object tracking + edge deployment, but no code link yet \u2014 early.",
+        "ring": "Watch",
+        "score": 30.64,
+        "title": "Fully Distributed Multi-View 3D Tracking in Real-Time",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Object Tracking",
+          "Edge AI & Deployment"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.13127v1"
+      },
+      {
+        "action": "Watch for a code release of the metric-depth method.",
+        "decided_at": "2026-06-11T13:59:44.482044",
+        "decided_by": "claude-curator",
+        "item_id": 3422,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Unified monocular metric depth across perspective and 360-degree panoramic images using virtual-projection-camera geometric priors; relevant to 3D geometry but no released code and broad zero-shot claims, so track only.",
+        "ring": "Watch",
+        "score": 25.2,
+        "title": "DepthMaster: Unified Monocular Depth Estimation for Perspective and Panoramic Images",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.12368v1"
+      },
+      {
+        "action": "Track the scene-graph localization approach for robot guidance.",
+        "decided_at": "2026-06-11T13:59:44.481290",
+        "decided_by": "claude-curator",
+        "item_id": 3474,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Lightweight sequential visual localization using a particle filter over 3D scene graphs, with released code; relevant to robot guidance, worth tracking.",
+        "ring": "Watch",
+        "score": 25.3,
+        "title": "SG2Loc: Sequential Visual Localization on 3D Scene Graphs",
+        "tracks": [
+          "Robotics Vision",
+          "Open-Source CV Tooling"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.11880v1"
+      },
+      {
+        "action": "Track as a metric-depth/LiDAR benchmark reference.",
+        "decided_at": "2026-06-11T13:59:44.475315",
+        "decided_by": "claude-curator",
+        "item_id": 3511,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Released field-robotics benchmark for metric depth and place recognition with synchronized LiDAR submaps; weak industrial fit but a useful metric-depth/LiDAR reference.",
+        "ring": "Watch",
+        "score": 36.2,
+        "title": "Cross-Modal Benchmarking for Robotic Perception in Natural Environments",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "3D Sensors",
+          "Robotics Vision",
+          "Open-Source CV Tooling",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.11563v1"
+      },
+      {
+        "action": "Note the calibration pipeline as a multi-sensor extrinsics reference.",
+        "decided_at": "2026-06-11T13:59:44.474018",
+        "decided_by": "claude-curator",
+        "item_id": 3488,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Released multi-camera plus LiDAR rig with an explicit calibration and pseudo-labeling pipeline; a possible reference for multi-sensor extrinsic calibration despite the off-radar occupant-monitoring application.",
+        "ring": "Watch",
+        "score": 40.04,
+        "title": "Multi-View In-Cabin Monitoring System for Public Transport Vehicles",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "3D Sensors",
+          "Open-Source CV Tooling",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.11739v1"
+      },
+      {
+        "action": "Skim for the topology-adaptive meshing approach.",
+        "decided_at": "2026-06-10T13:51:58.858164",
+        "decided_by": "claude-curator",
+        "item_id": 3191,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Explicit mesh reconstruction with topology adaptation; on-topic 3D-reconstruction method.",
+        "ring": "Watch",
+        "score": 24.9,
+        "title": "ExMesh: EXplicit Mesh Reconstruction with Topology Adaptation",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.07288v1"
+      },
+      {
+        "action": "Watch as an edge / event-vision hardware curiosity.",
+        "decided_at": "2026-06-10T13:51:58.856648",
+        "decided_by": "claude-curator",
+        "item_id": 3175,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Ultra-low-power on-device AI eyewear with event-based vision, open-source; edge + event-sensor signal.",
+        "ring": "Watch",
+        "score": 29.1,
+        "title": "OpenGlass: Ultra-Low-Power On-Device AI Eyewear with Event-based Vision",
+        "tracks": [
+          "Edge AI & Deployment",
+          "Sensors",
+          "Cameras & Standards"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.07431v2"
+      },
+      {
+        "action": "Read PDF; compare against current grasp-pose baselines.",
+        "decided_at": "2026-06-10T13:51:58.852761",
+        "decided_by": "claude-curator",
+        "item_id": 3245,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Cross-view fusion for 6-DoF grasp pose estimation, code + benchmark; core bin-picking robot-guidance signal.",
+        "ring": "Watch",
+        "score": 50.8,
+        "title": "A Cross-view Fusion Framework for Robust 6-DoF Grasp Pose Estimation",
+        "tracks": [
+          "Robot Guidance",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.06878v1"
+      },
+      {
+        "action": "Read for crack/defect representation; assess transfer to industrial surface inspection.",
+        "decided_at": "2026-06-10T13:51:58.613983",
+        "decided_by": "claude-curator",
+        "item_id": 3363,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Crack-detection foundation model for civil-infrastructure inspection with topology preservation; surface-defect inspection signal.",
+        "ring": "Watch",
+        "score": 23.2,
+        "title": "Multi-Task Crack Foundation Model for Engineering-Reliable Crack Representation and Topology Preservation in Civil Infrastructure",
+        "tracks": [
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.05641v1"
+      },
+      {
+        "action": "Skim for the synthetic-data + keypoint recipe.",
+        "decided_at": "2026-06-10T13:51:58.608947",
+        "decided_by": "claude-curator",
+        "item_id": 3290,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Synthetic-data + vision keypoint/wrinkle detection for cloth manipulation, uses OpenCV; practical synthetic-data pipeline.",
+        "ring": "Watch",
+        "score": 29.8,
+        "title": "Synthetic Data Generation and Vision-based Wrinkle and Keypoint Detection for Bimanual Cloth Manipulation",
+        "tracks": [
+          "Synthetic Data & Simulation",
+          "Robot Guidance"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.06292v1"
+      },
+      {
+        "action": "Note as a point-cloud sampling utility; AD context is incidental.",
+        "decided_at": "2026-06-10T13:51:58.607680",
+        "decided_by": "claude-curator",
+        "item_id": 3292,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Efficient farthest-point-sampling for point clouds on CPU/GPU; reusable 3D tooling primitive.",
+        "ring": "Watch",
+        "score": 31.29,
+        "title": "RadiusFPS: Efficient Farthest Point Sampling on CPUs and GPUs via Spherical Voxel Pruning",
+        "tracks": [
+          "3D Sensors",
+          "Open-Source CV Tooling"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.06255v1"
+      },
+      {
+        "action": "Watch for code / sim-to-real follow-up.",
+        "decided_at": "2026-06-10T13:23:03.894353",
+        "decided_by": "claude-curator",
+        "item_id": 3001,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Decoupled 3DGS digital twins from monocular robot video; sim-ready reconstruction worth tracking.",
+        "ring": "Watch",
+        "score": 23.4,
+        "title": "ManiSplat: Manipulation Trajectory Synthesis from Monocular Video via Decoupled 3D Gaussian Splatting",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Synthetic Data & Simulation"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.10645v1"
+      },
+      {
+        "action": "Read for the reflection-removal approach; no code yet.",
+        "decided_at": "2026-06-10T13:23:03.891153",
+        "decided_by": "claude-curator",
+        "item_id": 3013,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "LiDAR glass-reflection artifact removal in TLS point clouds; a real 3D-scanning cleanup problem.",
+        "ring": "Watch",
+        "score": 26.94,
+        "title": "GRAR: Glass-induced Reflection Artifact Removal in LiDAR Point Clouds",
+        "tracks": [
+          "3D Sensors"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.10541v1"
+      },
+      {
+        "action": "Skim for the stereo-generalization caveat; Mars domain is incidental.",
+        "decided_at": "2026-06-10T13:23:03.888333",
+        "decided_by": "claude-curator",
+        "item_id": 3030,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Stereo-depth benchmark (RAFT-Stereo vs SGBM) showing benchmark accuracy does not transfer to low-texture real terrain.",
+        "ring": "Watch",
+        "score": 33.1,
+        "title": "Benchmarking stereo reconstruction for 3D printable Martian terrain models",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.10364v1"
+      },
+      {
+        "action": "Pair with GA-HF (item 2937) when reviewing fisheye-distortion handling.",
+        "decided_at": "2026-06-10T13:23:03.635506",
+        "decided_by": "claude-curator",
+        "item_id": 3072,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Distortion-aware fisheye BEV detection; second fisheye-distortion data point today, calibration-relevant.",
+        "ring": "Watch",
+        "score": 24.95,
+        "title": "Distortion-Aware PETR for BEV Object Detection with Mixed Pinhole-Fisheye Cameras",
+        "tracks": [
+          "Calibration & Camera Models"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.08680v1"
+      },
+      {
+        "action": "Read for grasp+reconstruction coupling; no code.",
+        "decided_at": "2026-06-10T13:23:03.631788",
+        "decided_by": "claude-curator",
+        "item_id": 3095,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Reconstruction-driven robotic grasping with a 3D foundation prior (SAM3D); robot-guidance signal.",
+        "ring": "Watch",
+        "score": 30.44,
+        "title": "GraspFoM: Towards Reconstruction-Driven Robotic Grasping with 3D Foundation Priors",
+        "tracks": [
+          "Robot Guidance",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.08440v1"
+      },
+      {
+        "action": "Skim; track for real-time localization.",
+        "decided_at": "2026-06-10T13:23:03.628558",
+        "decided_by": "claude-curator",
+        "item_id": 3063,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Lightweight real-time LiDAR global localization (2.5D BEV scene-coordinate regression); 3D-sensor signal.",
+        "ring": "Watch",
+        "score": 34.6,
+        "title": "MB-Loc: Multi-planar Bird's-eye-view Localization in outdoor LiDAR scenes",
+        "tracks": [
+          "3D Sensors",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.08744v1"
+      },
+      {
+        "action": "Read for the distortion-aware fusion idea; AD domain is incidental.",
+        "decided_at": "2026-06-10T13:23:03.626963",
+        "decided_by": "claude-curator",
+        "item_id": 2937,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "First fisheye-LiDAR fusion with distortion-aware polar BEV; relevant to fisheye-distortion handling.",
+        "ring": "Watch",
+        "score": 34.64,
+        "title": "Geometry-Aware Fisheye-LiDAR Fusion for Robust 3D Object Detection in Low-Overlap Setups",
+        "tracks": [
+          "Calibration & Camera Models",
+          "3D Sensors"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.08844v1"
+      },
+      {
+        "action": "Watch as a sensors/edge curiosity.",
+        "decided_at": "2026-06-10T13:23:03.386317",
+        "decided_by": "claude-curator",
+        "item_id": 3103,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Programmable in-pixel silicon-retina vision sensor (SCAMP-5); novel sensor + edge-efficiency signal.",
+        "ring": "Watch",
+        "score": 16.8,
+        "title": "Programmable Silicon Retina on Pixel Processor Array",
+        "tracks": [
+          "Sensors",
+          "Cameras & Standards",
+          "Edge AI & Deployment"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.08370v1"
+      },
+      {
+        "action": "Read PDF; assess for multi-camera rig relative-pose.",
+        "decided_at": "2026-06-10T13:23:03.382980",
+        "decided_by": "claude-curator",
+        "item_id": 3110,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Relative 6-DoF pose between image groups (multi-camera rig odometry / relocalization), code available; touches rig calibration and visual odometry.",
+        "ring": "Watch",
+        "score": 46.4,
+        "title": "G2G: Exploiting Intra-Group Geometry for Inter-Group Pose Estimation",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Calibration & Camera Models"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.08284v1"
+      },
+      {
+        "action": "check code quality and scene types supported; test on robotics manipulation scenes",
+        "decided_at": "2026-06-09T13:19:31.082973",
+        "decided_by": "claude-curator",
+        "item_id": 2920,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "End-to-end open-vocabulary 3D panoptic segmentation from multi-view images in 1 second per scene (+13% mIoU on Replica vs SOTA). Distillation-based training enforces semantic-instance consistency. Relevant for robotic scene understanding and 3D mapping. Code available.\n",
+        "ring": "Watch",
+        "score": 25.3,
+        "title": "EPS3D: End-to-End Feed-Forward 3D Panoptic Segmentation",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Robotics Vision"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.08980v1"
+      },
+      {
+        "action": "watch for code release and hardware availability; compare against GelSight/DIGIT-style vision-based tactile sensors",
+        "decided_at": "2026-06-09T13:19:31.077837",
+        "decided_by": "claude-curator",
+        "item_id": 2858,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "First framework for dense 3D force field reconstruction using event-based optical tactile sensors. Recovers 3D surface displacements via event-based marker tracking + CNN, then maps to forces via inverse FEM. Operates at 100 Hz \u2014 a genuine step toward high-frequency force feedback for dexterous manipulation. Novel sensor+algorithm pairing with practical robot guidance implications. No code, specialized hardware required.\n",
+        "ring": "Watch",
+        "score": 30.7,
+        "title": "Dense Force Estimation with an Event-based Optical Tactile Sensor",
+        "tracks": [
+          "Robotics Vision",
+          "Robot Guidance"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.09451v1"
+      },
+      {
+        "action": "check https://github.com/Zibin6/EventPoseVelocity; compare accuracy vs frame-based methods on real sequences",
+        "decided_at": "2026-06-09T13:19:31.076462",
+        "decided_by": "claude-curator",
+        "item_id": 2900,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Geometric framework for absolute pose + velocity estimation from event cameras using 3D line features. Provides both linear and polynomial solvers, requiring only 3 event-line correspondences for full 6-DoF. Demo code is publicly available. Relevant to robotic navigation and localization in high-speed or low-light scenarios where frame cameras fail.\n",
+        "ring": "Watch",
+        "score": 31.9,
+        "title": "A Geometric Framework for Absolute Pose and Velocity Estimation with Event Cameras",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Robotics Vision"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.09139v1"
+      },
+      {
+        "action": "check if AeBAD code appears; revisit when code is public",
+        "decided_at": "2026-06-09T13:19:31.075252",
+        "decided_by": "claude-curator",
+        "item_id": 2838,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Addresses a real limitation in industrial anomaly detection: existing methods break when object scale, viewpoint, illumination, or placement assumptions are violated. The visual-prompting pipeline (foreground masking) + unfreezing teacher + diffusion-augmented training yields 3.5pp gain on AeBAD. Practical for non-standard industrial inspection setups. No code released.\n",
+        "ring": "Watch",
+        "score": 33.14,
+        "title": "Visual Prompting Meets Feature Reconstruction-Based Anomaly Detection with Dual-Teacher Supervision",
+        "tracks": [
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.09670v1"
+      },
+      {
+        "action": "Skim as a 3D-representation reference; mine the implicit-versus-primitive trade-off framing.",
+        "decided_at": "2026-06-04T13:09:59.723437",
+        "decided_by": "claude-curator",
+        "item_id": 2736,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Focused survey of 3D representation families (meshes, point clouds, implicit fields, Gaussian splatting) and their trade-offs; useful orientation reference for the 3D lane, with no implementation.",
+        "ring": "Watch",
+        "score": 25.65,
+        "title": "Recent Advances and Trends in Learning-based 3D Representations",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "3D Sensors"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.04871v1"
+      },
+      {
+        "action": "Note for the edge-deployment toolkit; compare accuracy retention against standard PTQ on a small ViT.",
+        "decided_at": "2026-06-04T13:09:59.720049",
+        "decided_by": "claude-curator",
+        "item_id": 2790,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Data-free post-training quantization for ViTs with released code; useful for edge ViT deployment when no calibration data is available.",
+        "ring": "Watch",
+        "score": 27.7,
+        "title": "Selective Coupling of Decoupled Informative Regions: Masked Attention Alignment for Data-Free Quantization of Vision Transformers",
+        "tracks": [
+          "Edge AI & Deployment"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.04373v2"
+      },
+      {
+        "action": "Skim the code (github.com/Kirito14IT/SFMambaNet); sanity-check inlier gains versus MAGSAC on our matching set.",
+        "decided_at": "2026-06-04T13:09:59.719516",
+        "decided_by": "claude-curator",
+        "item_id": 2772,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Two-view correspondence pruning (inlier selection) sits directly upstream of pose, calibration, and SfM and ships code, but is Mamba-framed and unproven against strong RANSAC and MAGSAC baselines.",
+        "ring": "Watch",
+        "score": 27.7,
+        "title": "SFMambaNet: Spectral-Frequency Enhanced Selective State Space Model for Correspondence Pruning",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.04493v1"
+      },
+      {
+        "action": "Check the project page (hsr-3dv.github.io) for code; compare against Poisson and KSR-style surface reconstruction.",
+        "decided_at": "2026-06-04T13:09:59.718751",
+        "decided_by": "claude-curator",
+        "item_id": 2734,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Occlusion-aware plane-assembly that turns LiDAR point clouds into compact watertight polygonal meshes; practical for 3D-scan reverse-engineering and metrology, with a project page.",
+        "ring": "Watch",
+        "score": 28.5,
+        "title": "Hierarchical Space Partition for Surface Reconstruction",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "3D Sensors"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.04891v1"
+      },
+      {
+        "action": "Read PDF; compare drift handling against the MASt3R-SLAM and streaming DUSt3R lineage.",
+        "decided_at": "2026-06-04T13:09:59.714869",
+        "decided_by": "claude-curator",
+        "item_id": 2721,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Streaming feed-forward 3D reconstruction that predicts window-relative poses and local pointmaps to fight long-horizon drift under bounded memory; directly relevant to online mapping for robot perception, though no code yet.",
+        "ring": "Watch",
+        "score": 35.1,
+        "title": "Anchor3R: Streaming 3D Reconstruction with Transient Anchors for Long-Horizon Visual Mapping",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "3D Sensors"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.05035v1"
+      },
+      {
+        "action": "Track; revisit if validated on real industrial 3D such as MVTec 3D-AD or if code appears.",
+        "decided_at": "2026-06-04T13:09:59.714351",
+        "decided_by": "claude-curator",
+        "item_id": 2791,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Training-free cross-category 3D anomaly detection (frozen CLIP multi-view plus text normal anchors) is squarely in the 3D-inspection lane, but evidence is ShapeNetPart synthetic only with no real industrial data or released code.",
+        "ring": "Watch",
+        "score": 35.54,
+        "title": "VT-3DAD: Cross-Category 3D Anomaly Detection via Visual-Text Normal Space Alignment",
+        "tracks": [
+          "Industrial Vision Inspection",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.04369v1"
+      },
+      {
+        "action": "Track the masked-pretraining-on-unlabeled-PCB idea; revisit if code or weights appear.",
+        "decided_at": "2026-06-03T13:41:37.652729",
+        "decided_by": "claude-curator",
+        "item_id": 2674,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Structure-guided masked pretraining plus spatial-continuity regularization for PCB defect detection in automated optical inspection (DsPCBSD+, 85.5% mAP50). Core industrial-AOI fit but incremental and no released code.",
+        "ring": "Watch",
+        "score": 28.5,
+        "title": "Structure-Guided Mixed Masked Pretraining and Spatial Continuity Regularization for Printed Circuit Board Defect Detection",
+        "tracks": [
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2606.03508v1"
+      },
+      {
+        "action": "Track the SAM2 plus probabilistic-track-validation idea; read if code surfaces.",
+        "decided_at": "2026-06-03T13:41:37.645545",
+        "decided_by": "claude-curator",
+        "item_id": 2635,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Zero-shot multi-object tracking and segmentation on SAM2 with a Bernoulli-filter track-validation module to suppress ghost tracks. On-track technique but weak evidence \u2014 KITTI MOTS (driving) only, no released code.",
+        "ring": "Watch",
+        "score": 39.7,
+        "title": "Seg2Track++: Probabilistic Track Validation and Data Association for Multi-Object Tracking and Segmentation",
+        "tracks": [
+          "Object Tracking"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2606.03875v1"
+      },
+      {
+        "action": "Track the unified multi-class anomaly-detection direction; read if code surfaces.",
+        "decided_at": "2026-05-29T13:08:05.189171",
+        "decided_by": "claude-curator",
+        "item_id": 2564,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Unified multi-class anomaly detection on MVTec-3D AD \u2014 core industrial-inspection track and SOTA multi-class, but no released code; scoring under-rated the domain fit (relevance 24).",
+        "ring": "Watch",
+        "score": 27.2,
+        "title": "Uni-RCM: Unified Reference-guided Cross-modal Mapping for Multi-Class Anomaly Detection",
+        "tracks": [
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.29455v1"
+      },
+      {
+        "action": "Skim github.com/nasa-jpl/martian for the Blender render + pose-annotation workflow.",
+        "decided_at": "2026-05-29T13:08:05.180709",
+        "decided_by": "claude-curator",
+        "item_id": 2534,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Open-source Blender-based renderer (NASA-JPL) producing pose-annotated synthetic views \u2014 useful synthetic-data reference, but Mars-aerial domain is niche.",
+        "ring": "Watch",
+        "score": 41.1,
+        "title": "MARTIAN: A Rendering Framework for Aerial Mars Imagery from HiRISE Orbital Data",
+        "tracks": [
+          "Synthetic Data & Simulation",
+          "Open-Source CV Tooling"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.29647v1"
+      },
+      {
+        "action": "Track the divide-and-conquer mesh pipeline; revisit if code is released.",
+        "decided_at": "2026-05-29T13:08:05.176532",
+        "decided_by": "claude-curator",
+        "item_id": 2456,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "City-scale watertight-mesh SfM pipeline (topological image clustering, cluster-wise SfM, curvature-aware remeshing). Generic technique but no code and weak industrial fit.",
+        "ring": "Watch",
+        "score": 54.24,
+        "title": "City-Mesh3R: Simulation-Ready City-Scale 3D Mesh Reconstruction from Multi-View Images",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Synthetic Data & Simulation"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.30310v1"
+      },
+      {
+        "action": "Watch for follow-up papers; revisit if a code/HDL release appears.",
+        "decided_at": "2026-05-28T13:11:32.106941",
+        "decided_by": "claude-curator",
+        "item_id": 2360,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Event-camera velocity estimator targeting low-cost FPGA (Artix-7) with integer-only logic and <2 kB storage; concrete low-latency edge path, real event-camera evaluation at 99.5% directional accuracy. Sparse-output trade-off acknowledged.",
+        "ring": "Watch",
+        "score": 25.4,
+        "title": "EventShiftFlow: Towards Hardware-efficient FPGA-based Flow Estimation",
+        "tracks": [
+          "3D Sensors",
+          "Edge AI & Deployment"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.28312v1"
+      },
+      {
+        "action": "Watch for code; revisit if zero-shot industrial AD becomes a target.",
+        "decided_at": "2026-05-28T13:11:32.104640",
+        "decided_by": "claude-curator",
+        "item_id": 2332,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Zero-shot anomaly detection evaluated on 10 industrial+medical benchmarks; CLIP-prompt-routing approach is in our inspection track. No code link, generic ZSAD framing.",
+        "ring": "Watch",
+        "score": 28.5,
+        "title": "EntroAD: Structural Entropy-Guided Prompt Adaptation for Zero-Shot Anomaly Detection",
+        "tracks": [
+          "Industrial Vision Inspection",
+          "Vision Foundation Models"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.28630v1"
+      },
+      {
+        "action": "Skim taxonomy of defect tags for ideas; ignore if VLM-centric.",
+        "decided_at": "2026-05-28T13:11:32.103178",
+        "decided_by": "claude-curator",
+        "item_id": 2367,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Defect-/usability-aware point-cloud quality benchmark; adjacent to industrial inspection of scanned parts. Mostly VLM-eval framing, so weak signal.",
+        "ring": "Watch",
+        "score": 30.25,
+        "title": "PointQ-Bench: Benchmarking Diagnostic and Interpretable Point Cloud Quality Assessment",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.28241v1"
+      },
+      {
+        "action": "Bookmark repo; pull in if we evaluate self-supervised mono-depth pipelines.",
+        "decided_at": "2026-05-28T13:11:32.102841",
+        "decided_by": "claude-curator",
+        "item_id": 2345,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Self-supervised monocular depth with explicit pose-depth scale alignment and public code; aligned scales matter when chaining VO+depth. Generic KITTI/NYU benchmark though.",
+        "ring": "Watch",
+        "score": 31.0,
+        "title": "SA4Depth: Consistent Pose-Depth Scale Alignment for Self-Supervised Monocular Depth Estimation",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.28477v1"
+      },
+      {
+        "action": "Bookmark repo; revisit if a real-world transparent-surface dataset emerges.",
+        "decided_at": "2026-05-28T13:11:32.100228",
+        "decided_by": "claude-curator",
+        "item_id": 2329,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Multi-layer depth for transparent surfaces with public code (princeton-vl/SeeGroup) \u2014 relevant for industrial inspection through glass/plastic, though benchmark is synthetic.",
+        "ring": "Watch",
+        "score": 33.0,
+        "title": "SeeGroup: Multi-Layer Depth Estimation of Transparent Surfaces via Self-Determined Grouping",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.28735v1"
+      },
+      {
+        "action": "Skim README to confirm symmetry/canonical-frame conventions.",
+        "decided_at": "2026-05-28T13:11:32.098726",
+        "decided_by": "claude-curator",
+        "item_id": 2363,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "21.8M real-world 9D pose annotations across 700 categories with public dataset+code; could serve as an evaluation set for category-level pose, but household-object domain is a soft fit.",
+        "ring": "Watch",
+        "score": 34.1,
+        "title": "Every9D-21M: Large-Scale Real-World 9D Canonicalization of Everyday Objects",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.28270v1"
+      },
+      {
+        "action": "Watch for code release; compare against current DSO/ORB-SLAM3 baselines if it appears.",
+        "decided_at": "2026-05-28T13:11:32.098104",
+        "decided_by": "claude-curator",
+        "item_id": 2401,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Direct RGB-D VO with learned consistency priors and substantial gains across five benchmarks; on-topic for SLAM/VO trend tracking.",
+        "ring": "Watch",
+        "score": 35.54,
+        "title": "Con-DSO: Learning Short-Horizon Consistency Priors for RGB-D Direct Sparse Odometry",
+        "tracks": [
+          "Robotics Vision",
+          "3D Sensors"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.27952v1"
+      },
+      {
+        "action": "Track follow-ups; revisit if a code release lands.",
+        "decided_at": "2026-05-28T13:11:32.096197",
+        "decided_by": "claude-curator",
+        "item_id": 2384,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Digital-twin-oriented NeRF for unbounded scenes with explicit metric-accuracy claims, but no code or test path published.",
+        "ring": "Watch",
+        "score": 55.1,
+        "title": "CLEAR-NeRF: Collinearity and Local-region Enhanced Accurate 3D Reconstruction in Unbounded Scenes",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.28125v1"
+      },
+      {
+        "action": "watch; revisit if image-driven point-completion shows up in inspection pipelines",
+        "decided_at": "2026-05-27T13:22:57.161176",
+        "decided_by": "claude-curator",
+        "item_id": 2230,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Single-image point-cloud completion with an iterative image-to-point refinement transformer (ShapeNet-ViPC, +12.3% Chamfer). Released code. Light industrial signal but a clean image-driven 3D building block.",
+        "ring": "Watch",
+        "score": 24.6,
+        "title": "I2PRef: Image-Driven Point Completion with Iterative Refinement",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.26914v1"
+      },
+      {
+        "action": "watch; revisit if INT8 CLIP / multimodal embedding deployment becomes a workload",
+        "decided_at": "2026-05-27T13:22:57.159946",
+        "decided_by": "claude-curator",
+        "item_id": 2290,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "INT8 quantization failure analysis on CLIP ViT-B/32 plus a Layer-wise Representation-Aware Early-Exit fix (+2.44%p Top-1, -13.4% FLOPs). Concrete edge-AI insight for VLM joint embeddings; niche but solid.",
+        "ring": "Watch",
+        "score": 25.59,
+        "title": "The Rescue Effect: Spatio-Semantic Early Exit Bypasses Quantization Collapse in CLIP",
+        "tracks": [
+          "Edge AI & Deployment"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.26415v1"
+      },
+      {
+        "action": "watch; revisit if the benchmark and DA-Next reach independent uptake",
+        "decided_at": "2026-05-27T13:22:57.158414",
+        "decided_by": "claude-curator",
+        "item_id": 2183,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Cross-paradigm spatial-foundation-model benchmark (19 datasets, 546 scenes, 41 models, 5 task suites) with a companion DA-Next-5M dataset and DA-Next baseline. Useful evaluation surface for the geometry-foundation-model line; large but unproven as a community standard.",
+        "ring": "Watch",
+        "score": 28.94,
+        "title": "SpatialBench: Is Your Spatial Foundation Model an All-Round Player?",
+        "tracks": [
+          "Vision Foundation Models",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.27367v1"
+      },
+      {
+        "action": "watch; revisit if scrap-sorting / conveyor-inspection becomes a track focus",
+        "decided_at": "2026-05-27T13:22:57.155837",
+        "decided_by": "claude-curator",
+        "item_id": 2249,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "High-resolution video dataset of E40 steel scrap on a conveyor belt for material classification, detection, and instance segmentation. Concrete industrial sorting use case, controlled lab capture.",
+        "ring": "Watch",
+        "score": 30.9,
+        "title": "SteelDS: A High-Resolution Video Dataset of E40 Steel Scrap for Object Detection and Instance Segmentation",
+        "tracks": [
+          "Industrial Vision Inspection",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.26682v1"
+      },
+      {
+        "action": "watch dataset; revisit if inspection workflows need small-object benchmarks",
+        "decided_at": "2026-05-27T13:22:57.155475",
+        "decided_by": "claude-curator",
+        "item_id": 2232,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Industrial recycling small/dense-object detection dataset (>10k images, 120k instances) with YOLO baselines and a public repo. Niche but legitimately industrial; useful as a reference for small-object inspection.",
+        "ring": "Watch",
+        "score": 31.0,
+        "title": "Small Object Detection in Industrial Recycling: A New Dataset and YOLO Performance Evaluation",
+        "tracks": [
+          "Industrial Vision Inspection",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.26884v1"
+      },
+      {
+        "action": "watch; revisit when code lands and there are streaming benchmarks",
+        "decided_at": "2026-05-27T13:22:57.154666",
+        "decided_by": "claude-curator",
+        "item_id": 2271,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Feed-forward 3D foundation model that abandons the global-frame assumption for streaming/long-context reconstruction via relative regression. Interesting trajectory for the geometry-foundation-model line; only a project page so far.",
+        "ring": "Watch",
+        "score": 31.1,
+        "title": "$R^3$: 3D Reconstruction via Relative Regression",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.26519v1"
+      },
+      {
+        "action": "watch repo; revisit if convergence/quality wins survive on textured industrial scenes",
+        "decided_at": "2026-05-27T13:22:57.153125",
+        "decided_by": "claude-curator",
+        "item_id": 2261,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Hybrid Gaussian-Voxel SDF representation aimed at fast and accurate surface reconstruction with released code. Indoor scenes only (ScanNet++/v2/DeepBlending); not yet industrial.",
+        "ring": "Watch",
+        "score": 34.7,
+        "title": "Gaussian-Voxel Duet: A Dual-Scaffolding Hybrid Representation for Fast and Accurate Monocular Surface Reconstruction",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Open-Source CV Tooling"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.26616v1"
+      },
+      {
+        "action": "watch the low-light multi-view benchmark; revisit if inspection-relevant",
+        "decided_at": "2026-05-27T13:22:57.151005",
+        "decided_by": "claude-curator",
+        "item_id": 2258,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Feed-forward 3D Gaussian Splatting hardened against low-light context views. Methodologically interesting for low-light reconstruction; not yet industrial.",
+        "ring": "Watch",
+        "score": 37.5,
+        "title": "DelowlightSplat: Feed-Forward Gaussian Splatting for Lowlight 3D Scene Reconstruction",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.26629v1"
+      },
+      {
+        "action": "track in Watch; revisit if SceneSmith-style scene generation pipelines mature",
+        "decided_at": "2026-05-27T13:22:57.150502",
+        "decided_by": "claude-curator",
+        "item_id": 2237,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Manipulation-oriented semantic-mapping benchmark with prompt-generated synthetic indoor scenes and released code. Indirectly relevant to synthetic-data + robotics evaluation; no immediate industrial use.",
+        "ring": "Watch",
+        "score": 39.8,
+        "title": "OSMa-Bench++: Toward Open-Ended Benchmarking of Semantic Mapping for Manipulation with Prompt-Generated Synthetic Scenes",
+        "tracks": [
+          "Robotics Vision",
+          "Synthetic Data & Simulation"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.26831v1"
+      },
+      {
+        "action": "Read PDF to understand the structured-light coding and Vis/SWIR pairing; note as a sensor-design reference.",
+        "decided_at": "2026-05-26T13:10:02.563849",
+        "decided_by": "claude-curator",
+        "item_id": 2108,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Single-spectrograph stereo (Vis+SWIR) dispersed-structured-light rig giving joint hyperspectral reflectance + depth \u2014 direct fit for 3D Sensors track; sensor hardware paper, no code, but the setup is something we could replicate conceptually.",
+        "ring": "Watch",
+        "score": 26.94,
+        "title": "Broadband Hyperspectral 3D Imaging using Dispersed Structured Light",
+        "tracks": [
+          "3D Sensors",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.25757v1"
+      },
+      {
+        "action": "Re-check once code+dataset land; revisit if Sim2Real CAD alignment numbers hold up.",
+        "decided_at": "2026-05-26T13:10:02.555942",
+        "decided_by": "claude-curator",
+        "item_id": 2153,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Zero-shot anomaly detection by aligning real observations to CAD digital twins \u2014 genuine industrial inspection framing. Code/dataset only \"will be\" available; thin without released artifacts.",
+        "ring": "Watch",
+        "score": 34.0,
+        "title": "Towards Active Real-to-Twin Inspection: A New Paradigm for Zero-Shot Anomaly Detection",
+        "tracks": [
+          "Industrial Vision Inspection",
+          "Synthetic Data & Simulation"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.25407v1"
+      },
+      {
+        "action": "Watch; revisit if a DETR-class detector becomes the target detector in a prototype.",
+        "decided_at": "2026-05-25T13:10:52.245796",
+        "decided_by": "claude-curator",
+        "item_id": 2038,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "DETR variant with masked duplicate suppressor \u2014 +2.8 mAP over Deformable-DETR with 5% training overhead, code released. Relevant to Target Detection track; modest gain over current DETR-family work but a clean drop-in idea.",
+        "ring": "Watch",
+        "score": 18.0,
+        "title": "MDS-DETR: DETR with Masked Duplicate Suppressor",
+        "tracks": [
+          "Open-Source CV Tooling"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.23507v1"
+      },
+      {
+        "action": "Watch; revisit when an industrial inspection problem requires material-class segmentation.",
+        "decided_at": "2026-05-25T13:10:52.243646",
+        "decided_by": "claude-curator",
+        "item_id": 2019,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Reviving the Apple DMS material-segmentation benchmark with a modern ViT baseline. Material perception is tangentially relevant to industrial inspection (texture/surface understanding). Useful as a baseline reference but no immediate prototyping path.",
+        "ring": "Watch",
+        "score": 21.0,
+        "title": "Revitalizing Dense Material Segmentation: Stabilized Vision Transformers and the Generalization Paradox",
+        "tracks": [
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.23747v1"
+      },
+      {
+        "action": "Watch; note as evidence that event-camera pretraining + synthetic supervision is becoming a usable pattern.",
+        "decided_at": "2026-05-25T13:10:52.238292",
+        "decided_by": "claude-curator",
+        "item_id": 2015,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "First event-camera saliency-prediction baseline with synthetic supervision; event-camera tooling is on the 3D Sensors track but saliency prediction itself is a niche evaluation task with no direct industrial application.",
+        "ring": "Watch",
+        "score": 27.6,
+        "title": "Exploring deep learning for Event-Based Saliency Prediction with a Transformer-based model",
+        "tracks": [
+          "3D Sensors",
+          "Synthetic Data & Simulation",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.23790v1"
+      },
+      {
+        "action": "Watch; revisit if the indoor reconstruction quality matters for a concrete prototype.",
+        "decided_at": "2026-05-25T13:10:52.237838",
+        "decided_by": "claude-curator",
+        "item_id": 2005,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Multi-view 3D scene reconstruction conditioned on a generative shape prior (Trellis.2). Interesting direction for indoor reconstruction but heavily tied to a specific generative backbone and indoor scenes; not aligned with our calibrated/industrial reconstruction needs today.",
+        "ring": "Watch",
+        "score": 27.8,
+        "title": "GenRecon: Bridging Generative Priors for Multi-View 3D Scene Reconstruction",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.23888v1"
+      },
+      {
+        "action": "Watch; revisit if code/dataset is released or if a robotics-manipulation prototype needs hand-occluded tracking.",
+        "decided_at": "2026-05-25T13:10:52.235976",
+        "decided_by": "claude-curator",
+        "item_id": 2034,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "6DoF object tracking from RGB that uses the grasping hand as a complementary cue rather than treating it as occluder; aligned with robotics-manipulation interests but no code link in the abstract.",
+        "ring": "Watch",
+        "score": 30.0,
+        "title": "ComPose: When to Trust Hands for Object Pose Tracking",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Robotics Vision",
+          "Object Tracking"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.23523v1"
+      },
+      {
+        "action": "Watch project page; recheck when public code lands or independent reproduction appears.",
+        "decided_at": "2026-05-25T13:10:52.234687",
+        "decided_by": "claude-curator",
+        "item_id": 2004,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Streaming 3D reconstruction with linear-time, constant-memory long-horizon attention; claims stable runs on 10k+ frame sequences from 48-frame training clips. Promising direction for online SLAM-style geometry but unproven outside synthetic clips.",
+        "ring": "Watch",
+        "score": 31.1,
+        "title": "HorizonStream: Long-Horizon Attention for Streaming 3D Reconstruction",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Open-Source CV Tooling"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.23889v1"
+      },
+      {
+        "action": "Watch the project page for code; revisit if VGGT-style models enter the prototype path.",
+        "decided_at": "2026-05-25T13:10:52.232494",
+        "decided_by": "claude-curator",
+        "item_id": 2002,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Token-selection strategy for visual geometry transformers (VGGT-class); 85% speedup on 500-image scenes with maintained accuracy. Useful efficiency direction if/when we adopt feed-forward MV reconstruction, but no immediate action.",
+        "ring": "Watch",
+        "score": 32.3,
+        "title": "Good Token Hunting: A Hitchhiker's Guide to Token Selection for Visual Geometry Transformers",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Open-Source CV Tooling"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.23892v1"
+      },
+      {
+        "action": "Track the pose-free feed-forward reconstruction trend; revisit if code is released.",
+        "decided_at": "2026-05-22T19:29:02.220019",
+        "decided_by": "claude-curator",
+        "item_id": 1978,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Pose-free feed-forward 4D Gaussian reconstruction from unposed multi-view video \u2014 a genuine direction for the 3D-geometry track. Weak signal \u2014 another 4DGS paper, no code link, evidence is benchmark-only.",
+        "ring": "Watch",
+        "score": 30.7,
+        "title": "No Pose, No Problem in 4D: Feed-Forward Dynamic Gaussians from Unposed Multi-View Videos",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.22190v1"
+      },
+      {
+        "action": "Skim to see if the appearance+geometry fusion is reusable for synthetic-data QA.",
+        "decided_at": "2026-05-22T19:29:02.217939",
+        "decided_by": "claude-curator",
+        "item_id": 1943,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "A metric that predicts whether a synthetic dataset will transfer to real data without downstream training \u2014 a genuine bottleneck for synthetic-data pipelines. Weak signal only \u2014 no code, measurement study, fusion of DINOv3 + MASt3R similarity.",
+        "ring": "Watch",
+        "score": 32.9,
+        "title": "SADGE: Structure and Appearance Domain Gap Estimation of Synthetic and Real Data",
+        "tracks": [
+          "Synthetic Data & Simulation"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.22467v1"
+      },
+      {
+        "action": "Bookmark repo; revisit if a tracking deployment needs a foundation-model baseline.",
+        "decided_at": "2026-05-22T19:29:02.216543",
+        "decided_by": "claude-curator",
+        "item_id": 1936,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Object tracking is a core track and this SAM2-based VOT adapter ships code with reported anti-UAV / nonlinear-motion gains. Still an incremental foundation-model adapter, so track rather than evaluate.",
+        "ring": "Watch",
+        "score": 42.9,
+        "title": "Segment Anything with Motion, Geometry, and Semantic Adaptation for Complex Nonlinear Visual Object Tracking",
+        "tracks": [
+          "Object Tracking"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.22538v1"
+      },
+      {
+        "action": "Skim PDF for the RS distortion model; track only, not actionable without the custom rig.",
+        "decided_at": "2026-05-22T19:29:02.213167",
+        "decided_by": "claude-curator",
+        "item_id": 1947,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Rolling-shutter / global-shutter geometric modeling is in-scope for camera models, and there is code plus a real-world synchronized GS-RS dataset. But the core contribution is high-speed video reconstruction (a restoration task) and reproducing it needs a custom dual/triaxial shutter rig.",
+        "ring": "Watch",
+        "score": 46.1,
+        "title": "Moment-Reenacting: Inverse Motion Degradation with Cross-shutter Guidance",
+        "tracks": [
+          "Calibration & Camera Models",
+          "Sensors",
+          "Cameras & Standards"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.22423v1"
+      },
+      {
+        "action": "Watch the open-vocabulary IAD trend; revisit if a lighter or reproducible variant appears.",
+        "decided_at": "2026-05-21T20:07:16.959294",
+        "decided_by": "claude-curator",
+        "item_id": 1832,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Open-vocabulary industrial anomaly detection on MVTec-AD/VisA/MPDD \u2014 a core inspection track \u2014 but the only evidence is zero-shot benchmark numbers from a heavy agentic-MLLM stack.",
+        "ring": "Watch",
+        "score": 32.25,
+        "title": "IndusAgent: Reinforcing Open-Vocabulary Industrial Anomaly Detection with Agentic Tools",
+        "tracks": [
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.20682v1"
+      },
+      {
+        "action": "Track as evidence for interpretable industrial-inspection nets; revisit if traceable accept/reject becomes a customer ask.",
+        "decided_at": "2026-05-20T17:55:24.959112",
+        "decided_by": "claude-curator",
+        "item_id": 1348,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Interpretable defect detection in aerospace SiC/SiC XCT with prototype layer aligned to expert-defined defect classes. Real industrial inspection paper with a traceability story (uncertainty regions + prototype evidence). Narrow domain but on-radar.",
+        "ring": "Watch",
+        "score": 30.7,
+        "title": "Interpretable Computer Vision for Defect Detection in X-ray Tomography of Aerospace SiC/SiC Composites",
+        "tracks": [
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.20159v1"
+      },
+      {
+        "action": "Track Depth2Pose; if monocular-depth evaluation comes up, compare against standard metrics on our targets.",
+        "decided_at": "2026-05-20T17:55:24.944544",
+        "decided_by": "claude-curator",
+        "item_id": 1391,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Pose-based monocular-depth evaluation without dense GT depth; useful angle for judging depth quality on real industrial scenes (vegetated, large-scale) where dense GT is impractical. Code + dataset released.",
+        "ring": "Watch",
+        "score": 60.18,
+        "title": "Depth2Pose: A Pose-Based Benchmark for Monocular Depth Estimation without Ground-Truth Depth",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.19797v1"
+      },
+      {
+        "action": "Read PDF; note the COLMAP failure-aware consistency metrics.",
+        "decided_at": "2026-05-19T17:29:28.858394",
+        "decided_by": "claude-curator",
+        "item_id": 1329,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Documents hallucination failure modes of feed-forward 3D foundation models (VGGT, MASt3R, DUSt3R, Fast3R) and proposes COLMAP-based geometric-verification metrics that beat MEt3R; useful reliability signal for anyone leaning on 3D backbones. Evaluation paper, weak code signal.",
+        "ring": "Watch",
+        "score": 26.3,
+        "title": "Can These Views Be One Scene? Evaluating Multiview 3D Consistency when 3D Foundation Models Hallucinate",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.18754v1"
+      },
+      {
+        "action": "Track the implicit-vs-explicit pointmap direction; revisit if code is released.",
+        "decided_at": "2026-05-18T14:12:49.809442",
+        "decided_by": "claude-curator",
+        "item_id": 1308,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Implicit/SDF variant of the pose-free visual-geometry foundation-model line (DUSt3R/VGGT). Plausible direction for 3D geometry + camera pose, but no code and only abstract-level claims.",
+        "ring": "Watch",
+        "score": 39.8,
+        "title": "IVGT: Implicit Visual Geometry Transformer for Neural Scene Representation",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.16258v1"
+      },
+      {
+        "action": "track the VGGT line; revisit when a feed-forward reconstruction prototype is on the table.",
+        "decided_at": "2026-05-16T07:34:57.442010",
+        "decided_by": "claude-curator",
+        "item_id": 1272,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Efficiency-focused feed-forward visual geometry transformer (VGGT family) with adaptive sparse attention for fast multi-view 3D reconstruction. Feed-forward 3D reconstruction is a trend worth tracking; this is an incremental efficiency variant.",
+        "ring": "Watch",
+        "score": 34.2,
+        "title": "TurboVGGT: Fast Visual Geometry Reconstruction with Adaptive Alternating Attention",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.14315v1"
+      },
+      {
+        "action": "track; revisit if a video-to-3DGS pipeline becomes relevant.",
+        "decided_at": "2026-05-16T07:34:57.439865",
+        "decided_by": "claude-curator",
+        "item_id": 1231,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Reuses AV1 codec motion vectors to skip exhaustive SfM matching, yielding denser point clouds and faster 3DGS initialization. Clever practical trick for SfM acceleration; niche and tied to video input.",
+        "ring": "Watch",
+        "score": 36.8,
+        "title": "Efficient Dense Matching for Enhanced Gaussian Splatting Using AV1 Motion Vectors",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.14629v1"
+      },
+      {
+        "action": "",
+        "decided_at": "2026-05-16T07:33:10.369271",
+        "decided_by": "web-curator",
+        "item_id": 675,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Has code + clear test path \u2014 worth a spike",
+        "ring": "Watch",
+        "score": 49.6,
+        "title": "VFM-SDM: A vision foundation model-based framework for training-free, marker-free, and calibration-free structural displacement measurement",
+        "tracks": [
+          "Calibration & Camera Models",
+          "3D Geometry & Reconstruction",
+          "Object Tracking",
+          "Edge AI & Deployment",
+          "Vision Foundation Models",
+          "Synthetic Data & Simulation",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.09677v1"
+      },
+      {
+        "action": "Read the PDI definition; consider whether the residuals are reusable on our own monocular reconstructions.",
+        "decided_at": "2026-05-15T14:20:10.849822",
+        "decided_by": "claude-curator",
+        "item_id": 1144,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Quantitative geometric-consistency metric using point tracking + monocular depth lift. The PDI residuals (scale/depth, 3D motion, rigidity) could be useful as a diagnostic for monocular reconstruction pipelines beyond video gen.",
+        "ring": "Watch",
+        "score": 26.29,
+        "title": "Quantitative Video World Model Evaluation for Geometric-Consistency",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.15185v1"
+      },
+      {
+        "action": "Check whether the Articraft-10K dataset is actually released and inspect a handful of assets.",
+        "decided_at": "2026-05-15T14:20:10.848672",
+        "decided_by": "claude-curator",
+        "item_id": 1142,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Agentic LLM pipeline generating 10K articulated 3D assets (URDF-grade) with code. Could become a useful synthetic-data source for robot-vision sim if quality holds.",
+        "ring": "Watch",
+        "score": 27.4,
+        "title": "Articraft: An Agentic System for Scalable Articulated 3D Asset Generation",
+        "tracks": [
+          "Synthetic Data & Simulation",
+          "Robotics Vision",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.15187v1"
+      },
+      {
+        "action": "Skim the paper and check the GitHub repo's license + ONNX export path before considering a Prototype.",
+        "decided_at": "2026-05-15T14:20:10.847533",
+        "decided_by": "claude-curator",
+        "item_id": 1176,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Compact (1.22M-param) crack segmentation with code and concrete F1/mIoU numbers. Closest item to industrial surface inspection in this batch.",
+        "ring": "Watch",
+        "score": 28.6,
+        "title": "SCRWKV: Ultra-Compact Structure-Calibrated Vision-RWKV for Topological Crack Segmentation",
+        "tracks": [
+          "Industrial Vision Inspection",
+          "Edge AI & Deployment",
+          "Open-Source CV Tooling"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.14926v1"
+      },
+      {
+        "action": "Re-check when the model/dataset is actually released.",
+        "decided_at": "2026-05-15T14:20:10.844662",
+        "decided_by": "claude-curator",
+        "item_id": 1169,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Zero-shot omnidirectional stereo with promised open dataset and model. Interesting if 360-rig stereo becomes a sensor option, but not a current need.",
+        "ring": "Watch",
+        "score": 32.2,
+        "title": "H-OmniStereo: Zero-Shot Omnidirectional Stereo Matching with Heading-Aligned Normal Priors",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.14963v1"
+      },
+      {
+        "action": "Note the YOLO11n vs RT-DETR-X mAP/FPS trade-off for future detector-selection conversations on inspection data.",
+        "decided_at": "2026-05-14T07:24:28.541203",
+        "decided_by": "claude-curator",
+        "item_id": 1010,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Real industrial QC use case \u2014 battery sorting/recycling \u2014 with side-by-side YOLOv8/YOLO11/RT-DETR numbers on ~8.5k images. Architectural contribution (pattern-based dynamic queries on RT-DETR) is minor; the benchmark snapshot is the usable artifact.",
+        "ring": "Watch",
+        "score": 26.3,
+        "title": "Pattern-Enhanced RT-DETR for Multi-Class Battery Detection",
+        "tracks": [
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.13670v1"
+      },
+      {
+        "action": "Bookmark; revisit only if a hyperspectral inspection question opens up.",
+        "decided_at": "2026-05-14T07:24:28.539250",
+        "decided_by": "claude-curator",
+        "item_id": 1020,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Continuous-spectrum reconstruction + super-resolution for snapshot compressive (CASSI) hyperspectral. Niche but hyperspectral imaging is a credible inspection sensor; code released.",
+        "ring": "Watch",
+        "score": 27.7,
+        "title": "Phy-CoSF: Physics-Guided Continuous Spectral Fields Reconstruction and Super-Resolution for Snapshot Compressive Imaging",
+        "tracks": [
+          "Sensors",
+          "Cameras & Standards",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.13583v1"
+      },
+      {
+        "action": "Track for code release; skim the room-based factor graph if monocular dense mapping is needed.",
+        "decided_at": "2026-05-14T07:24:28.534271",
+        "decided_by": "claude-curator",
+        "item_id": 1000,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Monocular RGB-only dense mapping + open-vocab 3D scene graph from ORI-DRS, room-based factor graph aligns reconstructions. Indoor/Habitat focus, project page only \u2014 useful if monocular SLAM enters our stack.",
+        "ring": "Watch",
+        "score": 36.84,
+        "title": "LEXI-SG: Monocular 3D Scene Graph Mapping with Room-Guided Feed-Forward Reconstruction",
+        "tracks": [
+          "Robotics Vision",
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.13741v1"
+      },
+      {
+        "action": "Track for code release; revisit if a monocular bin-picking prototype is on the table.",
+        "decided_at": "2026-05-14T07:24:28.529769",
+        "decided_by": "claude-curator",
+        "item_id": 1084,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Feed-forward monocular 6D pose + per-object Gaussian/NOCS reconstruction in one pass. Indoor-scene focus, no repo link, but the category-level 6D-pose head plus per-object reconstruction is the right shape for bin-picking analogues.",
+        "ring": "Watch",
+        "score": 49.4,
+        "title": "OCH3R: Object-Centric Holistic 3D Reconstruction",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.13018v1"
+      },
+      {
+        "action": "Skim PDF for the prompt-conditioning approach; consider for a future inspection depth prototype.",
+        "decided_at": "2026-05-13T06:09:13.601460",
+        "decided_by": "claude-curator",
+        "item_id": 898,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Region-prompted monocular depth could matter for inspection ROIs where global accuracy is irrelevant but a part-of-interest needs sharp boundaries. Builds on Depth Anything 2/3 + SAM3.",
+        "ring": "Watch",
+        "score": 28.5,
+        "title": "Focusable Monocular Depth Estimation",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.11756v1"
+      },
+      {
+        "action": "Track for code release; revisit when 3DGS surface fitting moves higher on the roadmap.",
+        "decided_at": "2026-05-13T06:09:13.600122",
+        "decided_by": "claude-curator",
+        "item_id": 807,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Identifies built-in photometric ambiguities in Gaussian Splatting with a self-indication module \u2014 relevant if 3DGS surface reconstruction becomes a tool for inspection. Project page only, no repo yet.",
+        "ring": "Watch",
+        "score": 28.7,
+        "title": "Revisiting Photometric Ambiguity for Accurate Gaussian-Splatting Surface Reconstruction",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.12494v1"
+      },
+      {
+        "action": "Skim PDF for the ray-space solver formulation; ignore the egocentric hand-pose application.",
+        "decided_at": "2026-05-13T06:09:13.595363",
+        "decided_by": "claude-curator",
+        "item_id": 803,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Unified network across fisheye/perspective/wide-FOV cameras with a ray-space closed-form solver; the camera-model abstraction is the interesting bit for calibration generalization. AR/VR focus weakens industrial fit.",
+        "ring": "Watch",
+        "score": 35.2,
+        "title": "EgoForce: Forearm-Guided Camera-Space 3D Hand Pose from a Monocular Egocentric Camera",
+        "tracks": [
+          "Calibration & Camera Models"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.12498v1"
+      },
+      {
+        "action": "Wait for the public release; revisit if synthetic-data tooling becomes a priority.",
+        "decided_at": "2026-05-13T06:09:13.594287",
+        "decided_by": "claude-curator",
+        "item_id": 811,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Unreal Engine 5 framework with Python API, procedural OOD scene generation, and 2D/3D ground truth \u2014 could matter for inspection synthetic data later.",
+        "ring": "Watch",
+        "score": 35.4,
+        "title": "LychSim: A Controllable and Interactive Simulation Framework for Vision Research",
+        "tracks": [
+          "Synthetic Data & Simulation"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.12449v1"
+      },
+      {
+        "action": "Track for code release; if VGGT enters our stack the disentanglement trick may matter.",
+        "decided_at": "2026-05-13T06:09:13.593374",
+        "decided_by": "claude-curator",
+        "item_id": 858,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Training-free dynamic/static decoupling on top of VGGT-style models; tidy idea but no code release and narrow benchmark scope.",
+        "ring": "Watch",
+        "score": 38.4,
+        "title": "4DVGGT-D: 4D Visual Geometry Transformer with Improved Dynamic Depth Estimation",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.12027v1"
+      },
+      {
+        "action": "Bookmark EgoEVHands dataset; revisit if an event-camera prototype starts.",
+        "decided_at": "2026-05-13T06:09:13.585392",
+        "decided_by": "claude-curator",
+        "item_id": 826,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Stereo event-camera hand-pose dataset with code; AR/VR focus, no industrial inspection path. Useful pointer if event-camera work resurfaces.",
+        "ring": "Watch",
+        "score": 52.8,
+        "title": "EgoEV-HandPose: Egocentric 3D Hand Pose Estimation and Gesture Recognition with Stereo Event Cameras",
+        "tracks": [
+          "3D Sensors",
+          "Datasets & Benchmarks"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.12297v1"
+      },
+      {
+        "action": "Track if posterior-sampling 3D ideas mature.",
+        "decided_at": "2026-05-12T19:04:17.263945",
+        "decided_by": "claude-curator",
+        "item_id": 519,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "NeRF + diffusion posterior sampling for 3D reconstruction with uncertainty; uncertainty axis is relevant to inspection QA but no code.",
+        "ring": "Watch",
+        "score": 31.8,
+        "title": "Predicting 3D structure by latent posterior sampling",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.10830v1"
+      },
+      {
+        "action": "Track until code lands.",
+        "decided_at": "2026-05-12T19:04:17.263101",
+        "decided_by": "claude-curator",
+        "item_id": 589,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Dynamic 3DGS with part-level tracking; promising for robotics scene understanding but no code release.",
+        "ring": "Watch",
+        "score": 32.0,
+        "title": "PaMoSplat: Part-Aware Motion-Guided Gaussian Splatting for Dynamic Scene Reconstruction",
+        "tracks": [
+          "3D Geometry & Reconstruction",
+          "Robotics Vision"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.10307v1"
+      },
+      {
+        "action": "Watch for general event-camera engineering patterns.",
+        "decided_at": "2026-05-12T19:04:17.262329",
+        "decided_by": "claude-curator",
+        "item_id": 564,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Event-camera pipeline with released code; UAV-detection use case is niche but the sensor work tracks our 3D-sensors interest.",
+        "ring": "Watch",
+        "score": 33.0,
+        "title": "M$^2$E-UAV: A Benchmark and Analysis for Onboard Motion-on-Motion Event-Based Tiny UAV Detection",
+        "tracks": [
+          "3D Sensors"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.10496v1"
+      },
+      {
+        "action": "Watch for production deployment reports.",
+        "decided_at": "2026-05-12T19:04:17.261567",
+        "decided_by": "claude-curator",
+        "item_id": 576,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Training-free VLM-agent anomaly detection; conceptually relevant to inspection but unproven in production.",
+        "ring": "Watch",
+        "score": 33.25,
+        "title": "AnomalyClaw: A Universal Visual Anomaly Detection Agent via Tool-Grounded Refutation",
+        "tracks": [
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.10397v1"
+      },
+      {
+        "action": "Track 3DGS feed-forward maturity.",
+        "decided_at": "2026-05-12T19:04:17.259548",
+        "decided_by": "claude-curator",
+        "item_id": 593,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Compact VFM adapter for feed-forward 3DGS; interesting but feed-forward 3DGS is not yet industrial-grade.",
+        "ring": "Watch",
+        "score": 37.4,
+        "title": "AdaptSplat: Adapting Vision Foundation Models for Feed-Forward 3D Gaussian Splatting",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.10239v1"
+      },
+      {
+        "action": "Track upstream; revisit if code lands.",
+        "decided_at": "2026-05-12T19:04:17.256617",
+        "decided_by": "claude-curator",
+        "item_id": 656,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Active learning for end-to-end MOT could cut labeling cost, but no released code and no industrial test rig path.",
+        "ring": "Watch",
+        "score": 47.64,
+        "title": "Clip-level Uncertainty and Temporal-aware Active Learning for End-to-End Multi-Object Tracking",
+        "tracks": [
+          "Object Tracking"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.09858v1"
+      },
+      {
+        "action": "Skim PDF if calibration-aware manipulation comes up later.",
+        "decided_at": "2026-05-12T19:04:17.253968",
+        "decided_by": "claude-curator",
+        "item_id": 633,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Stereo VLA policy with implicit geometry; no released code and no clear industrial calibration path.",
+        "ring": "Watch",
+        "score": 55.99,
+        "title": "StereoPolicy: Improving Robotic Manipulation Policies via Stereo Perception",
+        "tracks": [
+          "Robotics Vision",
+          "Calibration & Camera Models"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.09989v1"
+      },
+      {
+        "action": "Read PDF if optical-flow features come up for tracking.",
+        "decided_at": "2026-05-12T19:04:08.107613",
+        "decided_by": "claude-curator",
+        "item_id": 25,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Single-pass optical flow with foundation features; potentially relevant to tracking pipelines but no code mentioned.",
+        "ring": "Watch",
+        "score": 24.3,
+        "title": "Rethinking Dense Optical Flow without Test-Time Scaling",
+        "tracks": [
+          "Object Tracking"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.08000v1"
+      },
+      {
+        "action": "Track for event-camera engineering patterns.",
+        "decided_at": "2026-05-12T19:04:08.105406",
+        "decided_by": "claude-curator",
+        "item_id": 13,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Event-camera Mamba SSM with released code; deblurring/HDR applications are off-scope but the event-camera engineering generalizes.",
+        "ring": "Watch",
+        "score": 27.7,
+        "title": "EmambaIR: Efficient Visual State Space Model for Event-guided Image Reconstruction",
+        "tracks": [
+          "3D Sensors"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.08073v1"
+      },
+      {
+        "action": "Watch for code release; revisit if industrial-inspection variants appear.",
+        "decided_at": "2026-05-12T19:04:08.104548",
+        "decided_by": "claude-curator",
+        "item_id": 24,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Training-free MLLM video anomaly detection; surveillance focus, no code released yet, zero-shot SOTA claims unverified.",
+        "ring": "Watch",
+        "score": 22.75,
+        "title": "SphereVAD: Training-Free Video Anomaly Detection via Geodesic Inference on the Unit Hypersphere",
+        "tracks": [
+          "Industrial Vision Inspection"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.08003v1"
+      },
+      {
+        "action": "Track if active-vision techniques port to industrial inspection.",
+        "decided_at": "2026-05-12T19:04:08.104273",
+        "decided_by": "claude-curator",
+        "item_id": 32,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Active-vision imitation-learning benchmark with code; humanoid focus may not transfer to industrial robot guidance.",
+        "ring": "Watch",
+        "score": 31.0,
+        "title": "TAVIS: A Benchmark for Egocentric Active Vision and Anticipatory Gaze in Imitation Learning",
+        "tracks": [
+          "Robotics Vision"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.07943v1"
+      },
+      {
+        "action": "Track upstream; revisit if non-generative variants emerge.",
+        "decided_at": "2026-05-12T19:04:08.099658",
+        "decided_by": "claude-curator",
+        "item_id": 81,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Zero-overlap reconstruction with released code; generative-heavy and unproven for industrial sparse-view tasks.",
+        "ring": "Watch",
+        "score": 45.3,
+        "title": "Mind the Gap: Geometrically Accurate Generative Reconstruction from Disjoint Views",
+        "tracks": [
+          "3D Geometry & Reconstruction"
+        ],
+        "uncertain": true,
+        "url": "http://arxiv.org/abs/2605.07550v1"
+      },
+      {
+        "action": "revisit next week",
+        "decided_at": "2026-05-12T10:48:51.456448",
+        "decided_by": "seed-script",
+        "item_id": 717,
+        "llm_judgment": null,
+        "movement": null,
+        "reason": "Interesting but speculative \u2014 keep on radar",
+        "ring": "Watch",
+        "score": 43.0,
+        "title": "SAMOFT: Robust Multi-Object Tracking via Region and Flow",
+        "tracks": [
+          "Object Tracking",
+          "Vision Foundation Models"
+        ],
+        "uncertain": false,
+        "url": "http://arxiv.org/abs/2605.09417v1"
+      }
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "abstract": "Recent advances in stereo matching have achieved remarkable accuracy, but often rely on large models, heavy computation, or additional foundation-model priors, making them difficult to deploy on resource-constrained platforms. In contrast, efficient stereo models offer faster inference but are commonly considered less capable of strong zero-shot generalization. In this paper, we challenge this assumption by introducing Lite Any Stereo V2 (LAS2), an ultra-fast model series designed for efficient zero-shot stereo matching. LAS2 is developed from both architecture and training perspectives. Architecturally, we revisit efficient stereo design under practical deployment settings and propose a 2D-only cost aggregation framework, optimized for real inference latency rather than theoretical MACs alone. For training, we develop a three-stage strategy that combines synthetic supervision, self-distillation, and real-world knowledge distillation. To improve the reliability of real-world pseudo supervision, we further introduce pseudo-label filtering and an error-clamping operation, enabling smoother synthetic-to-real transfer. We instantiate LAS2 as a family of models, including feed-forward variants for different efficiency budgets and an iterative variant for higher accuracy. Extensive experiments show that LAS2 achieves state-of-the-art accuracy among efficient stereo methods while maintaining significantly lower latency. Specifically, LAS2-H achieves stronger overall zero-shot performance than the iterative method Fast-FoundationStereo, with 1.8x and 2.7x faster inference on H200 and Orin, respectively. The project page, demos, and code are available at https://tomtomtommi.github.io/LiteAnyStereoV2/.",
+  "decided_at": "2026-06-25T13:24:27.875177",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-25T13:24:27.875177",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 4658,
+  "movement": null,
+  "published_at": "2026-06-23T11:45:09",
+  "reason": "Ultra-fast zero-shot stereo matching tuned for real inference latency; runs on Jetson Orin, beats Fast-FoundationStereo, project page + code. Directly relevant to edge depth sensing / 3D; one of the week's strongest practical items.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "Lite Any Stereo V2: Faster and Stronger Efficient Zero-Shot Stereo Matching",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Edge AI & Deployment",
+    "3D Sensors"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.24457v1"
+}

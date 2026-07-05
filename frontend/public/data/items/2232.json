@@ -1,0 +1,25 @@
+{
+  "abstract": "In this paper, we address the problem of detecting small, dense, and overlapping objects, a major challenge in computer vision. Our focus is on reviewing proposed methods based on deep learning supervised approaches. We provide a detailed comparison of these systems on a new dataset of more than 10k images and 120k instances, highlighting their performance, accuracy, and computational efficiency in the industrial recycling process use case. Through this comparative analysis, we identify the most reliable systems currently available and the specific challenges they are designed to tackle. Furthermore, we explore the benefits of data augmentation and synthetic images. Based on our analysis, we also propose potential future directions and innovative solutions that could enhance the effectiveness of small, dense and overlapped object detection systems. The scope of our investigations encompasses object detection, length measurement, and anomaly detection within the context of the recycling process. The anomaly detection strategy is robust against variations in image resolution and zoom levels, ensuring reliable performance in industrial applications. The repository of the proposed dataset, methods and evaluation codes can be found at: https://github.com/o-messai/SDOOD",
+  "decided_at": "2026-05-27T13:22:57.155475",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-27T13:22:57.155475",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2232,
+  "movement": null,
+  "published_at": "2026-05-26T11:47:31",
+  "reason": "Industrial recycling small/dense-object detection dataset (>10k images, 120k instances) with YOLO baselines and a public repo. Niche but legitimately industrial; useful as a reference for small-object inspection.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Small Object Detection in Industrial Recycling: A New Dataset and YOLO Performance Evaluation",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.26884v1"
+}

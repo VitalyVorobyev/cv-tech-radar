@@ -1,0 +1,25 @@
+{
+  "abstract": "Zero-Shot Anomaly Detection (ZSAD) aims to detect anomalies in unseen domains without target-domain adaptation. Recent CLIP-based methods have shown promising performance by leveraging prompt learning and visual-text alignment. However, most existing approaches rely on a single adaptation pathway, which may be insufficient for heterogeneous anomaly patterns across domains. In practice, anomalies exhibit vastly different characteristics, ranging from salient, localized structural disruptions to subtle, diffuse, and irregular variations. To address this challenge, we propose EntroAD, a structural entropy-guided zero-shot anomaly detection framework. Unlike previous methods, EntroAD introduces a dynamic routing mechanism to process different types of anomalies with specialized adaptation strategies. Specifically, we estimate patch-level structural entropy from self-attention-induced patch relations and use it as a proxy for relational uncertainty to guide anomaly-aware token routing. Based on this routing signal, we construct anomaly-aware routed tokens to better capture anomaly cues with different structural characteristics. We further introduce a confidence-aware dual-branch prompt adaptation module to stabilize visual-text alignment while preserving CLIP's transferable prior. Extensive experiments on 10 industrial and medical benchmarks show that EntroAD achieves state-of-the-art performance in challenging cross-dataset ZSAD settings.",
+  "decided_at": "2026-05-28T13:11:32.104640",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-28T13:11:32.104640",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2332,
+  "movement": null,
+  "published_at": "2026-05-27T15:38:03",
+  "reason": "Zero-shot anomaly detection evaluated on 10 industrial+medical benchmarks; CLIP-prompt-routing approach is in our inspection track. No code link, generic ZSAD framing.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "EntroAD: Structural Entropy-Guided Prompt Adaptation for Zero-Shot Anomaly Detection",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection",
+    "Vision Foundation Models"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.28630v1"
+}

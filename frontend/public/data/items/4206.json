@@ -1,0 +1,26 @@
+{
+  "abstract": "Autonomous navigation of quadrupedal robots in diverse environments fundamentally relies on resilient Simultaneous Localization and Mapping (SLAM). While visual-inertial SLAM has matured across wheeled, handheld, and aerial platforms, a critical evaluation gap remains regarding how hardware-level sensor configurations affect performance under the aggressive dynamics of legged locomotion. Quadrupeds introduce distinct embodiment-induced sensory challenges, including foot-impact shocks, high-frequency mechanical vibrations, and rapid angular rotations, which degrade standard perception pipelines. To address this gap, we present a systematic evaluation of state-of-the-art visual, visual-inertial, and LiDAR-visual-inertial SLAM methods using the GrandTour dataset recorded on an ANYmal D quadruped. We isolate and quantify the impacts of camera modalities, shutter techniques, and inertial sensor tiers, analyzing their trade-offs across localization accuracy, algorithmic robustness, and computational resource utilization. Our empirical findings demonstrate that hardware selection has substantial influence on system resilience: stereo configurations consistently outperform monocular and RGB-D modalities, global shutter cameras significantly mitigate motion-induced tracking failures compared to rolling shutter cameras, and, crucially, standard inertial integration can degrade the performance of primarily vision-based frameworks under harsh legged locomotion. These insights additionally offer concrete design guidelines for tailoring custom sensor payloads to achieve dependable perception on agile legged systems.",
+  "decided_at": "2026-06-19T13:07:24.215891",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-19T13:07:24.215891",
+      "ring": "Watch"
+    }
+  ],
+  "id": 4206,
+  "movement": null,
+  "published_at": "2026-06-17T13:41:07",
+  "reason": "Systematic study of how sensor config (mono/stereo/RGB-D/LiDAR, rolling vs global shutter) affects SLAM under quadruped locomotion dynamics; useful sensor-selection evidence but legged-robot scope and no confirmed released benchmark.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Sensor Configuration Matters: A Systematic Evaluation of Multimodal SLAM on Quadruped Robots",
+  "track": "3D Sensors",
+  "tracks": [
+    "3D Sensors",
+    "Robotics Vision",
+    "Calibration & Camera Models"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.19067v1"
+}

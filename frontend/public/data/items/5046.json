@@ -1,0 +1,25 @@
+{
+  "abstract": "6-DoF LiDAR-based localization is a fundamental capability for autonomous systems operating in large-scale outdoor environments. Many deep-learning-based localization methods have achieved promising performance so far. However, as one of the always-on modules competing for limited on-board computational resources, the localization module is expected to consume only a small portion of the overall compute budget. Most existing learning-based methods are still too heavy for this purpose. In contrast, binary neural networks (BNNs) offer an appealing solution, but the 1-bit compression causes severe information loss and performance drop. In this paper, we address this challenge by proposing Binarized LiDAR-based Localization (BiLoc), the first binary neural network framework for 6-DoF LiDAR localization. Specifically, we reinterpret the training of BNNs from the perspective of the information-bottleneck principle, aiming at retaining minimal yet sufficient representations for pose estimation while suppressing redundant variations. And we introduce an auxiliary objective that adaptively regulates information retention in the binary encoder, effectively mitigating the information loss caused by binarization. This auxiliary objective provides additional optimization signals that compensate for the limited representational capacity and the gradient mismatch inherent in BNNs. Extensive experiments on large-scale outdoor LiDAR datasets demonstrate that BiLoc establishes a new state of the art for LiDAR localization with BNNs.",
+  "decided_at": "2026-06-29T13:33:32.590699",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-29T13:33:32.590699",
+      "ring": "Watch"
+    }
+  ],
+  "id": 5046,
+  "movement": null,
+  "published_at": "2026-06-26T05:20:35",
+  "reason": "First binary-neural-network framework for 6-DoF LiDAR localization with an information-bottleneck auxiliary objective; relevant to edge 3D-sensing compute budgets, though AD-flavored and no code.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Learning 1-Bit LiDAR-based Localization with Auxiliary Objective",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "3D Sensors"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.27729v1"
+}

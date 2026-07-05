@@ -1,0 +1,24 @@
+{
+  "abstract": "Material segmentation, the pixel-wise classification of physical surface properties, remains a challenging problem in computer vision, requiring physicochemical understanding distinct from object-centric parsing. Despite the introduction of the rigorous Apple Dense Material Segmentation (DMS) dataset, the benchmark has suffered from attrition and stagnation, increasingly overshadowed by geometry-biased foundation models. In this paper, we revive the Apple-DMS benchmark to establish a modern Vision Transformer baseline. We conduct an exhaustive evaluation of SegFormer and Mask2Former architectures, revealing that standard training paradigms fail on amorphous texture fields due to high-variance gradients. To address this, we introduce a stabilized training recipe featuring High-Fidelity Logit Projection, Query Entropy Regularization, and a domain-specific, physics-compliant augmentation pipeline. Our optimized SegFormer-B5 achieves a new State-of-the-Art (SOTA) of 0.4572 mIoU on the original dataset split, significantly surpassing the prior convolutional baseline. Furthermore, we identify a critical \"Generalization Paradox\": while re-partitioning the dataset into a data-rich 80/10/10 split inflates the metric to 0.5276 mIoU, expert qualitative analysis reveals this induces distributional homogenization, severely degrading real-world, out-of-distribution performance. By releasing our recovered dataset index and robust training framework, we demonstrate that material perception is far from solved and urge the community to leverage the rigorous original split to drive genuine progress in physically grounded artificial intelligence.",
+  "decided_at": "2026-05-25T13:10:52.243646",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-25T13:10:52.243646",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2019,
+  "movement": null,
+  "published_at": "2026-05-22T15:20:27",
+  "reason": "Reviving the Apple DMS material-segmentation benchmark with a modern ViT baseline. Material perception is tangentially relevant to industrial inspection (texture/surface understanding). Useful as a baseline reference but no immediate prototyping path.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Revitalizing Dense Material Segmentation: Stabilized Vision Transformers and the Generalization Paradox",
+  "track": "Datasets & Benchmarks",
+  "tracks": [
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.23747v1"
+}

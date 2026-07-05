@@ -1,0 +1,25 @@
+{
+  "abstract": "Simultaneous 3D reconstruction and 6D object pose estimation from a single monocular image is an inherently ill-posed problem. In industrial settings, however, multiple instances of an object are often randomly arranged in bins, implicitly providing several views of the same object within a single image. We show that this implicit multi-view geometry can be exploited to simultaneously reconstruct the object in 3D and estimate the 6D pose of each visible object instance. We present MooMIns, a new Gaussian-splatting-based approach that inverts the original Gaussian splatting formulation: instead of rendering a single scene from multiple cameras, we render multiple object instances from a single camera. Our method is initialized with SAM3 instance segmentation masks and a modified Structure from Motion (SfM) pipeline. In contrast to learned monocular depth estimation, we perform true geometry-based reconstruction from image evidence, avoiding hallucinations caused by training data priors. We evaluate MooMIns on synthetic and real bin-picking scenarios, and demonstrate accurate reconstruction of previously unseen objects as well as reliable pose estimation of individual instance",
+  "decided_at": "2026-06-15T13:10:54.714514",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-15T13:10:54.714514",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 3648,
+  "movement": null,
+  "published_at": "2026-06-12T12:24:50",
+  "reason": "Monocular 3D reconstruction + per-instance 6D pose for bin-picking by inverting Gaussian splatting (multiple instances as implicit multi-view); true geometry, not learned-depth hallucination. Directly on a priority robot-guidance use case.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "MooMIns -- Monocular 3D Reconstruction and Object Pose Estimation from Multiple Instances",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Robot Guidance"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.14389v1"
+}

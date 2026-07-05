@@ -1,0 +1,26 @@
+{
+  "abstract": "3D object reconstruction, and camera pose estimation in industrial applications are challenging tasks, as errors are costly while the computation time is often limited. The complexity of typical industrial objects further complicates these tasks. Most of the existing datasets in this context do not depict realistic industrial scenarios. Therefore, we introduce the Machine Vision Metrology Industrial Object Dataset (MVM-IOD). Images of typical industrial objects are captured systematically, by moving a camera, mounted at the end effector of an industrial robot arm, on a hemisphere around the objects. MVM-IOD contains reference camera poses and reference 3D point clouds, the acquired RGB images of 9 objects and 2 background choices resulting in 18 scenes, which allows evaluation of all image based methods that compute a 3D reconstruction, camera poses, or novel views of a scene. Based on MVM-IOD, we extensively evaluate current SOTA 3D reconstruction and camera pose estimation methods, such as Structure from Motion, Multi-View Stereo, recent feed forward methods (Visual Geometry Grounded Transformer, \u03c03), and 2D Gaussian Splatting and report our findings as a baseline for future research. The experiments show that capture setups like ours generate out-of distribution images for feed forward methods, leading to suboptimal point clouds and camera poses. However, these out-of-distribution images can be shifted closer to the training distribution by applying simple preprocessing steps. Consequently, in certain industrial applications, feed forward methods should be used with caution.",
+  "decided_at": "2026-06-16T13:07:34.410280",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-16T13:07:34.410280",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 3739,
+  "movement": null,
+  "published_at": "2026-06-15T12:26:47",
+  "reason": "MVM-IOD \u2014 industrial machine-vision metrology dataset (robot-arm hemisphere capture) with reference camera poses and 3D point clouds, benchmarking SfM/MVS/VGGT/pi3/2DGS on realistic industrial objects; finds feed-forward methods go out-of-distribution on industrial captures. Squarely on the calibration/3D/industrial-metrology core and usable as an internal evaluation benchmark.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "MVM-IOD: An Industrial Object-Centric Benchmark Dataset for the Evaluation of 3D Reconstruction Methods",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Industrial Vision Inspection",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.16638v1"
+}

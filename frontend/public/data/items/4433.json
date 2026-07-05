@@ -1,0 +1,25 @@
+{
+  "abstract": "Commercial greenhouse cucumber production is graded by fruit length, which drives harvest scheduling, labour allocation, and logistics. Manual measurement with thread or caliper is accurate but infeasible at commercial scale. This paper presents CucumberVision, a non-contact length estimation framework using an Intel RealSense D435 RGB-D camera. A YOLO26n instance segmentation model locates cucumbers, and SAM (ViT-B backbone) refines each detection to a pixel-precise mask. Five methods are evaluated under matched conditions: (M1) a dominant-axis skeleton scan-line baseline; (M2) PCA on the bounding-box depth point cloud; (M3) SAM mask with medial-axis skeletonisation; (M4) a hybrid keypoint-guided approach using a YOLO26-pose model predicting five anatomical landmarks (KP0--KP4) with piecewise 3D arc-length; and (M5) a novel medial arc spline method fitting a cubic spline through the 3D medial axis of the SAM mask and computing arc length by trapezoidal integration -- the first such application to elongated vegetable measurement. All methods share five-frame burst depth averaging, colour-stream intrinsic alignment, and adaptive method selection with cascading fallbacks ensuring 100% coverage. A benchmark of 48 captures across seven cucumbers in three size categories (small ~8 cm, medium ~13 cm, large ~25 cm) with thread-based ground truth establishes a significant accuracy hierarchy: M1 (MAPE 9.68%) > M2 (5.31%) > M4 (5.51%) > M3 (5.82%) > M5 (4.13%). M5 significantly outperforms all competitors at Bonferroni-corrected alpha=0.0125. A secondary contribution is identifying a 12--18% length underestimation caused by using depth-stream rather than colour-stream intrinsics after rs.align(rs.stream.color) -- an under-reported error source. The complete system is released open source and runs in real time on a single consumer-grade GPU.",
+  "decided_at": "2026-06-23T13:14:23.660932",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-23T13:14:23.660932",
+      "ring": "Watch"
+    }
+  ],
+  "id": 4433,
+  "movement": null,
+  "published_at": "2026-06-21T11:10:12",
+  "reason": "RGB-D arc-length metrology that flags a real RealSense pitfall: depth-vs-colour-stream intrinsics after rs.align cause 12-18% metric error. Open source; cucumber app is niche but the calibration gotcha is transferable.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Curvature-aware 3D length estimation of greenhouse cucumbers using RGB-D imaging and cubic spline arc-length integration",
+  "track": "Calibration & Camera Models",
+  "tracks": [
+    "Calibration & Camera Models",
+    "3D Sensors"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.22439v1"
+}

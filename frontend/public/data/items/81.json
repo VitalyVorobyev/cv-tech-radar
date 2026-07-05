@@ -1,0 +1,24 @@
+{
+  "abstract": "3D vision systems are fundamentally constrained by their reliance on visual overlap: reconstruction methods require it for geometric alignment, while generative models use it to enforce multi-view consistency. This limitation is particularly acute in real-world scenarios such as distributed swarm robotics or crowd-sourced data collection, where capturing overlapping perspectives, both in terms of spatial and appearance overlap, is often impossible. We introduce Generative Reconstruction from Disjoint Views as a new paradigm, establish a comprehensive dataset, and propose specialized evaluation metrics for zero-overlap scenarios. Our benchmarking demonstrates that existing state-of-the-art methods fail catastrophically on this task, producing disconnected geometries or semantically incoherent reconstructions. To address these limitations, we propose GLADOS, a general, modular framework that operates through three stages: (1) Generative Bridging, where foundation models synthesize intermediate perspectives to connect disjoint inputs; (2) Robust Coarse 3D Reconstruction, that establish coarse geometric scaffold via global alignment which absorbs local contradictions from generative process; and (3) Iterative Context Expansion and Consistency Optimization to fill missing regions and unify the reconstruction. As an architectureagnostic framework, GLADOS enables seamless integration of future advances in generation, reconstruction, and inpainting. The source code is available at: https://github.com/gwilczynski95/GLADOS.",
+  "decided_at": "2026-05-12T19:04:08.099658",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-12T10:48:51.456307",
+      "ring": "Watch"
+    }
+  ],
+  "id": 81,
+  "movement": null,
+  "published_at": "2026-05-08T10:24:23",
+  "reason": "Zero-overlap reconstruction with released code; generative-heavy and unproven for industrial sparse-view tasks.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Mind the Gap: Geometrically Accurate Generative Reconstruction from Disjoint Views",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.07550v1"
+}

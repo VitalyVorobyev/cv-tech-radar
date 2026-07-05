@@ -1,0 +1,24 @@
+{
+  "abstract": "Vision foundation models pretrained on web-scale data have recently shown strong transfer capabilities on many downstream tasks, but their effectiveness for industrial visual inspection remains unclear. Industrial data differ substantially from web-data and often require fine-grained dense prediction, raising the question of whether modern self-supervised pretraining can improve over the conventional transfer-learning paradigm based on supervised ImageNet initialization. In this work, we compare ConvNeXt backbones pretrained with supervised ImageNet classification or DINOv3 distillation, and relate them to the conventional ResNet-50 baseline. We evaluate semantic segmentation, instance segmentation, and object detection across four downstream datasets spanning RGB surface-defect inspection and X-ray defect detection. We further study both frozen and fully finetuned adaptation regimes. Our results show that DINOv3 offers no clear advantage in frozen transfer, but provides a stronger initialization after full finetuning on RGB tasks, yielding faster convergence and better final performance. Under X-ray modality shift, however, supervised ImageNet pretraining remains more effective in both frozen and finetuned settings. Overall, our findings suggest that modern vision foundation models are promising for supervised RGB industrial inspection, but their transferability is strongly conditioned by downstream adaptation and target modality.",
+  "decided_at": "2026-05-25T13:10:52.235477",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-25T13:10:52.235477",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 2042,
+  "movement": null,
+  "published_at": "2026-05-22T10:31:25",
+  "reason": "Direct empirical comparison of DINOv3 vs ImageNet pretraining for industrial defect inspection across RGB and X-ray \u2014 concrete answer to a real backbone choice for inspection systems. Finding (DINOv3 helps RGB on full finetune, ImageNet still wins for X-ray) is actionable.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "Rethinking Transfer Learning for Industrial Inspection: DINOv3 vs. ImageNet Pretraining Across RGB and X-ray Tasks",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.23472v1"
+}

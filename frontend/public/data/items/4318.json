@@ -1,0 +1,25 @@
+{
+  "abstract": "6D pose estimation is a key task in computer vision and embodied AI, widely used in robotic manipulation, augmented reality, etc. Existing methods directly regress in a high-dimensional continuous space, facing two key challenges in category-level pose estimation: limited accuracy due to noise and local optima, and inefficient search over an infinite space that hinders real-time performance. This paper proposes Flow6D, a hierarchical flow matching framework with a two-stage discrete latent space localization-continuous pose regression strategy. Rotation and translation parameters are first discretized into bins, with a discrete flow matching model locking the latent space around the true pose to reduce search complexity. Then, by sampling in the latent space, a continuous flow matching model predicts local pose residuals to optimize the estimate and regress to an accurate pose. The framework also naturally extends to articulated objects, outperforming state-of-the-art methods on synthetic and real datasets with real-time inference at 70 FPS. Project website: https://flow6d.github.io/.",
+  "decided_at": "2026-06-23T13:14:23.946815",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-23T13:14:23.946815",
+      "ring": "Watch"
+    }
+  ],
+  "id": 4318,
+  "movement": null,
+  "published_at": "2026-06-22T13:05:55",
+  "reason": "Category-level 6D pose via discrete-to-continuous flow matching, real-time (70 FPS), project page (likely code), extends to articulated objects. Relevant to robot guidance/bin-picking; verify code + real-data results.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Flow6D: Discrete-to-Continuous Flow Matching for Efficient and Accurate Category-Level 6D Pose Estimation",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Robotics Vision"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.23293v1"
+}

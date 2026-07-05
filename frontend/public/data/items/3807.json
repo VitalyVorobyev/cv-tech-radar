@@ -1,0 +1,25 @@
+{
+  "abstract": "Industrial inspection needs zero-shot anomaly detection (ZSAD) that remains useful under edge deployment constraints. Recent methods often rely on ViT-L foundation backbones (~300M parameters), which exceed the memory and operator budget of typical embedded hardware. We study this regime through EdgeZSAD, a compact reference system built around a TinyViT-21M-512 backbone, an asymmetric global-local readout (EdgeGLR), and a reproducible source-side training recipe (Real-IAD-DR). We train a single checkpoint in a source-trained, target-unseen protocol and evaluate it across six industrial benchmarks. Across three independent runs, the resulting model reaches an average image AUROC of 91.6 on MVTec-AD and 88.2 on VisA, while remaining directly deployable on Jetson Orin Nano Super (TensorRT FP16) and RB5 Gen2 (QNN GPU FP16). Across the six device-rescored benchmarks, image-AUROC drift stays below 0.2 points, indicating that the exported graph preserves host-side ranking behavior in the evaluated deployment setting.",
+  "decided_at": "2026-06-16T13:07:34.414864",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-16T13:07:34.414864",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3807,
+  "movement": null,
+  "published_at": "2026-06-15T02:17:46",
+  "reason": "EdgeZSAD \u2014 zero-shot anomaly detection targeted at edge devices; both tracks are priorities, but edge zero-shot anomaly is a crowded claim space.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "EdgeZSAD: Practical Zero-Shot Anomaly Detection on Edge Devices",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection",
+    "Edge AI & Deployment"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.16119v1"
+}

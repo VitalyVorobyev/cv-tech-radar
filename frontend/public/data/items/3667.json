@@ -1,0 +1,24 @@
+{
+  "abstract": "Reconstruction-based anomaly detection is attractive for industrial inspection, but scaling it from category-specific training to a one-for-all setting is challenging. A single model must reconstruct diverse normal appearances without copying abnormal details, which exposes two coupled failure modes: identical shortcut, where anomalies pass through the reconstruction path, and mis-reconstruction, where normal categories are confused with one another. We propose \\textbf{BoRAD}, a label-free training framework that treats this as a representation-capacity allocation problem. BoRAD uses a shared learnable prototype bank to impose two complementary regularizers: spatial prototype alignment contracts local within-prototype variation to suppress anomaly copying, while prototype-relative global alignment preserves between-prototype structure and improves sensitivity to abnormal angular deviations. The prototype bank and prediction heads are used only during training; inference remains a standard teacher-student feature discrepancy pass, with no class labels, negative pairs, memory retrieval, or prototype lookup. BoRAD achieves competitive one-for-all anomaly detection performance, including 86.2\\% mAD on MVTec AD, 80.7\\% mAD on VisA and 73.1\\% mAD on Real-IAD. Diagnostic analyses further show reduced anomaly leakage, improved normal-category separability, and stronger anomaly-normal score separation.",
+  "decided_at": "2026-06-15T13:10:54.721057",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-15T13:10:54.721057",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3667,
+  "movement": null,
+  "published_at": "2026-06-12T05:29:25",
+  "reason": "One-for-all (multi-class) reconstruction-based anomaly detection on MVTec AD / VisA / Real-IAD \u2014 a priority inspection direction \u2014 but results are competitive-not-leading and no code is released.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "BoRAD: Bootstrap your Own Representations for Multi-class Anomaly Detection",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.14129v1"
+}

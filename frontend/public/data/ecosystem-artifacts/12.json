@@ -1,0 +1,45 @@
+{
+  "artifact_id": 12,
+  "capability": "ml-runtimes",
+  "decisions": [
+    {
+      "action": "",
+      "decided_at": "2026-07-05T06:40:16.337205",
+      "decided_by": "web-curator",
+      "reason": "Moved to Use from the ecosystem radar.",
+      "ring": "Use",
+      "tracks": [
+        "Edge AI & Deployment"
+      ],
+      "uncertain": false
+    }
+  ],
+  "description": "Rust wrapper for ONNX Runtime.",
+  "events": [],
+  "homepage_url": "",
+  "key": "ort",
+  "name": "ort",
+  "refs": [
+    {
+      "ecosystem": "crates",
+      "last_checked_at": "2026-07-03T13:02:14.451633",
+      "last_release_at": "2026-03-05T04:56:45.131839",
+      "last_status": "ok",
+      "last_version": "2.0.0-rc.12",
+      "ref": "ort"
+    },
+    {
+      "ecosystem": "github",
+      "last_checked_at": "2026-07-03T13:02:13.971891",
+      "last_release_at": "2026-03-05T05:41:17",
+      "last_status": "ok",
+      "last_version": "v2.0.0-rc.12",
+      "ref": "pykeio/ort"
+    }
+  ],
+  "ring": "Use",
+  "status": "watchlist",
+  "tracks": [
+    "Edge AI & Deployment"
+  ]
+}

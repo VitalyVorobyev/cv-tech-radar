@@ -1,0 +1,67 @@
+{
+  "artifact_id": 6,
+  "capability": "ml-runtimes",
+  "decisions": [],
+  "description": "Deep learning framework.",
+  "events": [
+    {
+      "artifact_id": 6,
+      "artifact_key": "pytorch",
+      "artifact_name": "PyTorch",
+      "body": "This release is meant to fix the following regressions and silent correctness issues:\r\n## Regression fixes\r\n- Fix nondeterministic outputs in test_batch_invariance with FLASH_ATTN on NVIDIA B200 GPUs ([#181248](https://github.com/pytorch/pytorch/issues/181248)), fixed by updating Triton to 3.7.1 ([#186814](https://github.com/pytorch/pytorch/pull/186814))\r\n- Fix illegal memory access in the Triton convolution2d_bwd_weight kernel on B100/B200 (sm100) GPUs ([#187081](https://github.com/pytorch/pytorch/issues/187081)), fixed by updating Triton to 3.7.1 ([#186814](https://github.com/pytorch/pytorch/pull/186814))\r\n- Fix fill_ on byte-dtype views with misaligned storage offset ([#186821](https://github.com/pytorch/pytorch/pull/186821))\r\n## Releng / Build\r\n- Drop CPython 3.13t from the binary build matrix ([#182951](https://github.com/pytorch/pytorch/pull/182951))",
+      "ecosystem": "github",
+      "event_date": "2026-06-18T00:41:17",
+      "event_type": "release",
+      "id": 38,
+      "matched_keywords": [],
+      "relevant": true,
+      "severity": "medium",
+      "summary": "PyTorch 2.12.1 Release, bug fix release",
+      "url": "https://github.com/pytorch/pytorch/releases/tag/v2.12.1",
+      "version": "v2.12.1"
+    },
+    {
+      "artifact_id": 6,
+      "artifact_key": "pytorch",
+      "artifact_name": "PyTorch",
+      "body": "Tensors and Dynamic neural networks in Python with strong GPU acceleration",
+      "ecosystem": "pypi",
+      "event_date": "2026-06-17T21:08:43.160075",
+      "event_type": "release",
+      "id": 39,
+      "matched_keywords": [],
+      "relevant": true,
+      "severity": "medium",
+      "summary": "Tensors and Dynamic neural networks in Python with strong GPU acceleration",
+      "url": "https://pypi.org/project/torch/2.12.1/",
+      "version": "2.12.1"
+    }
+  ],
+  "homepage_url": "https://pytorch.org",
+  "key": "pytorch",
+  "name": "PyTorch",
+  "refs": [
+    {
+      "ecosystem": "github",
+      "last_checked_at": "2026-07-03T13:02:08.076775",
+      "last_release_at": "2026-06-18T00:41:17",
+      "last_status": "ok",
+      "last_version": "v2.12.1",
+      "ref": "pytorch/pytorch"
+    },
+    {
+      "ecosystem": "pypi",
+      "last_checked_at": "2026-07-03T13:02:08.129838",
+      "last_release_at": "2026-06-17T21:08:43.160075",
+      "last_status": "ok",
+      "last_version": "2.12.1",
+      "ref": "torch"
+    }
+  ],
+  "ring": "Use",
+  "status": "adopted",
+  "tracks": [
+    "Vision Foundation Models",
+    "Edge AI & Deployment"
+  ]
+}

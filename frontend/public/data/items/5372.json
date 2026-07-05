@@ -1,0 +1,25 @@
+{
+  "abstract": "Structure from Motion (SfM) systems traditionally struggle with planar scenes, where standard epipolar geometry-based methods become degenerate. Rather than viewing planar surfaces as a limitation, we propose a unified framework that leverages them as a source of geometric constraints. Our key insight is that each planar surface visible across multiple views provides an independent estimate of relative camera poses through homography decomposition. By aggregating estimates from multiple planes or even from a single dominant plane we achieve robust pose recovery in scenarios where traditional methods fail. We introduce a novel graph-based approach that constructs a pose-graph from homography estimates and employs spectral embedding to identify and filter unreliable edges. Our method maps homography-based pose estimates onto the real line based on their geometric and visual consistency, enabling efficient extraction of a maximally consistent spanning tree for pose recovery. This approach naturally handles both highly planar scenes, such as indoor sports arenas, and general $3$D environments. We demonstrate superior performance on basketball court imagery where existing methods struggle, while matching or exceeding state-of-the-art results on unconstrained outdoor scenes from the IMC Phototourism benchmark.",
+  "decided_at": "2026-07-02T13:13:10.349091",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-07-02T13:13:10.349091",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 5372,
+  "movement": "new",
+  "published_at": "2026-06-30T17:18:27",
+  "reason": "Homography decomposition + pose-graph spectral filtering for planar-scene pose recovery \u2014 squarely calibration/3D-geometry, relevant to planar-target and multi-view calibration. Concrete method with IMC-Phototourism results.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "Planar-SfM: Camera Pose Estimation via Homography Graph Embeddings",
+  "track": "Calibration & Camera Models",
+  "tracks": [
+    "Calibration & Camera Models",
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.31979v1"
+}

@@ -1,0 +1,25 @@
+{
+  "abstract": "PuzzleBoard introduces a camera calibration target that combines the subpixel corner-detection accuracy of a checkerboard / chessboard with a low-resolution position-encoded code embedded in each cell. The pattern enables robust corner detection, decoding, and partial-view calibration where the full board is not visible, while remaining backwards-compatible with classical checkerboard pipelines. Useful for camera intrinsic / extrinsic calibration, hand-eye calibration, and fiducial / calibration target detection in industrial vision setups.",
+  "decided_at": "2026-05-14T07:38:13.921827",
+  "decided_by": "curator",
+  "history": [
+    {
+      "at": "2026-05-14T07:38:13.921827",
+      "ring": "Use"
+    }
+  ],
+  "id": 1134,
+  "movement": null,
+  "published_at": "2024-09-30T12:00:00",
+  "reason": "Calibration target with subpixel-accurate corner detection plus a position code per cell \u2014 handles partial-view and partially-occluded boards while staying compatible with checkerboard pipelines. In Use as a practical alternative to plain checkerboards / ChArUco for camera calibration.",
+  "ring": "Use",
+  "source": "Manual",
+  "title": "PuzzleBoard: A New Camera Calibration Pattern with Position Encoding",
+  "track": "Target Detection & Fiducials",
+  "tracks": [
+    "Target Detection & Fiducials",
+    "Calibration & Camera Models"
+  ],
+  "uncertain": false,
+  "url": "https://arxiv.org/abs/2409.20127v1"
+}

@@ -1,0 +1,25 @@
+{
+  "abstract": "Visual Geometry Grounded Transformer (VGGT) has already attracted a great deal of attention in a short period of time, not least due to the Best Paper Award at CVPR-2025. Similar to DUSt3R and MASt3R, VGGT aims to bring about a paradigm shift by replacing established methods like bundle adjustment and feature matching with a simple, unified, feed-forward neural network that predicts camera poses, depth maps, and dense 3D structure directly from multiple images of a scene in a few seconds. A key aspect is its ability to process an arbitrary number of views consistently in a single forward pass without any post-processing or iterative optimization. For photogrammetry, this opens new possibilities for real-time, scalable, and accessible 3D reconstruction. In this context, not only high reconstruction accuracy but also high-quality uncertainty estimates are crucial, as they foster trust and enable robust quality assurance. This paper therefore investigates the quality of VGGT's uncertainty predictions. The analysis identifies an effective confidence threshold for filtering VGGT's raw output and demonstrates that enhancing uncertainty quality holds strong potential for improving the accuracy of its 3D reconstructions.",
+  "decided_at": "2026-06-16T13:07:34.413458",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-16T13:07:34.413458",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3755,
+  "movement": null,
+  "published_at": "2026-06-15T09:49:00",
+  "reason": "Analysis of VGGT uncertainty quality on the DTU benchmark; useful context if relying on feed-forward MVS uncertainty, but analysis-only on a single benchmark.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Uncertainty Quality of VGGT: An Analysis on the DTU Benchmark Dataset",
+  "track": "Calibration & Camera Models",
+  "tracks": [
+    "Calibration & Camera Models",
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.16479v1"
+}

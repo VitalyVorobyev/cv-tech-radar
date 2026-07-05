@@ -1,0 +1,25 @@
+{
+  "abstract": "Hyperspectral 3D imaging enables the capture of dense spectral information and scene geometry but has traditionally been confined to narrow spectral windows, typically the visible range. In this work, we introduce a broadband hyperspectral 3D imaging (BH3D) method to extend this capability across the full visible-near-infrared and short-wavelength infrared (SWIR) spectrum (450-1500 nm). This broad coverage is critical as it captures complementary physical cues: visible wavelengths reveal surface appearance, while SWIR bands provide insight into subsurface properties and material composition. However, realizing BH3D is challenging due to fundamental sensor constraints between visible-spectrum silicon and SWIR-spectrum InGaAs sensors, which necessitate complex multi-spectrograph designs. Here we propose a single-spectrograph BH3D system, using a stereo setup comprising visible and SWIR cameras, that reconstructs dense broadband hyperspectral reflectance together with accurate 3D geometry. Our key idea is to extend dispersed structured light to the broadband regime using a single spectrograph. We model the image formation of broadband dispersed structured light, and estimate hyperspectral reflectance and depth. We validate our approach on diverse real-world scenes, demonstrating accurate reconstruction with a mean spectral angle mapper of 0.13 rad, root mean square error of 0.03, and mean depth error of 4.5 mm. We further demonstrate identifying metameric materials, performing imaging through opaque layers, uncovering hidden features on banknotes, and revealing blood vessels.",
+  "decided_at": "2026-05-26T13:10:02.563849",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-26T13:10:02.563849",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2108,
+  "movement": null,
+  "published_at": "2026-05-25T12:09:46",
+  "reason": "Single-spectrograph stereo (Vis+SWIR) dispersed-structured-light rig giving joint hyperspectral reflectance + depth \u2014 direct fit for 3D Sensors track; sensor hardware paper, no code, but the setup is something we could replicate conceptually.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Broadband Hyperspectral 3D Imaging using Dispersed Structured Light",
+  "track": "3D Sensors",
+  "tracks": [
+    "3D Sensors",
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.25757v1"
+}

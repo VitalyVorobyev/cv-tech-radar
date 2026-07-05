@@ -1,0 +1,25 @@
+{
+  "abstract": "Event cameras asynchronously report brightness changes with microsecond-level temporal resolution, but real event data remain difficult to collect at scale because specialized sensors, careful synchronization, and task-specific annotations are required. Event-camera simulation is therefore important to event-based vision tasks. Most practical simulators build on contrast-threshold event generation, some with additional filtering, stochastic noise, or hand-tuned sensor parameters. While effective, such formulations often simplify the temporal structure produced by the lifecycle of each pixel, which can distort event timing and weaken downstream transfer. We introduce FracEvent, an event simulator that models this pixel-level lifecycle with fractional-relaxation voltage dynamics. Given a log-intensity trajectory, FracEvent drives a compact stack of relaxation modes, combines their responses into a voltage state, emits ON/OFF events by localizing threshold crossings on the continuous voltage trajectory, and updates the reference while retaining the underlying memory modes. This retained state links residual voltage response to later event timing. We evaluate FracEvent through event-stream comparison and downstream transfer on image reconstruction and optical flow estimation. Across multiple datasets, FracEvent improves the temporal structure of generated events and achieves stronger downstream-transfer results than competing simulator baselines, showing its practical value for event-camera simulation.",
+  "decided_at": "2026-06-29T13:33:32.335313",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-29T13:33:32.335313",
+      "ring": "Watch"
+    }
+  ],
+  "id": 4953,
+  "movement": null,
+  "published_at": "2026-06-25T06:01:39",
+  "reason": "Event-camera simulator using fractional-relaxation pixel dynamics to improve event-timing fidelity and downstream transfer; relevant to event sensors + synthetic data, no code.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "FracEvent: Event-Camera Simulation via Fractional-Relaxation Pixel Dynamics",
+  "track": "3D Sensors",
+  "tracks": [
+    "3D Sensors",
+    "Synthetic Data & Simulation"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.26636v1"
+}

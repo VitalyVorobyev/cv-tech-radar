@@ -1,0 +1,25 @@
+{
+  "abstract": "Few-shot cross-category 3D anomaly detection aims to determine whether an unknown point cloud belongs to a target normal category using only a few normal references. Existing training-based methods usually require category-wise optimization, while recent training-free methods based on multi-view CLIP visual features mainly rely on visual similarity and may be confused by geometrically similar categories. In this paper, we propose VT-3DAD, a training-free framework for cross-category 3D anomaly detection via Visual-Text Normal Space Alignment. Given few-shot normal references and a test point cloud, VT-3DAD first generates realistic multi-view depth maps and extracts view-wise features using a frozen CLIP visual encoder. The visual branch measures reference-test deviation in the multi-view feature space. In parallel, depth-aware and 3D-aware prompts are encoded by the frozen CLIP text encoder to construct textual normal anchors, which provide semantic normality constraints for the target category. The final anomaly score is obtained by fusing visual deviation from normal references and semantic deviation from the textual normal space. Experiments on the ShapeNetPart dataset demonstrate that VT-3DAD achieves state-of-the-art performance. In particular, VT-3DAD improves the one-shot average AUC-ROC from 92.49% to 94.80% compared with the visual-only baseline, while also reducing the average standard deviation from 5.64 to 3.41.",
+  "decided_at": "2026-06-04T13:09:59.714351",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-04T13:09:59.714351",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2791,
+  "movement": null,
+  "published_at": "2026-06-03T02:34:20",
+  "reason": "Training-free cross-category 3D anomaly detection (frozen CLIP multi-view plus text normal anchors) is squarely in the 3D-inspection lane, but evidence is ShapeNetPart synthetic only with no real industrial data or released code.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "VT-3DAD: Cross-Category 3D Anomaly Detection via Visual-Text Normal Space Alignment",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection",
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.04369v1"
+}

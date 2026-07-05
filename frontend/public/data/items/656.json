@@ -1,0 +1,28 @@
+{
+  "abstract": "Multi-Object Tracking (MOT) in dynamic environments relies on robust temporal reasoning to maintain consistent object identities over time. Transformer-based end-to-end MOT models achieve strong performance by explicitly modeling temporal dependencies, yet training them requires extensive bounding-box and identity annotations. Given the high labeling cost and strong redundancy in videos, Active Learning (AL) is an effective approach to improve annotation efficiency. However, existing AL methods for MOT primarily operate at the frame level, which is structurally misaligned with modern end-to-end trackers whose inference and training rely on multi-frame clips. To bridge this gap, we formulate clip-level active learning and propose Clip-level Uncertainty and Temporal-aware Active Learning (CUTAL). In contrast to frame-based approaches, CUTAL scores each clip using uncertainty metrics derived from multi-frame predictions to capture inter-frame correspondence ambiguities, while enforcing temporal diversity to select an informative and non-redundant subset. Experiments show that CUTAL achieves stronger overall performance than baselines at the same label budgets across MeMOTR and SambaMOTR. Notably, CUTAL achieves performance comparable to full supervision for MeMOTR on both datasets using only 50% of the labeled training data.",
+  "decided_at": "2026-05-12T19:04:17.256617",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-12T10:48:51.456040",
+      "ring": "Evaluate"
+    },
+    {
+      "at": "2026-05-12T17:55:52.155106",
+      "ring": "Watch"
+    }
+  ],
+  "id": 656,
+  "movement": null,
+  "published_at": "2026-05-11T01:33:35",
+  "reason": "Active learning for end-to-end MOT could cut labeling cost, but no released code and no industrial test rig path.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Clip-level Uncertainty and Temporal-aware Active Learning for End-to-End Multi-Object Tracking",
+  "track": "Object Tracking",
+  "tracks": [
+    "Object Tracking"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.09858v1"
+}

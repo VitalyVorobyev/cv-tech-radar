@@ -1,0 +1,24 @@
+{
+  "abstract": "Terrestrial Laser Scanning (TLS) point clouds captured in urban environments frequently suffer from glass-induced reflection artifacts, severely degrading downstream applications. Existing reflection artifact removal methods generally rely on ideal reflection symmetry assumptions, yet their performance is limited by inaccurate glass estimation and insufficient geometric representations. To address these issues, we propose a novel unified framework aimed at robust reflection artifact removal: In the first stage, we leverage a multi-modal vision foundation model to produce initial glass masks, which are then refined using geometric cues to achieve high-precision glass regions, followed by glass completion to recover missing regions caused by no-return measurements on transparent surfaces; In the second stage, we propose a physics-driven descriptor, termed Reflection-aware Local-Global Geometric Similarity (RE-LGGS), which is grounded in actual laser reflection geometry and jointly encodes multi-scale geometric structures and orientation consistency using PCA-based local shape representations, thereby significantly improving robustness against imperfect observations. Extensive experiments on multiple public TLS datasets demonstrate that our framework consistently outperforms state-of-the-art methods in reflection artifacts removal.",
+  "decided_at": "2026-06-10T13:23:03.891153",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-10T13:23:03.891153",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3013,
+  "movement": null,
+  "published_at": "2026-06-09T08:09:33",
+  "reason": "LiDAR glass-reflection artifact removal in TLS point clouds; a real 3D-scanning cleanup problem.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "GRAR: Glass-induced Reflection Artifact Removal in LiDAR Point Clouds",
+  "track": "3D Sensors",
+  "tracks": [
+    "3D Sensors"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.10541v1"
+}

@@ -1,0 +1,24 @@
+{
+  "abstract": "Reconstructing dynamic 4D scenes from monocular videos is a fundamental yet challenging task. While recent 3D foundation models provide strong geometric priors, their performance significantly degrades in dynamic environments. This degradation stems from a fundamental tension: the inherent coupling of camera ego-motion and object motion within global attention mechanisms. In this paper, we propose a novel, training-free progressive decoupling framework that disentangles dynamics from statics in a principled, coarse-to-fine manner. Our core insight is to resolve the tension by first stabilizing the camera pose, followed by geometric refinement. Specifically, our approach consists of three synergistic components: (1) a Dynamic-Mask-Guided Pose Decoupling module that isolates pose estimation from dynamic interference, yielding a stable motion-free reference frame; (2) a Topological Subspace Surgery mechanism that orthogonally decomposes the depth manifold, safely preserving dynamic objects while injecting refined, mask-aware geometry into static regions; and (3) an Information-Theoretic Confidence-Aware Fusion strategy that formulates depth integration as a heteroscedastic Bayesian inference problem, adaptively blending multi-pass predictions via inverse-variance weighting. Extensive experiments on standard 4D reconstruction benchmarks demonstrate that our method achieves consistent and substantial improvements across principal point-cloud metrics. Notably, our approach shows competitive performance in robust 4D scene reconstruction without requiring fine-tuning, suggesting the potential of mathematically grounded dynamic-static disentanglement.",
+  "decided_at": "2026-05-13T06:09:13.593374",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-13T06:09:13.593374",
+      "ring": "Watch"
+    }
+  ],
+  "id": 858,
+  "movement": null,
+  "published_at": "2026-05-12T12:13:36",
+  "reason": "Training-free dynamic/static decoupling on top of VGGT-style models; tidy idea but no code release and narrow benchmark scope.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "4DVGGT-D: 4D Visual Geometry Transformer with Improved Dynamic Depth Estimation",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.12027v1"
+}

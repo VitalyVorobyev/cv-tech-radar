@@ -1,0 +1,24 @@
+{
+  "abstract": "Industrial anomaly localization aims to accurately identify and localize abnormal regions in industrial products, addressing the critical challenge of detecting unseen defect categories in real-world scenarios. Traditional closed-set methods often suffer from poor cross-scenario generalization, while existingMultimodal Large Language Model (MLLM)-based approachesface two core limitations: they either adopt QA-style paradigmsmisaligned with the practical demands of localization, or relyon standard optimization techniques such as Group RelativePolicy Optimization (GRPO), which fails to deliver effectivelearning signals for subtle defects. To tackle these issues, thispaper proposes DifferAD-R1, an MLLM-augmented reinforcement learning framework tailored for industrial anomaly localization. We design a Difference-Guided dual-image paradigm,which reformulates the localization task as a one-shot difference grounding problem to effectively explore cross-scenarioanomalies. A Dual-Consistency Localization Reward is developedfor hard-to-detect anomalies, enhancing optimization stabilityand robustness. Additionally, we integrate a difficulty-awarestrategy with adaptive reweighting and group-wise resamplingto prioritize learning on challenging instances. To facilitateevaluations in real-world industrial settings, we construct theAD-DualDiff dataset, comprising 13K paired images across 20categories. Experimental results demonstrate that DifferADR1 significantly outperforms existing baselines and achievescompetitive performance compared to large-scale models likeQwen3-VL (235B parameters). Our code is publicly availableat: https://github.com/Rong2026/work-1.",
+  "decided_at": "2026-06-16T13:07:34.415543",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-16T13:07:34.415543",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3742,
+  "movement": null,
+  "published_at": "2026-06-15T11:50:12",
+  "reason": "DifferAD-R1 \u2014 difference-guided industrial anomaly localization with an MLLM/reasoning model; on-domain but MLLM-based localization is immature versus specialized anomaly methods.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "DifferAD-R1: A Difference-Guided IndustrialAnomaly Localization with Multimodal LargeLanguage Models",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2606.16601v1"
+}

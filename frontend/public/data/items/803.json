@@ -1,0 +1,24 @@
+{
+  "abstract": "Reconstructing the absolute 3D pose and shape of the hands from the user's viewpoint using a single head-mounted camera is crucial for practical egocentric interaction in AR/VR, telepresence, and hand-centric manipulation tasks, where sensing must remain compact and unobtrusive. While monocular RGB methods have made progress, they remain constrained by depth-scale ambiguity and struggle to generalize across the diverse optical configurations of head-mounted devices. As a result, models typically require extensive training on device-specific datasets, which are costly and laborious to acquire. This paper addresses these challenges by introducing EgoForce, a monocular 3D hand reconstruction framework that recovers robust, absolute 3D hand pose and its position from the user's (camera-space) viewpoint. EgoForce operates across fisheye, perspective, and distorted wide-FOV camera models using a single unified network. Our approach combines a differentiable forearm representation that stabilizes hand pose, a unified arm-hand transformer that predicts both hand and forearm geometry from a single egocentric view, mitigating depth-scale ambiguity, and a ray space closed-form solver that enables absolute 3D pose recovery across diverse head-mounted camera models. Experiments on three egocentric benchmarks show that EgoForce achieves state-of-the-art 3D accuracy, reducing camera-space MPJPE by up to 28% on the HOT3D dataset compared to prior methods and maintaining consistent performance across camera configurations. For more details, visit the project page at https://dfki-av.github.io/EgoForce.",
+  "decided_at": "2026-05-13T06:09:13.595363",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-13T06:09:13.595363",
+      "ring": "Watch"
+    }
+  ],
+  "id": 803,
+  "movement": null,
+  "published_at": "2026-05-12T17:59:56",
+  "reason": "Unified network across fisheye/perspective/wide-FOV cameras with a ray-space closed-form solver; the camera-model abstraction is the interesting bit for calibration generalization. AR/VR focus weakens industrial fit.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "EgoForce: Forearm-Guided Camera-Space 3D Hand Pose from a Monocular Egocentric Camera",
+  "track": "Calibration & Camera Models",
+  "tracks": [
+    "Calibration & Camera Models"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.12498v1"
+}

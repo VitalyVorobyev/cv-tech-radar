@@ -1,0 +1,25 @@
+{
+  "abstract": "Structure from Motion (SfM) is essential for multi-view 3D reconstruction, however, its accuracy heavily relies on the accuracy of image matching. While the recent correspondence matching method, MASt3R, enables robust matching even under challenging conditions, it tends to generate incorrect correspondences for non-overlapping image pairs. Consequently, existing SfM methods using MASt3R, such as MASt3R-SfM, suffer from significant degradation in pose estimation accuracy as they incorporate these unreliable matches directly into optimization. To address this issue, we propose G-MASt3R-SfM, a novel SfM pipeline that enhances robustness through two key modules. First, the Graph-based View Pruning (GVP) module constructs a scene graph from matching confidence and geometrically prunes outlier views. Second, the Multi-Stage Optimization (MSO) module progressively refines camera parameters by expanding the optimization scope from local consistency to the global consistency. Experiments on the ETH3D dataset demonstrate that our method achieves state-of-the-art accuracy in both camera pose estimation and 3D reconstruction, effectively suppressing noise caused by outliers.",
+  "decided_at": "2026-06-23T13:14:23.943113",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-23T13:14:23.943113",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 4384,
+  "movement": null,
+  "published_at": "2026-06-22T05:01:08",
+  "reason": "Graph-based view pruning + multi-stage optimization to make MASt3R-SfM robust to bad correspondences; ETH3D SOTA on pose + reconstruction. No code yet and incremental, but the learned-SfM/MASt3R line is core to calibration-free 3D.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "G-MASt3R-SfM: Graph-based View Pruning and Multi-stage Optimization for Robust SfM",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Calibration & Camera Models"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.22856v1"
+}

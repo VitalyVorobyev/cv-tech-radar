@@ -1,0 +1,238 @@
+{
+  "weeks": [
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W02",
+      "label": "W02"
+    },
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W03",
+      "label": "W03"
+    },
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W04",
+      "label": "W04"
+    },
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W05",
+      "label": "W05"
+    },
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W06",
+      "label": "W06"
+    },
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W07",
+      "label": "W07"
+    },
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W08",
+      "label": "W08"
+    },
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W09",
+      "label": "W09"
+    },
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W10",
+      "label": "W10"
+    },
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W11",
+      "label": "W11"
+    },
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W12",
+      "label": "W12"
+    },
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W13",
+      "label": "W13"
+    },
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W14",
+      "label": "W14"
+    },
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W15",
+      "label": "W15"
+    },
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W16",
+      "label": "W16"
+    },
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W17",
+      "label": "W17"
+    },
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W18",
+      "label": "W18"
+    },
+    {
+      "Evaluate": 0,
+      "Ignore": 0,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 0,
+      "iso": "2026-W19",
+      "label": "W19"
+    },
+    {
+      "Evaluate": 9,
+      "Ignore": 97,
+      "Prototype": 4,
+      "Use": 5,
+      "Watch": 31,
+      "iso": "2026-W20",
+      "label": "W20"
+    },
+    {
+      "Evaluate": 2,
+      "Ignore": 96,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 9,
+      "iso": "2026-W21",
+      "label": "W21"
+    },
+    {
+      "Evaluate": 6,
+      "Ignore": 90,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 29,
+      "iso": "2026-W22",
+      "label": "W22"
+    },
+    {
+      "Evaluate": 1,
+      "Ignore": 40,
+      "Prototype": 1,
+      "Use": 0,
+      "Watch": 8,
+      "iso": "2026-W23",
+      "label": "W23"
+    },
+    {
+      "Evaluate": 2,
+      "Ignore": 135,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 24,
+      "iso": "2026-W24",
+      "label": "W24"
+    },
+    {
+      "Evaluate": 5,
+      "Ignore": 160,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 10,
+      "iso": "2026-W25",
+      "label": "W25"
+    },
+    {
+      "Evaluate": 5,
+      "Ignore": 133,
+      "Prototype": 0,
+      "Use": 0,
+      "Watch": 12,
+      "iso": "2026-W26",
+      "label": "W26"
+    },
+    {
+      "Evaluate": 2,
+      "Ignore": 59,
+      "Prototype": 1,
+      "Use": 0,
+      "Watch": 13,
+      "iso": "2026-W27",
+      "label": "W27"
+    }
+  ]
+}

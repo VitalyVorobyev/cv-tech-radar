@@ -1,0 +1,26 @@
+{
+  "abstract": "Depth estimation has numerous medical and surgical applications. We benchmark four depth sensors on a porcine bone specimen, a porcine belly specimen, and a silicone kidney phantom using stylus-sampled references. These objects contain several real-world challenges, including homogeneous surfaces, specular surfaces, and subsurface scattering. The comparison includes stereo, structured-light, and time-of-flight sensors at a distance of approximately 50 cm. Specifically, the Intel RealSense D405 (Intel RealSense, United States), PMD Flexx2 (pmdtechnologies, Germany), Stereolabs ZED 2i (Stereolabs, France), and Zivid 2M+ 60 (Zivid, Norway) are compared. The Zivid 2M+ 60 performed best across all objects and metrics considered in this work. The ZED ranked second for real tissue, but last on the phantom.",
+  "decided_at": "2026-06-12T13:04:19.755015",
+  "decided_by": "codex",
+  "history": [
+    {
+      "at": "2026-06-12T13:04:19.755015",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 3587,
+  "movement": null,
+  "published_at": "2026-06-11T08:02:27",
+  "reason": "Direct accuracy benchmark of 4 commercial depth sensors (RealSense D405, PMD Flexx2, ZED 2i, Zivid 2M+) on specular/homogeneous/subsurface surfaces with stylus references \u2014 exactly the kind of practical 3D-sensor evidence the radar tracks; medical framing is incidental.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "Comparing Commercial Depth Sensor Accuracy for Medical Applications",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "3D Sensors",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.13028v1"
+}

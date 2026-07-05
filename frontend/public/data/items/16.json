@@ -1,0 +1,25 @@
+{
+  "abstract": "In this paper, we propose a modular framework for 6D pose estimation based on keypoint heatmap regression. Our approach combines YOLOv10m for object detection with a ResNet18-based network that predicts 2D heatmaps from RGB images. Keypoints extracted from these heatmaps are used to estimate the 6D object pose via the PnP RANSAC algorithm. We compare different keypoint selection strategies to assess their impact on pose accuracy. Additionally, we extend the baseline by incorporating depth data using a cross-fusion architecture, which enables interaction between RGB and depth features at multiple stages. We further explore general training improvements, such as experimenting with activation functions and learning rate scheduling strategies to improve model performance. Our best RGB-only model achieved a mean ADD-based accuracy of 84.50%, while the RGB-D fusion model reached 92.41% on the LINEMOD dataset. The code is available at https://github.com/ameermasood/HeatNet.",
+  "decided_at": "2026-05-12T19:04:08.101996",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-12T18:10:57.472668",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 16,
+  "movement": null,
+  "published_at": "2026-05-08T17:47:02",
+  "reason": "6D pose with RGB-D and released code; LINEMOD is the canonical industrial pose benchmark.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "6D Pose Estimation via Keypoint Heatmap Regression with RGB-D Residual Neural Networks",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "3D Sensors"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.08059v1"
+}

@@ -1,0 +1,24 @@
+{
+  "abstract": "Tiny UAV detection from an onboard event camera is difficult when the observer and target move at the same time. In this motion-on-motion regime, ego-motion activates background edges across buildings, vegetation, and horizon structures, while the UAV may appear as a sparse event cluster. To explore this practical problem, we present M$^2$E-UAV, a benchmark and analysis setup for onboard motion-on-motion event-based tiny UAV detection. The processed M$^2$E-UAV benchmark contains 87,223 training samples and 21,395 validation samples across four scene families: sunny building-forest, sunny farm-village, sunset building-forest, and sunset farm-village. We provide M$^2$E-Point, a point-based event baseline, and M$^2$E-Point + IMU, an IMU-conditioned variant, to analyze the role of inertial cues under onboard motion-on-motion detection. M$^2$E-Point encodes events as $[x,y,t,p]$ point sets, extracts local event structure with EdgeConv, and predicts event-level UAV foreground scores, from which bounding boxes are derived via DBSCAN. Our validation-stage analysis shows that point-based event modeling is a strong baseline, while simple IMU conditioning provides only marginal aggregate gains. Under the train/validation split, M$^2$E-Point achieves 0.9673 F1 and 0.5501 mAP50-95, while the IMU-conditioned variant reaches 0.5561 mAP50-95 with only marginal aggregate changes, serving as an initial baseline for future exploration in this domain. Code will be ready in https://github.com/Wickyan/M2E-UAV.",
+  "decided_at": "2026-05-12T19:04:17.262329",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-12T17:55:52.168745",
+      "ring": "Watch"
+    }
+  ],
+  "id": 564,
+  "movement": null,
+  "published_at": "2026-05-11T12:54:34",
+  "reason": "Event-camera pipeline with released code; UAV-detection use case is niche but the sensor work tracks our 3D-sensors interest.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "M$^2$E-UAV: A Benchmark and Analysis for Onboard Motion-on-Motion Event-Based Tiny UAV Detection",
+  "track": "3D Sensors",
+  "tracks": [
+    "3D Sensors"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.10496v1"
+}

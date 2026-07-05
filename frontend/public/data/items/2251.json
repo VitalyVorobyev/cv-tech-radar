@@ -1,0 +1,24 @@
+{
+  "abstract": "Anomaly detection (AD) under data contamination is critical for deploying unsupervised defect detection in industrial environments, where curating perfectly clean training sets is impractical. However, existing methods are sensitive to contamination, suffering significant performance degradation as the noise ratio increases. In this paper, we propose Memory-Distilled Selection (MeDS), a training algorithm based on data selection. MeDS constructs an ensemble of partial memories via random subsampling, where the resulting sparsity acts as a low-pass filter that captures nominal patterns across a wide range of noise ratios, enabling coarse-level identification of contaminated samples. The aggregated distances to the bootstrapped memories are then distilled into a reconstruction score network, which is subsequently fine-tuned on clean data filtered using scores from the distilled model, enabling fine-grained localization of anomalies. MeDS is robust across a wide range of noise ratios without requiring noise-ratio-specific hyperparameter tuning, achieving 99.16\\% image-level AUROC on MVTecAD at a 40\\% noise ratio, and attaining state-of-the-art performance on both VisA and Real-IAD under noisy settings. We thoroughly verify the efficacy of MeDS on industrial AD benchmarks under noisy data scenarios, accompanied by in-depth empirical analyses.",
+  "decided_at": "2026-05-27T13:22:57.152597",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-27T13:22:57.152597",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 2251,
+  "movement": null,
+  "published_at": "2026-05-26T08:13:41",
+  "reason": "Robust industrial anomaly-detection method under contaminated training data \u2014 MVTecAD/VisA/Real-IAD, 99.16% AUROC at 40% noise. Directly on-radar for industrial inspection.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "Memory-Distilled Selection for Noise-Robust Anomaly Detection",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.26676v1"
+}

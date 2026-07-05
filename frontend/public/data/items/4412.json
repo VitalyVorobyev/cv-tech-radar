@@ -1,0 +1,25 @@
+{
+  "abstract": "While synthetic data generation resolves the manual labeling bottleneck in computer vision, minimizing the syn-to-real domain gap requires optimizing rendering variables. This paper presents a systematic study analyzing the impact of lighting configurations and background complexity on object detection performance. We introduce SmartSDG, an automated, reproducible pipeline built on NVIDIA Isaac Sim using Physically-Based Shading (PBS), alongside ILLUM\\_INTRUCK, a new multi-object industrial benchmark dataset. Through 18 controlled experiments utilizing a state-of-the-art YOLOv12 framework, we demonstrate that complex, indirect lighting configurations paired with domain-relevant background variability significantly increase visual cue richness. Our quantitative findings show that avoiding direct specular peaks preserves crucial surface textures, mitigates the domain gap, reduces false positives, and accelerates model convergence compared to using conventional direct-light synthetic data. Ultimately, we provide actionable virtual scene design guidelines to maximize object detection robustness in industrial automation.",
+  "decided_at": "2026-06-23T13:14:23.667980",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-23T13:14:23.667980",
+      "ring": "Watch"
+    }
+  ],
+  "id": 4412,
+  "movement": null,
+  "published_at": "2026-06-21T16:21:34",
+  "reason": "Systematic study of synthetic-data lighting (Isaac Sim PBR) for industrial object detection, with actionable guidelines (avoid direct specular peaks, use indirect light) and a new industrial benchmark. No code, but directly in the synthetic-data track.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "The Power of Light: Improving Synthetic-to-Real Domain Adaptation through Physically-Based Indirect Illumination",
+  "track": "Synthetic Data & Simulation",
+  "tracks": [
+    "Synthetic Data & Simulation",
+    "Industrial Vision Inspection"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.22574v1"
+}

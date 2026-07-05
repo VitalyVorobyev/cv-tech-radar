@@ -1,0 +1,25 @@
+{
+  "abstract": "This dataset provides high-resolution, annotated video sequences of shredded E40-grade steel and copper scrap on a conveyor belt. Captured in a controlled laboratory environment, the data reflects the industrial post-magnetic sorting stage, where manual intervention is typically required to remove copper contaminants. The dataset comprises 24,297 labeled frames across five subsets, featuring 396 steel and 101 copper objects categorized by size. It supports the development of machine learning models for material classification, object detection, and instance segmentation. Variations in object spacing and density are included to simulate realistic industrial sorting conditions. Ground truth annotations include pixel-wise segmentation masks and material classes. This dataset serves as a benchmark for evaluating automated sorting algorithms aiming to identify copper impurities within complex, heterogeneous steel scrap streams.",
+  "decided_at": "2026-05-27T13:22:57.155837",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-27T13:22:57.155837",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2249,
+  "movement": null,
+  "published_at": "2026-05-26T08:20:12",
+  "reason": "High-resolution video dataset of E40 steel scrap on a conveyor belt for material classification, detection, and instance segmentation. Concrete industrial sorting use case, controlled lab capture.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "SteelDS: A High-Resolution Video Dataset of E40 Steel Scrap for Object Detection and Instance Segmentation",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection",
+    "Datasets & Benchmarks"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.26682v1"
+}

@@ -1,0 +1,25 @@
+{
+  "abstract": "Vision Foundation Models (VFMs) have significantly advanced dense feature matching, yet severe in-plane rotation remains a critical challenge. Existing solutions face a fundamental dilemma: data-driven methods require inefficient parameter scaling to implicitly learn rotations, whereas strictly equivariant networks lack the semantic capacity of modern VFMs. Consequently, current frameworks typically freeze VFMs and shift the entire burden of rotation generalization to the downstream decoder. To break this architectural bottleneck, we propose REDI-Match, an efficient framework driven by a novel Rotation-Equivariant Distillation (REDI) paradigm. Instead of relying on rotation data augmentation to establish rotational correspondences, REDI distills the non-equivariant semantic representations of a VFM into a lightweight, strictly rotation-equivariant encoder, leveraging an equivariant geometric architecture to constrain robust high-dimensional semantics. To fully exploit these features, we equip the decoder with an entropy-driven spatial alignment module. By evaluating discrete rotation hypotheses, this mechanism explicitly locks onto the canonical coordinate system, eliminating global ambiguity before continuous refinement. Extensive experiments demonstrate that REDI-Match establishes a new state-of-the-art (SOTA) across multiple benchmarks. Notably, it achieves a 13.89% absolute pose accuracy improvement on the highly challenging SatAst dataset while operating 1.9x faster than the current SOTA (RoMa v2), enabling real-time inference (~41 FPS) on a single RTX 4090 GPU. Code: https://github.com/YinjiGe/REDI-Match.",
+  "decided_at": "2026-06-25T13:24:27.874620",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-25T13:24:27.874620",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 4674,
+  "movement": null,
+  "published_at": "2026-06-23T09:05:20",
+  "reason": "Rotation-equivariant distillation of a VFM into a lightweight equivariant dense matcher; 1.9x faster than RoMa v2 at ~41 FPS, open code, strong pose accuracy under in-plane rotation. A practical correspondence tool for SfM/pose; the classifier under-scored it on keywords.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "REDI-Match: Rotation-Equivariant Distillation for Efficient and Robust Dense Matching",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction",
+    "Edge AI & Deployment"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.24330v1"
+}

@@ -1,0 +1,97 @@
+{
+  "artifact_id": 1,
+  "capability": "cv-imaging",
+  "decisions": [
+    {
+      "action": "",
+      "decided_at": "2026-06-10T13:25:45.312411",
+      "decided_by": "codex",
+      "reason": "OpenCV 5.0.0 major release \u2014 first major version bump; breaking changes worth a migration test pass on calib3d/aruco before relying on it.",
+      "ring": "Prototype",
+      "tracks": [
+        "Open-Source CV Tooling",
+        "Calibration & Camera Models"
+      ],
+      "uncertain": false
+    },
+    {
+      "action": "",
+      "decided_at": "2026-06-11T13:05:27.427903",
+      "decided_by": "codex",
+      "reason": "OpenCV 5.0.0 major release (first major bump from 4.x) \u2014 review breaking API/ABI changes and migration notes before upgrading pinned builds; calib3d/charuco surfaces matter to us.",
+      "ring": "Evaluate",
+      "tracks": [
+        "Open-Source CV Tooling",
+        "Calibration & Camera Models"
+      ],
+      "uncertain": false
+    }
+  ],
+  "description": "Core open-source computer vision library.",
+  "events": [
+    {
+      "artifact_id": 1,
+      "artifact_key": "opencv",
+      "artifact_name": "OpenCV",
+      "body": "Wrapper package for OpenCV python bindings.",
+      "ecosystem": "pypi",
+      "event_date": "2026-07-02T05:50:25.466711",
+      "event_type": "major_release",
+      "id": 65,
+      "matched_keywords": [
+        "opencv"
+      ],
+      "relevant": true,
+      "severity": "high",
+      "summary": "Wrapper package for OpenCV python bindings.",
+      "url": "https://pypi.org/project/opencv-python/5.0.0.93/",
+      "version": "5.0.0.93"
+    },
+    {
+      "artifact_id": 1,
+      "artifact_key": "opencv",
+      "artifact_name": "OpenCV",
+      "body": "OpenCV 5.0.0 released!\r\n\r\nOpenCV 5.0.0 overview: https://opencv.org/opencv-5\r\nOpenCV 4.x -> 5.x migration guide: https://github.com/opencv/opencv/wiki/OpenCV-4-to-5-migration",
+      "ecosystem": "github",
+      "event_date": "2026-06-06T10:52:34",
+      "event_type": "major_release",
+      "id": 24,
+      "matched_keywords": [
+        "opencv",
+        "github"
+      ],
+      "relevant": true,
+      "severity": "high",
+      "summary": "OpenCV 5.0.0",
+      "url": "https://github.com/opencv/opencv/releases/tag/5.0.0",
+      "version": "5.0.0"
+    }
+  ],
+  "homepage_url": "https://opencv.org",
+  "key": "opencv",
+  "name": "OpenCV",
+  "refs": [
+    {
+      "ecosystem": "github",
+      "last_checked_at": "2026-07-03T13:02:03.586583",
+      "last_release_at": "2026-06-06T10:52:34",
+      "last_status": "ok",
+      "last_version": "5.0.0",
+      "ref": "opencv/opencv"
+    },
+    {
+      "ecosystem": "pypi",
+      "last_checked_at": "2026-07-03T13:02:03.917211",
+      "last_release_at": "2026-07-02T05:50:25.466711",
+      "last_status": "ok",
+      "last_version": "5.0.0.93",
+      "ref": "opencv-python"
+    }
+  ],
+  "ring": "Evaluate",
+  "status": "adopted",
+  "tracks": [
+    "Open-Source CV Tooling",
+    "Calibration & Camera Models"
+  ]
+}

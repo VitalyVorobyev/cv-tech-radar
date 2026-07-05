@@ -1,0 +1,24 @@
+{
+  "abstract": "Reconstructing surface meshes from multi-view images has remained a core challenge in recent years. Most existing methods, whether implicit or explicit, depend on intermediate representations and post-processing steps like Marching Cubes or TSDF fusion, often resulting in artifacts and fragmented geometry. Directly optimizing explicit meshes is a promising approach. However, it presents two critical challenges. The first is how to adaptively refine mesh topology to capture detail without introducing degenerate faces. The second is how to maintain consistent UV coordinates for high-fidelity texturing as the mesh structure evolves. To overcome these, we propose ExMesh, a novel framework that directly optimizes explicit meshes by integrating differentiable optimization with discrete topology updates. Specifically, we introduce an adaptive vertex splitting and merging strategy, along with real-time UV maintenance, to enable coarse-to-fine optimization while preserving geometric integrity. To our knowledge, ExMesh is the first framework to seamlessly integrate discrete topology operations into a continuous differentiable optimization pipeline. Extensive experiments demonstrate that ExMesh achieves a balance among accuracy, computational efficiency, and mesh conciseness.",
+  "decided_at": "2026-06-10T13:51:58.858164",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-10T13:51:58.858164",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3191,
+  "movement": null,
+  "published_at": "2026-06-05T13:59:58",
+  "reason": "Explicit mesh reconstruction with topology adaptation; on-topic 3D-reconstruction method.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "ExMesh: EXplicit Mesh Reconstruction with Topology Adaptation",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.07288v1"
+}

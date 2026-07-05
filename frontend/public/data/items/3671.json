@@ -1,0 +1,24 @@
+{
+  "abstract": "Conventional RGB cameras have been widely used in multi-object tracking due to their ability to capture rich appearance and semantic information. However, their performance is often degraded under complex real-world challenges, such as motion blur, low illumination, and overexposure. Bio-inspired event cameras offer high temporal resolution and high dynamic range, providing complementary cues under extreme scenarios. Nevertheless, RGB-event multi-object tracking remains underexplored due to the lack of large-scale and well-annotated datasets. To address this issue, we propose FEMOT, a large-scale RGB-event multi-object tracking dataset that covers diverse real-world scenarios and 14 challenging attributes. With both RGB and event data as well as high-quality annotations, FEMOT provides a reliable platform for systematically evaluating RGB-event multi-object tracking methods. Based on FEMOT, we retrain and evaluate over ten strong trackers, thereby establishing a comprehensive benchmark for future research. Furthermore, we propose FEMOTR, a multimodal tracking framework that decouples RGB and event features and fuses them in the frequency domain, thereby effectively exploiting their complementary characteristics for robust object localization and identity association. Extensive experiments on FEMOT and DSEC-MOT datasets demonstrate the effectiveness of the proposed method. The source code and benchmark dataset have been released on https://github.com/Event-AHU/FEMOT.",
+  "decided_at": "2026-06-15T13:10:54.716240",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-15T13:10:54.716240",
+      "ring": "Watch"
+    }
+  ],
+  "id": 3671,
+  "movement": null,
+  "published_at": "2026-06-12T04:17:41",
+  "reason": "RGB-event multi-object tracking with released code + dataset (github Event-AHU/FEMOT). Object tracking is a priority track, but frequency-domain RGB-event fusion is niche and event hardware is not our current path.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "FEMOT: Multi-Object Tracking using Frame and Event Cameras",
+  "track": "Object Tracking",
+  "tracks": [
+    "Object Tracking"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.14094v1"
+}

@@ -1,0 +1,24 @@
+{
+  "abstract": "Multi-modal industrial anomaly detection typically relies on separate models for each product category, fundamentally limiting practical scalability. When shifting to a unified paradigm that handles diverse classes simultaneously, detection accuracy often degrades due to inter-class interference and feature manifold confusion. To overcome these challenges, we propose a Unified Reference guided Cross-modal Mapping framework, named Uni-RCM. At its core, we propose a reference guide block to dynamically filter out category-specific noise by introducing a learnable reference feature, which captures the commonalities across different modalities. Besides, an offline residual quantizer is proposed to characterize the normal distribution by multiple cascaded codebooks. Extensive evaluations on the MVTec-3D AD dataset demonstrate the state-of-the-art performance in the challenging multi-class setting and in terms of image-level detection and pixel-level localization.",
+  "decided_at": "2026-05-29T13:08:05.189171",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-29T13:08:05.189171",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2564,
+  "movement": null,
+  "published_at": "2026-05-28T06:48:26",
+  "reason": "Unified multi-class anomaly detection on MVTec-3D AD \u2014 core industrial-inspection track and SOTA multi-class, but no released code; scoring under-rated the domain fit (relevance 24).",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Uni-RCM: Unified Reference-guided Cross-modal Mapping for Multi-Class Anomaly Detection",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.29455v1"
+}

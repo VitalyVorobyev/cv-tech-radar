@@ -1,0 +1,24 @@
+{
+  "abstract": "Geometric foundation models hold promise for unconstrained dense geometry prediction from uncalibrated images. However, in current feed-forward designs, their predicted confidence scores are heuristic, lack probabilistic interpretation, and often fail to indicate where and how much the predicted geometry can be trusted. To address this gap, we present Trust3R, a lightweight evidential uncertainty framework for feed-forward 3D reconstruction. Trust3R combines gated residual mean refinement with a Normal-Inverse-Wishart evidential head, yielding a closed-form multivariate Student-t distribution for per-point geometric uncertainty. This design provides probabilistically grounded pointmap uncertainty estimates while adding moderate inference overhead. We evaluate on diverse indoor and outdoor benchmarks and compare against MASt3R's built-in confidence map as well as common uncertainty-aware baselines spanning single-pass heteroscedastic regression and sampling-based methods such as MC dropout and deep ensembles. Experimental results show that Trust3R consistently improves risk-coverage and sparsification, and generally improves geometric accuracy. These gains are reflected in stronger uncertainty ranking across benchmarks, with 25% lower AURC and 41% lower AUSE on ScanNet++, providing a practical reliability signal for uncertainty-aware weighting in downstream geometry pipelines. The project page and code are available at https://trust3r-z.github.io/.",
+  "decided_at": "2026-05-20T17:55:24.953563",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-20T17:55:24.953563",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 1428,
+  "movement": null,
+  "published_at": "2026-05-19T08:39:48",
+  "reason": "Evidential uncertainty head bolted onto feed-forward 3D reconstruction (MASt3R-style). Reports +25%/+41% AURC/AUSE on ScanNet++ with closed-form per-point Student-t. Uncertainty on geometric foundation models is a real gap for industrial 3D use. Code released.",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "Trust It or Not: Evidential Uncertainty for Feed-Forward 3D Reconstruction with Trust3R",
+  "track": "3D Geometry & Reconstruction",
+  "tracks": [
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2605.19539v1"
+}

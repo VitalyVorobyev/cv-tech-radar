@@ -1,0 +1,25 @@
+{
+  "abstract": "Feed-forward models for 3D reconstruction have achieved strong performance using deep cross-view attention to exchange information across images. However, these approaches often depend on heavy decoder stacks and lack a structured mechanism for geometry refinement, resulting in poor multi-view consistency. We address this by drawing inspiration from classical bundle adjustment (BA), which can be viewed as an iterative information propagation process between poses and local geometry. Inspired by BA, we propose BA-T, an iterative Transformer that implements BA-style structured updates as a repeatable layer in implicit token space. Instead of relying on deep attention stacks, BA-T refines predictions based on latent residual by a single lightweight layer. Experiments demonstrate that BA-T progressively improves pose and reconstruction accuracy across iterations, achieves stronger cross-view consistency than conventional decoders, and matches or surpasses substantially larger models while using only 16% of their decoder parameters. BA-T provides a compact, efficient, and structural alternative to depth-heavy attention, enabling accurate 3D reconstruction within a lightweight architecture. The code will be made publicly at https://github.com/zhangganlin/BA-T.",
+  "decided_at": "2026-06-03T13:41:37.645151",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-03T13:41:37.645151",
+      "ring": "Evaluate"
+    }
+  ],
+  "id": 2697,
+  "movement": null,
+  "published_at": "2026-06-02T07:51:14",
+  "reason": "Iterative Transformer that injects classical bundle-adjustment structure into feed-forward two-view 3D reconstruction, matching larger models at 16% decoder params. Squarely in the calibration/SfM lane; code promised (not yet released). Scoring under-rated it (relevance 47).",
+  "ring": "Evaluate",
+  "source": "arXiv cs.CV",
+  "title": "BA-T: An Iterative Transformer for Two-View Bundle Adjustment",
+  "track": "Calibration & Camera Models",
+  "tracks": [
+    "Calibration & Camera Models",
+    "3D Geometry & Reconstruction"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.03287v1"
+}

@@ -1,0 +1,25 @@
+{
+  "abstract": "The deployment of zero-shot anomaly detection (AD) in embodied industrial inspection is severely bottlenecked by its reliance on passive, fixed-viewpoint 2D imagery. Such formulations inherently fail to accommodate the active, dynamic observations required in real-world environments. To break this limitation, we introduce Real-to-Twin Anomaly Detection, a novel task that evaluates physical observations directly against geometrically matched CAD Digital Twins. To tackle this new task, we propose AVATAR, a framework designed to learn robust semantic alignment between Real and Digital Twins. By bridging benign Sim2Real domain gaps using only defect-free pairs, AVATAR effectively transforms CAD priors into dynamic, anomaly-free references. This elegant formulation enables the model to localize diverse anomalies in a zero-shot manner as unalignable deviations, eliminating the need for defect annotations. Extensive experiments demonstrate that AVATAR substantially outperforms adapted state-of-the-art baselines, exhibiting exceptional robustness to severe viewpoint variations. The code and dataset will be made publicly available.",
+  "decided_at": "2026-05-26T13:10:02.555942",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-05-26T13:10:02.555942",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2153,
+  "movement": null,
+  "published_at": "2026-05-25T04:05:25",
+  "reason": "Zero-shot anomaly detection by aligning real observations to CAD digital twins \u2014 genuine industrial inspection framing. Code/dataset only \"will be\" available; thin without released artifacts.",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Towards Active Real-to-Twin Inspection: A New Paradigm for Zero-Shot Anomaly Detection",
+  "track": "Industrial Vision Inspection",
+  "tracks": [
+    "Industrial Vision Inspection",
+    "Synthetic Data & Simulation"
+  ],
+  "uncertain": true,
+  "url": "http://arxiv.org/abs/2605.25407v1"
+}

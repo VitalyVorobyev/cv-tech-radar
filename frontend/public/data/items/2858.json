@@ -1,0 +1,25 @@
+{
+  "abstract": "Humans rely on spatially dense, geometry and force-aware tactile feedback at high temporal resolution for dexterous manipulation. While vision-based tactile sensors enable dense force estimation, they are limited by camera frame rates, motion blur, and data bandwidth. Event-based optical tactile sensors offer an attractive alternative with microsecond temporal resolution and low motion blur, but existing methods are restricted to predicting only net forces. We introduce the first framework for dense 3D force field reconstruction using event-based optical tactile sensors. Our approach estimates 3D surface displacements from event data and maps them to forces via the inverse Finite Elements Method (iFEM). Shear displacements are recovered through the proposed event-based marker tracking algorithm, while normal displacements are predicted by a convolutional neural network trained on a collected dataset of synchronized force-displacement-event data. Experiments demonstrate accurate reconstruction of physically grounded forces, achieving a mean absolute error of (0.14 N, 0.10 N, 0.93 N) over force ranges up to (4 N, 4 N, 20 N), while operating at an average of 100 Hz. This work constitutes a first step toward enabling dense force feedback for high-frequency control in robotic grasping and dexterous manipulation.",
+  "decided_at": "2026-06-09T13:19:31.077837",
+  "decided_by": "claude-curator",
+  "history": [
+    {
+      "at": "2026-06-09T13:19:31.077837",
+      "ring": "Watch"
+    }
+  ],
+  "id": 2858,
+  "movement": null,
+  "published_at": "2026-06-08T12:57:21",
+  "reason": "First framework for dense 3D force field reconstruction using event-based optical tactile sensors. Recovers 3D surface displacements via event-based marker tracking + CNN, then maps to forces via inverse FEM. Operates at 100 Hz \u2014 a genuine step toward high-frequency force feedback for dexterous manipulation. Novel sensor+algorithm pairing with practical robot guidance implications. No code, specialized hardware required.\n",
+  "ring": "Watch",
+  "source": "arXiv cs.CV",
+  "title": "Dense Force Estimation with an Event-based Optical Tactile Sensor",
+  "track": "Robotics Vision",
+  "tracks": [
+    "Robotics Vision",
+    "Robot Guidance"
+  ],
+  "uncertain": false,
+  "url": "http://arxiv.org/abs/2606.09451v1"
+}
