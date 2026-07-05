@@ -17,11 +17,11 @@ with the static-mode flag.
 uv run radar build-static --target frontend/public/data
 
 # 2. Build the React app in static mode.
-cd frontend && pnpm install   # or npm install
-pnpm build:static             # → frontend/dist/
+cd frontend && bun install    # bun is the canonical package manager
+bun run build:static          # → frontend/dist/
 ```
 
-`pnpm build:static` runs `tsc -b && vite build --mode static`, which loads
+`bun run build:static` runs `tsc -b && vite build --mode static`, which loads
 `frontend/.env.static` (sets `VITE_STATIC=1`). The build emits to
 `frontend/dist/`. Upload that directory to your host.
 
@@ -31,7 +31,7 @@ If the radar lives under a path other than `/`, set `VITE_BASE_PATH` before
 the Vite build:
 
 ```bash
-VITE_BASE_PATH=/cv-radar/ pnpm build:static
+VITE_BASE_PATH=/cv-tech-radar/ bun run build:static
 ```
 
 The same env var feeds both Vite's asset paths (`<script src="…">`) and the
@@ -77,8 +77,8 @@ state).
 After running both commands:
 
 ```bash
-# Open the build locally — http://localhost:5174/
-cd frontend && npx serve dist -p 5174
+# Open the build locally — http://localhost:4173/
+cd frontend && bun run preview
 ```
 
 Browser checks:

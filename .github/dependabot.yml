@@ -11,3 +11,10 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+
+  # Frontend JS deps (bun.lock uses the npm registry / npm ecosystem).
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
