@@ -1,0 +1,18 @@
+[book]
+title = "The CV Radar Method"
+description = "How a private-first computer-vision technology radar decides what deserves attention."
+authors = ["Vitaly Vorobyev"]
+language = "en"
+src = "src"
+
+[output.html]
+# Published alongside the static radar at https://vitalyvorobyev.github.io/cv-tech-radar/book/
+site-url = "/cv-tech-radar/book/"
+git-repository-url = "https://github.com/VitalyVorobyev/cv-tech-radar"
+edit-url-template = "https://github.com/VitalyVorobyev/cv-tech-radar/edit/main/book/{path}"
+default-theme = "light"
+preferred-dark-theme = "navy"
+
+[output.html.fold]
+enable = true
+level = 1

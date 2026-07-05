@@ -175,7 +175,33 @@ function LaneNav({
         margin: "0 auto",
       }}
     >
-      <LaneSwitch lane={lane} onSwitch={(next) => onNavigate(LANE_HOME[next])} />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "1rem",
+        }}
+      >
+        <LaneSwitch lane={lane} onSwitch={(next) => onNavigate(LANE_HOME[next])} />
+        {IS_STATIC && (
+          // The methodology book is published alongside the static radar at
+          // `${BASE_URL}book/`. Only shown in the public build (no /book/ in dev).
+          <a
+            href={`${import.meta.env.BASE_URL}book/`}
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "var(--text-micro)",
+              letterSpacing: "var(--tracking-caps)",
+              textTransform: "uppercase",
+              color: "var(--color-muted)",
+              textDecoration: "none",
+            }}
+          >
+            Method ↗
+          </a>
+        )}
+      </div>
       <div style={{ display: "flex", gap: "1.25rem", flexWrap: "wrap" }}>
         {tabs.map((tab) => {
           const active = tab.matches ? tab.matches(route) : tab.value === route;
