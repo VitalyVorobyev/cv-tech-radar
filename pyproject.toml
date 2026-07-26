@@ -5,7 +5,7 @@ description = "Personal-first computer-vision technology radar."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi>=0.139.0",
+    "fastapi>=0.140.0",
     "feedparser>=6.0.11",
     "httpx>=0.28.1",
     "pydantic>=2.11.0",
