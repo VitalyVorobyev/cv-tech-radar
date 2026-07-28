@@ -40,7 +40,15 @@ tracks:
       - marker detection
       - corner detection
       - subpixel
-    negative_keywords: []
+    # `checkerboard` is also the name of the autoregressive context pattern in
+    # learned image compression — 2026-07-21 candidate 18 (6653, "Wavefront
+    # Parallelization for Efficient Learned Image Compression") entered the queue
+    # on the *calibration-target* track purely because it cites the checkerboard
+    # context model. Nothing in this track's vocabulary overlaps compression, so
+    # the guard cannot cost a real fiducial paper its track.
+    negative_keywords:
+      - image compression
+      - context model
 
   - id: 3d-geometry-reconstruction
     name: 3D Geometry & Reconstruction
@@ -84,7 +92,23 @@ tracks:
       - slam
       - navigation
       - manipulation
-    negative_keywords: []
+    # `manipulation` means image manipulation as often as robot manipulation —
+    # 2026-07-21 candidate 7 (6632, ExpertVerse, a knowledge-intensive *image
+    # generation* benchmark) matched this track on "semantic manipulation" alone.
+    # These three phrases are already global negative topics; repeating them here
+    # removes the spurious relevance boost as well as the score penalty.
+    #
+    # `world generation` added 2026-07-23: 7215 (GS-Agent, LLM-agent-driven 4D
+    # world creation) matched this track on "camera and lighting manipulation"
+    # and says none of the three phrases above — it generates *worlds*, not
+    # images. Probed over the corpus: 9 hits, none of them kept, and every one is
+    # generative content creation or a driving world model. The narrower
+    # `lighting manipulation` was rejected as a one-off phrasing.
+    negative_keywords:
+      - image generation
+      - image editing
+      - text-to-image
+      - world generation
 
   - id: robot-guidance
     name: Robot Guidance
@@ -144,6 +168,12 @@ tracks:
   - id: vision-foundation-models
     name: Vision Foundation Models
     quadrant: models
+    # Bare `multimodal` was dropped after 2026-07-08 curation: across the
+    # 07-03..07-07 backfill it matched 26 Ignore items and 0 promoted items —
+    # it fires on generic VLM/MLLM papers (the breadth noise already partly
+    # caught by the `multimodal large language` / `omnimodal` negative topics).
+    # Genuine foundation-model work still matches sam / dinov2 / clip /
+    # visual language model / vision foundation model / foundation model.
     positive_keywords:
       - vision foundation model
       - segmentation anything
@@ -151,7 +181,6 @@ tracks:
       - dinov2
       - clip
       - visual language model
-      - multimodal
       - foundation model
     negative_keywords:
       - image generation
@@ -160,6 +189,12 @@ tracks:
   - id: open-source-cv-tooling
     name: Open-Source CV Tooling
     quadrant: tooling
+    # `github` is retained despite being a weak signal (40/118 Ignore, 1 promo in
+    # the 2026-07-08 backfill): dropping it pushed the legitimate MMVIAD industrial
+    # anomaly-detection anchor below the Watch threshold (see
+    # test_industrial_inspection_dataset_still_matches_track). A repo link is also
+    # rewarded in score_implementation, so it is a mild double-count we tolerate to
+    # avoid that false negative.
     positive_keywords:
       - opencv
       - open-source

@@ -343,6 +343,191 @@ def test_text_to_image_decoder_papers_get_negative_penalty(app_config):
     assert result.recommended_ring == "Ignore"
 
 
+def test_bare_multimodal_no_longer_matches_foundation_track(app_config):
+    """Anchor: 2026-07-08 backfill curation (07-03..07-07).
+
+    Bare `multimodal` matched 26 Ignore items and 0 promotions — it fired the
+    Vision Foundation Models track on generic VLM/MLLM benchmarks (e.g. CMDR,
+    a multimodal document-retrieval benchmark) that carry no CV-engineering
+    path. The breadth noise is already partly caught by the `multimodal large
+    language` / `omnimodal` negatives; dropping bare `multimodal` from the track
+    stops a document-retrieval benchmark from claiming a foundation-model match.
+    """
+    item = make_item(
+        "CMDR: A Benchmark for Contextual Multimodal Document Retrieval",
+        "We introduce CMDR, a benchmark for multimodal document retrieval that "
+        "evaluates retrieval over interleaved text-and-image documents.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Vision Foundation Models" not in result.tracks
+    assert result.recommended_ring == "Ignore"
+
+
+def test_genuine_foundation_model_paper_still_matches_track(app_config):
+    """Guard: dropping bare `multimodal` must not touch real foundation-model
+    work — sam / dinov2 / clip / vision foundation model still fire."""
+    item = make_item(
+        "Adapting SAM and DINOv2 for Industrial Anomaly Detection",
+        "We adapt the SAM vision foundation model together with DINOv2 features "
+        "for zero-shot industrial anomaly detection and surface inspection.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Vision Foundation Models" in result.tracks
+    assert "Industrial Vision Inspection" in result.tracks
+    assert result.final_score >= app_config.scoring.thresholds.watch
+
+
+def test_deepfake_forensics_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-07-08 backfill candidate 5718 (VendorBench-100).
+
+    VendorBench-100 is a deepfake image-detection benchmark that floated to a
+    suggested Watch (final 45) purely on `benchmark` / `dataset` / `github` /
+    `leaderboard` matches. Media-forensics / deepfake detection is outside the
+    industrial-CV radar; the `deepfake` negative topic fires on the forensics
+    task and drops the recommended ring back to Ignore.
+    """
+    item = make_item(
+        "VendorBench-100: A Cross-Paradigm Benchmark for Deepfake Image Detection",
+        "We present VendorBench-100, a benchmark and dataset for deepfake image "
+        "detection across 100 generators, with a public leaderboard. Code is "
+        "available at https://github.com/example/vendorbench.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "deepfake" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+    assert result.recommended_ring == "Ignore"
+
+
+def test_synthetic_data_track_survives_deepfake_negative_topic(app_config):
+    """Guard: the deepfake/forensics negatives must not touch a legitimate
+    synthetic-data paper — the Synthetic Data & Simulation track keys off the
+    two-word `synthetic data` phrase, not the forensics `synthetic image`."""
+    item = make_item(
+        "Domain-Randomized Synthetic Data for Industrial Defect Detection",
+        "We build a rendering pipeline that produces synthetic data with domain "
+        "randomization and sim-to-real transfer for surface defect detection and "
+        "visual inspection on a calibrated industrial camera.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Synthetic Data & Simulation" in result.tracks
+    assert result.negative_topic_penalty == 0
+    assert result.final_score >= app_config.scoring.thresholds.watch
+
+
+def test_medical_image_segmentation_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-07-08 daily run (items 6134 HPR-SAM, 6128 TRACE-Seg3D).
+
+    Two SAM-based medical-segmentation papers reached the top-25 queue with a
+    *zero* negative penalty — they matched the Vision Foundation Models track
+    via `sam` plus `benchmark` / `github`, and the older `medical imaging` /
+    `medical segmentation` negatives missed the phrase these abstracts use:
+    "medical image segmentation". The `medical image segmentation` negative
+    fires on the task and keeps the recommended ring at Ignore.
+    """
+    item = make_item(
+        "HPR-SAM: Prompt-free SAM for Medical Image Segmentation",
+        "We adapt the Segment Anything Model (SAM) for automatic medical image "
+        "segmentation of anatomical structures, evaluated on public benchmarks. "
+        "Code is available at https://github.com/example/hpr-sam.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "medical image segmentation" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+    assert result.recommended_ring == "Ignore"
+
+
+def test_ultrasound_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-07-08 daily run (items 6103 EP-SAM, 6084 SonoRank).
+
+    An ultrasound-segmentation paper and a forearm-ultrasound prosthetics paper
+    both queued with no negative penalty. `ultrasound` is medical-imaging noise
+    for this optical-CV radar; no positive keyword contains it, so the
+    whole-word negative fires only on genuine ultrasound work.
+    """
+    item = make_item(
+        "EP-SAM: Edge-aware Prompt-enhanced SAM for Ultrasound Image Segmentation",
+        "Ultrasound image segmentation delineates anatomical structures and "
+        "lesions; we adapt SAM with edge-aware supervision, evaluated on "
+        "multiple benchmarks.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "ultrasound" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+    assert result.recommended_ring == "Ignore"
+
+
+def test_industrial_segmentation_survives_medical_negative_topics(app_config):
+    """Guard: the medical negatives must not touch a legitimate industrial
+    inspection paper. `medical image segmentation` is a full phrase (industrial
+    work says defect / anomaly / surface segmentation) and `ultrasound` is a
+    whole word absent from optical inspection abstracts."""
+    item = make_item(
+        "Anomaly Detection and Surface Inspection for Industrial Visual Inspection",
+        "We present a defect detection and anomaly detection method for surface "
+        "inspection in industrial visual inspection with machine vision and "
+        "quality control, on a public benchmark dataset with code on github.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Industrial Vision Inspection" in result.tracks
+    assert result.negative_topic_penalty == 0
+    assert result.final_score >= app_config.scoring.thresholds.watch
+
+
+def test_vehicle_reid_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-07-09 daily run candidate 6227 (EV-MoE multi-query vehicle
+    ReID + LCRI-1K benchmark).
+
+    The paper reached rank 3 (final 41.8) on a *false* 3D Geometry &
+    Reconstruction track match — its `multi-view` / `reconstruction` hits are
+    ReID feature-fusion terms, not 3D geometry — plus Open-Source CV Tooling
+    (github) and Datasets & Benchmarks. No ReID keyword fired because the
+    abstract uses the "ReID" abbreviation, so the older `person re-identification`
+    negative missed it. The vehicle-specific `vehicle reid` negative fires on the
+    surveillance-retrieval task and drops the recommended ring back to Ignore.
+    """
+    item = make_item(
+        "Mixture of Enhanced-View Experts for Multi-Query Vehicle ReID and A Large-Scale Benchmark",
+        "We present a Mixture of Enhanced-View Experts for robust multi-query "
+        "vehicle ReID, fusing multi-view features with reconstruction "
+        "constraints, and collect a large-scale vehicle ReID benchmark. Code is "
+        "available at https://github.com/example/ev-moe.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "vehicle reid" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+    assert result.recommended_ring == "Ignore"
+
+
+def test_multi_object_tracking_reid_survives_vehicle_reid_negative(app_config):
+    """Guard: the vehicle-specific ReID negative must NOT touch a legitimate
+    multi-object-tracking paper that uses re-identification as an association
+    component. The Object Tracking track keeps bare `re-identification` as a
+    positive keyword by design, and the negative is scoped to the two-word
+    `vehicle reid` / `vehicle re-identification` phrases, which a generic MOT
+    abstract does not contain."""
+    item = make_item(
+        "Robust Multi-Object Tracking with Re-Identification-Based Association",
+        "We propose a multi-object tracking method that uses a re-identification "
+        "head for temporal association across frames, improving identity "
+        "preservation under occlusion. Code is available at "
+        "https://github.com/example/mot-reid.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Object Tracking" in result.tracks
+    assert "re-identification" in result.positive_keywords
+    assert result.negative_topic_penalty == 0
+    assert result.final_score >= app_config.scoring.thresholds.watch
+
+
 def test_calibration_paper_survives_image_restoration_negative_topics(app_config):
     """Guard: the new image-restoration / SR negative topics must not touch a
     genuine calibration / 3D reconstruction paper. The phrases we added
@@ -383,3 +568,882 @@ def test_medical_imaging_papers_get_negative_penalty(app_config):
     assert "computed tomography" in result.negative_keywords
     assert "clinical" in result.negative_keywords
     assert result.recommended_ring == "Ignore"
+
+
+def test_human_pose_estimation_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-07-10 daily run candidate 6284 (TSR-Ego).
+
+    TSR-Ego is an egocentric 3D human pose estimation paper that reached the
+    top-25 with a *zero* negative penalty — it matched the Calibration & Camera
+    Models + 3D Geometry tracks via `fisheye` / `stereo` / `pose estimation`.
+    Human-body CV (HPE) is outside the industrial-CV radar; the `human pose`
+    and `egocentric` negatives fire on the task and drop the ring to Ignore
+    without touching the `pose estimation` positive (a camera-pose paper never
+    says "human pose").
+    """
+    item = make_item(
+        "TSR-Ego: Temporally Guided Stereo Refinement for Egocentric 3D Human Pose Estimation",
+        "Egocentric 3D human pose estimation from head-mounted stereo cameras is "
+        "challenging due to fisheye distortion, severe self-occlusion, and "
+        "truncation of body joints. We propose a temporally guided stereo "
+        "framework that refines learned 3D joint queries with fisheye deformable "
+        "stereo cross-attention, achieving state-of-the-art on UnrealEgo2.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "human pose" in result.negative_keywords
+    assert "egocentric" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+    assert result.recommended_ring == "Ignore"
+
+
+def test_human_mesh_recovery_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-07-10 daily run candidate 6299 (DETRAM).
+
+    DETRAM is an end-to-end multi-person human mesh recovery + tracking paper
+    that queued with a zero negative penalty — it matched the 3D Geometry +
+    Object Tracking tracks via `reconstruction` / `tracking`. HMR is human-body
+    CV, out of scope; the `human mesh` negative fires on the task.
+    """
+    item = make_item(
+        "DETRAM: End-to-end Detection, Tracking and Recovery of Human Meshes",
+        "In the task of human mesh recovery, multi-person scenes are difficult "
+        "due to occlusions between entities over time. DETRAM unifies detection, "
+        "reconstruction, and tracking of humans with a single transformer "
+        "decoder, achieving state-of-the-art tracking on PoseTrack21 and 3DPW.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "human mesh" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+    assert result.recommended_ring == "Ignore"
+
+
+def test_human_motion_generation_papers_get_negative_penalty(app_config):
+    """Anchor: recurring human-motion-generation class (e.g. 2026-07-09 ARDY,
+    "Autoregressive Diffusion ... for Interactive Human Motion Generation").
+
+    Human motion generation / prediction is human-body CV that recurs in the
+    candidate queues via `reconstruction` / `tracking` / `diffusion`. The
+    `human motion` negative fires on the task; it does not collide with the
+    `motion model` or `structure from motion` positive keywords (distinct
+    phrases).
+    """
+    item = make_item(
+        "ARDY: Autoregressive Diffusion with Hybrid Representation for "
+        "Interactive Human Motion Generation",
+        "We present ARDY, an autoregressive diffusion framework for interactive "
+        "human motion generation, producing coherent full-body human motion "
+        "sequences conditioned on user input, with state-of-the-art motion "
+        "quality on standard benchmarks.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "human motion" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+    assert result.recommended_ring == "Ignore"
+
+
+def test_camera_pose_estimation_survives_human_negatives(app_config):
+    """Guard: the human-centric negatives must NOT touch a genuine camera
+    calibration / pose-estimation paper. `pose estimation`, `pose refinement`
+    and `motion model` stay POSITIVE keywords; the negatives are scoped to the
+    two-word `human pose` / `human mesh` / `human motion` phrases (plus
+    `egocentric`), which a camera-geometry abstract does not contain."""
+    item = make_item(
+        "Robust Camera Pose Estimation for Multi-View 3D Reconstruction",
+        "We estimate camera pose via bundle adjustment with epipolar geometry "
+        "and pose refinement over a multi-view structure-from-motion pipeline, "
+        "improving intrinsic calibration and 3D reconstruction accuracy for "
+        "industrial cameras.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Calibration & Camera Models" in result.tracks
+    assert result.negative_topic_penalty == 0
+    assert result.final_score >= app_config.scoring.thresholds.watch
+
+
+def test_video_llm_benchmark_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-07-13 daily run candidate 6395 (Do Video-LLMs Actually Watch?).
+
+    The paper is a video-LLM character-tracking *diagnostic benchmark* that
+    reached the top-25 with a *zero* negative penalty and a *false* Object
+    Tracking track match — it matched `tracking` on "character-tracking" (a
+    Video-LLM evaluation term, not multi-object tracking), plus Open-Source CV
+    Tooling (toolkit) and Datasets & Benchmarks. Video-LLM evaluation is outside
+    the industrial-CV radar; the `video large language` negative fires on the
+    genre (dropping the trailing "model(s)" so both forms match) and drops the
+    recommended ring to Ignore.
+    """
+    item = make_item(
+        "Do Video-LLMs Actually Watch? Diagnosing Character-Tracking Failures in Long-Form Video",
+        "Can a Video Large Language Model (Video-LLM) follow one person through a "
+        "long video? Benchmarks increasingly score this kind of task. We test "
+        "three open-source Video-LLMs with a nine-condition diagnostic protocol "
+        "and release a toolkit for auditing what such benchmark scores measure.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "video large language" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+    assert result.recommended_ring == "Ignore"
+
+
+def test_video_question_answering_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-07-13 daily run candidate 6323 (Evidence-Backed Video QA).
+
+    A video-LLM question-answering paper (E-VQA, ST-Evidence benchmark) that
+    piggy-backed on `benchmark` / `dataset` / `github` matches. Both the
+    `video large language` and the question-answering negatives fire and keep
+    it in Ignore.
+
+    2026-07-27: `video question answering` was widened to bare `question
+    answering` (35 Ignore / 0 kept over the decided corpus, and a strict
+    superset of the old phrase), so this anchor now pins the short form.
+    """
+    item = make_item(
+        "Evidence-Backed Video Question Answering",
+        "Current Video Large Language Models (Video LLMs) excel in question "
+        "answering but operate as black boxes. We propose Evidence-Backed Video "
+        "Question Answering (E-VQA) and introduce ST-Evidence, a human-verified "
+        "benchmark. Code and data are available at https://github.com/example/evqa.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "question answering" in result.negative_keywords
+    assert "video large language" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+    assert result.recommended_ring == "Ignore"
+
+
+def test_video_object_tracking_survives_video_llm_negatives(app_config):
+    """Guard: the video-LLM negatives must NOT touch a genuine video
+    object-tracking / detection paper. The negatives are scoped to the
+    `video large language` / `video question answering` phrases; a real MOT or
+    RGBT video-object-detection abstract does not contain them, and the Object
+    Tracking track keeps its `tracking` / `object tracking` /
+    `re-identification` positives intact."""
+    item = make_item(
+        "Robust Multi-Object Tracking in Video via Appearance Re-Identification",
+        "We propose an online multi-object tracker for video that associates "
+        "detections across frames using an appearance re-identification head and "
+        "a Kalman filter for real-time object tracking. Code is available at "
+        "https://github.com/example/video-mot.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Object Tracking" in result.tracks
+    assert result.negative_topic_penalty == 0
+    assert result.final_score >= app_config.scoring.thresholds.watch
+
+
+def test_healthcare_training_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-07-13 daily run candidate 6325 (LoRA cascaded multimodal
+    fusion for action recognition in healthcare/nurse-training environments).
+
+    The paper slipped into the top-25 with a *zero* negative penalty: the
+    existing medical negatives (`medical imaging` / `medical image segmentation`
+    / `clinical` / `surgical` / `computed tomography`) all missed it because the
+    abstract frames the domain as "healthcare-oriented training environments",
+    not medical *imaging*. The `healthcare` negative fires and drops the ring to
+    Ignore.
+    """
+    item = make_item(
+        "LoRA Cascaded Multimodal Fusion for Action Recognition in Medical Training",
+        "We present a cascaded LoRA-based multimodal fusion framework for action "
+        "and activity recognition in healthcare-oriented training environments. "
+        "We evaluate on two healthcare-oriented training environment datasets: "
+        "NurViD and the Nurse Training dataset.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "healthcare" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+    assert result.recommended_ring == "Ignore"
+
+
+def test_dermatology_generation_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-07-14 daily run candidate 8 (6425 cgDDI).
+
+    A controllable *dermatological* imagery-generation paper for malignancy
+    classification reached the top-25 with a *zero* negative penalty — it
+    matched only Datasets & Benchmarks / Open-Source CV Tooling via
+    `benchmark` / `dataset` / `github`, and no medical negative covered the
+    skin/dermatology domain. The `dermatological` negative fires on the task and
+    drops the recommended ring to Ignore.
+    """
+    item = make_item(
+        "Controllable Generation of Diverse Dermatological Imagery for Malignancy Classification",
+        "Accurate dermatological diagnosis requires equitable performance across "
+        "diverse skin tones. We introduce cgDDI, a framework that synthesizes "
+        "realistic skin samples and maps rare lesions onto novel skin-tones. We "
+        "validate malignancy classification on the DDI benchmark and openly "
+        "release synthetic images and code at https://github.com/example/cgDDI.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "dermatological" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+    assert result.recommended_ring == "Ignore"
+
+
+def test_dermatology_reconstruction_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-07-14 daily run candidate 1 (6423 DermDepth), which floated
+    to RANK 1 (final 42.45) on only the `clinical` hit.
+
+    A monocular metric-scale 3D reconstruction paper for the *dermatology*
+    domain. The metric-scale technique is metrology-adjacent, but the dataset
+    (D-Synth) and benchmarks are dermatological. The `dermatology` /
+    `dermatological` negatives fire on the domain — a real calibration / 3D
+    paper never says "dermatology".
+    """
+    item = make_item(
+        "DermDepth: Monocular Metric Scale 3D Reconstruction for Dermatology",
+        "We present DermDepth, the first single-view metric scale 3D "
+        "reconstruction model for the dermatological domain, and D-Synth, a "
+        "synthetic dermoscopic dataset with pixel-perfect 3D information for skin "
+        "cancer screening. Code and models are available on github.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "dermatology" in result.negative_keywords
+    assert "dermatological" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+    assert result.recommended_ring == "Ignore"
+
+
+def test_computational_pathology_wsi_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-07-14 daily run candidate 12 (6469 CGRL).
+
+    A *computational pathology* / *whole-slide image* classification paper
+    (TCGA-BRCA/NSCLC) reached the top-25 with a *zero* negative penalty: the
+    existing `histopathology` negative did not fire because the abstract says
+    "computational pathology" and "whole-slide image", not "histopathology".
+    The `computational pathology` and `whole-slide image` negatives fire on the
+    task and keep it in Ignore.
+    """
+    item = make_item(
+        "CGRL: Concept-Guided Representation Learning for Whole-Slide Image Classification",
+        "Weakly supervised whole-slide image (WSI) classification is widely used "
+        "in computational pathology because slide-level labels are easier to "
+        "obtain than dense annotations. We evaluate CGRL on the TCGA-BRCA and "
+        "TCGA-NSCLC datasets using multiple instance learning baselines.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "computational pathology" in result.negative_keywords
+    assert "whole-slide image" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+    assert result.recommended_ring == "Ignore"
+
+
+def test_industrial_reconstruction_survives_dermatology_pathology_negatives(app_config):
+    """Guard: the dermatology / pathology negatives must NOT touch a genuine
+    industrial 3D-reconstruction / surface-inspection paper. The phrases are
+    medical-specific (`dermatology` / `dermatological` / `computational
+    pathology` / `whole-slide image`); an industrial abstract about defect /
+    surface reconstruction does not contain them."""
+    item = make_item(
+        "Metric 3D Reconstruction for Surface Defect Inspection on a Calibrated Camera",
+        "We reconstruct metric 3D surface geometry from a calibrated industrial "
+        "camera for defect detection and surface inspection, using bundle "
+        "adjustment and structure from motion. Code is available on github.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Industrial Vision Inspection" in result.tracks
+    assert result.negative_topic_penalty == 0
+    assert result.final_score >= app_config.scoring.thresholds.watch
+
+
+def test_wildlife_ecology_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-07-22 backfill (07-15..07-21), the largest uncovered noise
+    class of the window — 6745 NACTI camera-trap species recognition, 6808
+    leprosy in wild chimpanzees, 6887 AnimalCLEF animal ReID, 6807 PanAf-SBR
+    great-ape behaviour. All reached the top-25 with a *zero* negative penalty,
+    riding `benchmark` / `dataset` / `re-identification` matches."""
+    item = make_item(
+        "Benchmarking NACTI Species Recognition in Long-Tailed Regimes",
+        "We benchmark species recognition on camera trap imagery collected for "
+        "wildlife monitoring and biodiversity assessment, releasing a dataset "
+        "and evaluation code on github.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "camera trap" in result.negative_keywords
+    assert "wildlife" in result.negative_keywords
+    assert "species recognition" in result.negative_keywords
+    assert "biodiversity" in result.negative_keywords
+    assert result.recommended_ring == "Ignore"
+
+
+def test_agriculture_phenotyping_papers_get_negative_penalty(app_config):
+    """Anchor: 6707 (tomato phenotyping via procedural synthetic data) and 6655
+    (Delineate Anything v2 global field delineation) — both reached RANK 2 of
+    their day with a zero penalty, the two highest-scoring noise items of the
+    2026-07-22 backfill window."""
+    phenotyping = make_item(
+        "Text-conditioned Segmentation for Tomato Phenotyping via Procedural Synthetic Data",
+        "We generate procedural synthetic data to train a segmentation model for "
+        "tomato phenotyping, and release the simulation pipeline and dataset.",
+    )
+    delineation = make_item(
+        "Delineate Anything v2: A Global Foundation Model for Field Delineation",
+        "Agricultural field boundary delineation is a foundational task. Our "
+        "foundation model handles cropland texturing patterns at national scale, "
+        "with a benchmark and weights on github.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    for item, phrase in ((phenotyping, "phenotyping"), (delineation, "cropland")):
+        result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+        assert phrase in result.negative_keywords
+        assert result.recommended_ring == "Ignore"
+
+
+def test_affect_recognition_papers_get_negative_penalty(app_config):
+    """Anchor: 6933 ambivalence/hesitancy recognition, 6733 SpEmoC emotion
+    benchmark and 6860 facial action unit detection, all zero-penalty in the
+    2026-07-22 backfill window. The phrase-level negatives are narrower than the
+    pre-existing `face recognition` negative, not a duplicate of it. On
+    2026-07-23 `facial expression` / `facial action unit` were consolidated into
+    bare `facial`, so one abstract now contributes one match, not two."""
+    item = make_item(
+        "SpEmoC: A Balanced Speaker-Segment Multimodal Emotion Benchmark",
+        "We study affective behaviour analysis, combining emotion recognition "
+        "with facial expression and facial action unit cues, and release the "
+        "benchmark and dataset on github.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "emotion recognition" in result.negative_keywords
+    assert "facial" in result.negative_keywords
+    assert "affective" in result.negative_keywords
+    assert result.recommended_ring == "Ignore"
+
+
+def test_handwriting_ocr_papers_get_negative_penalty(app_config):
+    """Anchor: 6557 Devanagari handwriting recognition, 6917 handwritten vs
+    printed text segmentation and 6970 cross-lingual handwritten OCR, all
+    zero-penalty across the 2026-07-22 backfill window."""
+    item = make_item(
+        "Barnamala: Parameter-Efficient Handwritten Devanagari Recognition",
+        "We study handwritten script recognition and optical character "
+        "recognition at benchmark saturation, releasing code on github.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "handwritten" in result.negative_keywords
+    assert "optical character recognition" in result.negative_keywords
+    assert result.recommended_ring == "Ignore"
+
+
+def test_uncovered_medical_modalities_get_negative_penalty(app_config):
+    """Anchor: 6983 echocardiography, 6974 screening mammography and 6699
+    breast-MRI classification reached the top-25 at zero penalty because the
+    existing medical negatives name neither the modality nor these organs."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    cases = [
+        (
+            "Motion-Conditioned Multi-View Fusion for Myocardial Infarction Localization",
+            "We fuse multi-view echocardiography sequences and release a dataset.",
+            "echocardiography",
+        ),
+        (
+            "Dataset-Origin Signatures and Shortcut Learning in Screening Mammography AI",
+            "A cross-dataset benchmark of screening mammography models.",
+            "mammography",
+        ),
+        (
+            "Cross-Dataset Generalization in Breast MRI Tumor Classification",
+            "We study class-wise dataset mixing for breast MRI tumor classification.",
+            "mri",
+        ),
+    ]
+    for title, summary, phrase in cases:
+        result = classify_item(
+            make_item(title, summary), config=app_config, source=source, now=FIXTURE_NOW
+        )
+        assert phrase in result.negative_keywords
+        assert result.recommended_ring == "Ignore"
+
+
+def test_industrial_xct_defect_paper_is_exempt_from_computed_tomography(app_config):
+    """Anchor: 2026-07-15 candidate 17 (7081 XCT-SAM). Defect segmentation on
+    additive-manufacturing X-ray CT lost 25 points to the *medical* `computed
+    tomography` negative. Industrial XCT is NDT inspection, not radiology, so
+    the exemption guards must suppress the penalty entirely."""
+    item = make_item(
+        "XCT-SAM: Domain Adaptation of SAM for Industrial XCT Defect Segmentation",
+        "Defect segmentation in additive manufacturing X-ray computed tomography "
+        "images remains challenging due to class imbalance. We adapt SAM with "
+        "Conv-LoRA adapters and release the dataset on github.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "computed tomography" not in result.negative_keywords
+    assert result.negative_topic_penalty == 0
+
+
+def test_semiconductor_inspection_paper_is_exempt_from_super_resolution(app_config):
+    """Anchor: 2026-07-19 candidate 17 (6806). A low-false-call semiconductor
+    inspection benchmark lost 25 points to the generic `super-resolution`
+    negative, even though its finding argues *against* SR in inspection
+    pipelines. Core-domain items must not be penalised for naming the technique
+    they evaluate."""
+    item = make_item(
+        "Does Super-Resolution Preserve Defect Evidence? A Benchmark for Semiconductor Inspection",
+        "Super-resolution can make inspection images appear sharper without "
+        "preserving the evidence needed to detect a defect. We benchmark "
+        "reconstruction against detection at a predeclared false-positive rate.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "super-resolution" not in result.negative_keywords
+    assert result.negative_topic_penalty == 0
+
+
+def test_exemptions_do_not_leak_to_medical_or_restoration_noise(app_config):
+    """Guard on the guard: the `computed tomography` / `super-resolution`
+    exemptions are scoped to industrial vocabulary, so ordinary medical-CT and
+    image-restoration papers must keep their penalty."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    medical = make_item(
+        "Anatomy-Aware 3D Mesh Refinement of Pericardium Segmentations",
+        "We refine pericardium segmentations on computed tomography volumes for "
+        "clinical use, releasing code on github.",
+    )
+    restoration = make_item(
+        "DRIFT: Difficulty-aware Rectified Flows for Through-plane Super-Resolution",
+        "We propose a rectified-flow model for through-plane super-resolution of "
+        "volumetric scans, improving perceptual quality over prior baselines.",
+    )
+    for item, phrase in ((medical, "computed tomography"), (restoration, "super-resolution")):
+        result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+        assert phrase in result.negative_keywords
+        assert result.negative_topic_penalty > 0
+
+
+def test_cardiovascular_magnetic_resonance_paper_gets_negative_penalty(app_config):
+    """Anchor: 2026-07-22 candidate 2 (7138). A cardiac-disease diagnosis
+    pipeline reached RANK 2 (final 41.1) at ZERO penalty — its abstract says
+    "cardiovascular magnetic resonance", never "…imaging", and "clinically
+    meaningful" rather than "clinical". Shortening the phrase to `magnetic
+    resonance` and adding the adverb closes both halves of the gap."""
+    item = make_item(
+        "An Automated, Clinically Meaningful AI Tool for Diagnosing Cardiac Disease from CMR",
+        "Cardiovascular magnetic resonance enables non-invasive assessment of "
+        "myocardial structure. We fine-tune three vision foundation models and "
+        "release weights and code on github.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "magnetic resonance" in result.negative_keywords
+    assert "clinically" in result.negative_keywords
+    assert result.recommended_ring == "Ignore"
+
+
+def test_face_and_gaze_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-07-21 candidate 3 (6681 UVFaceFusion, final 40.9 at zero
+    penalty) and candidate 9 (6678 gaze object prediction), plus 2026-07-22
+    candidate 13 (7179 pain assessment from facial video). The `human pose` /
+    `human mesh` negatives cover bodies, not faces; `face recognition` covers
+    identification, not reconstruction."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    cases = [
+        (
+            "UVFaceFusion: Multi-view Topologically Consistent Face Reconstruction",
+            "We reconstruct high-fidelity facial geometry with an assigned topology "
+            "for digital avatar creation, fusing multi-view point maps in UV space. "
+            "Code on github.",
+            "facial",
+        ),
+        (
+            "ReFace: Reorganizing Facial Spatiotemporal Representations for Pain Assessment",
+            "Automatic pain assessment from facial video remains challenging. We "
+            "evaluate on a benchmark dataset and report test set accuracy.",
+            "facial",
+        ),
+        (
+            "Open-Vocabulary Gaze Object Prediction: Benchmark and Method",
+            "Gaze object prediction localizes the objects humans attend to. We "
+            "introduce a benchmark and release code on github.",
+            "gaze",
+        ),
+    ]
+    for title, summary, phrase in cases:
+        result = classify_item(
+            make_item(title, summary), config=app_config, source=source, now=FIXTURE_NOW
+        )
+        assert phrase in result.negative_keywords
+        assert result.recommended_ring == "Ignore"
+
+
+def test_geospatial_mapping_papers_get_negative_penalty(app_config):
+    """Anchor: 2026-07-22 candidates 25 (7143 Sentinel-2 building detection),
+    16 (7173 global building-footprint rasters) and 12 (7147 UAV-to-satellite
+    geo-localisation), all zero-penalty because the abstracts never say "remote
+    sensing"."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    cases = [
+        (
+            "Toward Seasonal Guidelines for Sentinel-2 Building Detection",
+            "We build a multi-temporal Sentinel-2 dataset and derive binary "
+            "ground truth masks from a topographic database.",
+            "sentinel-2",
+        ),
+        (
+            "Global Building Area Estimation Products: How Accurate Are They?",
+            "Geospatial rasters of building footprint area support monitoring "
+            "urbanization and tracking greenhouse gas emissions. We evaluate four "
+            "products against a manually labeled dataset.",
+            "geospatial",
+        ),
+        (
+            "OffNadirLoc: UAV-to-Satellite Geo-Localization under Large Off-Nadir Views",
+            "Cross-view localization between drone and satellite imagery remains "
+            "challenging. We release a benchmark on github.",
+            "satellite imagery",
+        ),
+    ]
+    for title, summary, phrase in cases:
+        result = classify_item(
+            make_item(title, summary), config=app_config, source=source, now=FIXTURE_NOW
+        )
+        assert phrase in result.negative_keywords
+        assert result.recommended_ring == "Ignore"
+
+
+def test_image_compression_paper_does_not_match_fiducial_track(app_config):
+    """Anchor: 2026-07-21 candidate 18 (6653). "Checkerboard context model" is
+    learned-image-compression vocabulary, not a calibration target — the track
+    guard must drop the Target Detection & Fiducials match entirely."""
+    item = make_item(
+        "Wavefront Parallelization for Efficient Learned Image Compression",
+        "Autoregressive context models are foundational for learned image "
+        "compression. Existing acceleration methods such as checkerboard context "
+        "require retraining. Code on github.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Target Detection & Fiducials" not in result.tracks
+
+
+def test_calibration_target_paper_still_matches_fiducial_track(app_config):
+    """Guard on the guard: the compression phrases must not cost a real
+    checkerboard-calibration paper its track."""
+    item = make_item(
+        "Robust Checkerboard Corner Detection for Industrial Camera Calibration",
+        "We detect checkerboard corners at subpixel accuracy under motion blur "
+        "and compare against ChArUco calibration target detection.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Target Detection & Fiducials" in result.tracks
+
+
+def test_image_generation_benchmark_does_not_match_robotics_track(app_config):
+    """Anchor: 2026-07-21 candidate 7 (6632 ExpertVerse). A knowledge-intensive
+    image-generation benchmark matched Robotics Vision on "semantic
+    manipulation" alone."""
+    item = make_item(
+        "ExpertVerse: A Benchmark for Expert-Level Reasoning in Visual Synthesis",
+        "Instruction-based image generation has moved beyond semantic "
+        "manipulation to knowledge-driven visual reasoning. We curate an "
+        "open-source benchmark dataset.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Robotics Vision" not in result.tracks
+
+
+def test_robot_manipulation_paper_still_matches_robotics_track(app_config):
+    """Guard on the guard: a genuine robot-manipulation paper keeps its track."""
+    item = make_item(
+        "Visual Servoing for Bin-Picking Manipulation with a Calibrated Robot Arm",
+        "We combine visual odometry and robotics manipulation planning to guide a "
+        "robot arm toward randomly posed parts in a bin.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Robotics Vision" in result.tracks
+
+
+def test_industrial_tracking_paper_survives_the_new_negatives(app_config):
+    """Known false positive to protect: an industrial multi-object tracking /
+    inspection paper must not pick up any of the wildlife, affect, OCR or
+    medical-modality phrases added on 2026-07-22, nor the face/gaze, medical and
+    geospatial phrases added on 2026-07-23."""
+    item = make_item(
+        "Real-Time Multi-Object Tracking of Parts on a Conveyor for Inline Inspection",
+        "We track densely packed, visually similar parts on a conveyor using "
+        "re-identification features and a calibrated industrial camera, and "
+        "detect surface defects inline. Code is available on github.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Object Tracking" in result.tracks
+    assert result.negative_topic_penalty == 0
+    assert result.final_score >= app_config.scoring.thresholds.watch
+
+
+def test_biometric_identity_papers_get_negative_penalty(app_config):
+    """Anchor: the 2026-07-23 queue held three biometric-identity papers at zero
+    penalty (7283 finger-vein age/gender, 7212 iris recognition, 7261 text-based
+    person retrieval) because `face recognition` covers one modality and
+    `person re-identification` misses the "person retrieval" phrasing."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    cases = [
+        (
+            "MAGE-Vein: Multi-Instance Age and Gender Estimation from Finger Vein Images",
+            "Age estimation from finger vein images has been considered impractical due to "
+            "demographic biases in public datasets. Our code is available on github.",
+        ),
+        (
+            "Towards Robust Iris Recognition Through Occlusion Identification",
+            "Iris recognition identifies individuals using the stable texture of the iris. "
+            "A diffusion model performs reconstruction of the occluded region.",
+        ),
+        (
+            "Achieving Text-based Person Retrieval with Any Granularity",
+            "Text-based person retrieval faces uncertainty of query granularity. We build a "
+            "multi-grained dataset and an evaluation benchmark.",
+        ),
+        (
+            "DINO-VPT: Visual Prompt Tuning for Joint Physical-Digital Face Anti-Spoofing",
+            "We evaluate presentation attack detection under a unified protocol and release "
+            "the benchmark on github.",
+        ),
+        (
+            "Complex Structure Tensor Representations for Periocular Recognition",
+            "We enhance CNNs for periocular verification on a biometrics benchmark.",
+        ),
+        (
+            "Local Spatiotemporal Convolutional Network for Robust Gait Recognition",
+            "Gait recognition identifies subjects at a distance from silhouette sequences.",
+        ),
+        (
+            "A Prototypical Approach for Writer-Independent Offline Signature Verification",
+            "Offline signature verification decides whether a questioned signature is genuine.",
+        ),
+    ]
+    for title, summary in cases:
+        result = classify_item(
+            make_item(title, summary), config=app_config, source=source, now=FIXTURE_NOW
+        )
+        assert result.negative_topic_penalty > 0, title
+        assert result.final_score < app_config.scoring.thresholds.watch, title
+
+
+def test_industrial_papers_survive_the_biometric_negatives(app_config):
+    """Guard on the guard: the biometric phrases are modality-specific and must
+    not touch on-radar work. `signature` alone would have hit the spectral-
+    signature paper; `iris` alone would have hit the iris diaphragm."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    cases = [
+        (
+            "Spectral Signature Matching for Multispectral Weld Seam Inspection",
+            "We match the spectral signature of weld defects across bands using a calibrated "
+            "industrial multispectral camera.",
+        ),
+        (
+            "Lens Iris Aperture Calibration for Depth-from-Defocus Metrology",
+            "We model how the iris aperture of the lens changes the point spread function "
+            "during camera calibration for 3D measurement.",
+        ),
+        (
+            "Template Retrieval for Part Identification in Bin Picking",
+            "We retrieve the matching CAD template for each part and refine its 6-DoF pose "
+            "for robot guidance, then verify the grasp with a calibrated industrial camera.",
+        ),
+    ]
+    for title, summary in cases:
+        result = classify_item(
+            make_item(title, summary), config=app_config, source=source, now=FIXTURE_NOW
+        )
+        assert result.negative_topic_penalty == 0, title
+
+
+def test_generative_world_paper_does_not_match_robotics_track(app_config):
+    """Anchor: 2026-07-23 candidate 12 (7215 GS-Agent). LLM-agent-driven 4D world
+    creation matched Robotics Vision on "camera and lighting manipulation"."""
+    item = make_item(
+        "GS-Agent: Creating 4D Physical Worlds With Generative Simulation",
+        "We present an end-to-end multi-agent framework for 4D world generation that covers "
+        "3D asset curation, material tuning, placement, and rendering configuration, "
+        "including camera and lighting manipulation.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Robotics Vision" not in result.tracks
+
+
+def test_vlm_reasoning_benchmark_papers_get_negative_penalty(app_config):
+    """Anchor: the 2026-07-27 mining pass over the decided corpus. Half the
+    Ignore items still carried zero penalty, and the largest coherent class in
+    that residue is the multimodal-LLM reasoning/QA benchmark — papers whose
+    contribution is an evaluation of language grounding rather than of a
+    measurement. The existing `vision-language` / `multimodal large language`
+    negatives only catch the ones that name the architecture; these catch the
+    ones that name the task."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    cases = [
+        (
+            "Ground3D-LMM: Fine-Grained 3D Point Grounding with Large Multimodal Models",
+            "We evaluate spatial reasoning over indoor point clouds and release a benchmark.",
+            "spatial reasoning",
+        ),
+        (
+            "Look Light, Think Heavy: What Multimodal Reasoning Can and Cannot Do",
+            "We study multimodal chain-of-thought prompting across 12 benchmarks.",
+            "chain-of-thought",
+        ),
+        (
+            "PhysScene: A Scene Graph Dataset for Scientific Reasoning in Physics Experiments",
+            "A dataset for visual reasoning about laboratory scenes, released on github.",
+            "visual reasoning",
+        ),
+        (
+            "Seeing Once is Enough? Geometry-Aware Token Pruning for 3D Scene Understanding",
+            "We prune tokens for 3D question answering while preserving accuracy.",
+            "question answering",
+        ),
+        (
+            "Robo-Cortex: A Self-Evolving Agent via Dual-Grain Cognitive Memory",
+            "We build an embodied agent that accumulates episodic memory across tasks.",
+            "embodied agent",
+        ),
+        (
+            "Parse, Search, and Confirmation: Training-Free Aerial Navigation with LLMs",
+            "A training-free vision-and-language navigation pipeline for aerial agents.",
+            "vision-and-language navigation",
+        ),
+    ]
+    for title, summary, phrase in cases:
+        result = classify_item(
+            make_item(title, summary), config=app_config, source=source, now=FIXTURE_NOW
+        )
+        assert phrase in result.negative_keywords, f"{phrase!r} did not fire on {title!r}"
+        assert result.recommended_ring == "Ignore"
+
+
+def test_question_answering_widening_still_catches_video_qa(app_config):
+    """`video question answering` was widened to bare `question answering` on
+    2026-07-27. The widening must strictly subsume the old phrase — and must
+    fire exactly once, so the item is not penalised twice for the same trait."""
+    item = make_item(
+        "Evidence-Backed Video Question Answering with Temporal Grounding",
+        "We release a benchmark for long-video question answering with evidence spans.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "question answering" in result.negative_keywords
+    assert result.negative_keywords.count("question answering") == 1
+    assert "video question answering" not in result.negative_keywords
+
+
+def test_core_domain_survives_the_vlm_reasoning_negatives(app_config):
+    """Probe against kept items: none of the 2026-07-27 reasoning phrases may
+    touch geometry, calibration, or robot-guidance work. `embodied`,
+    `embodied ai`, `world model` and `success rate` were rejected precisely
+    because they did — this pins the narrower replacements."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    cases = [
+        (
+            "EmbodiedGen V2: An Agentic, Simulation-Ready 3D World Engine for Embodied AI",
+            "A generative engine producing simulation-ready 3D assets with physical scale "
+            "for embodied AI research, released open-source.",
+        ),
+        (
+            "Quantitative Video World Model Evaluation for Geometric-Consistency",
+            "We evaluate whether video world models preserve geometric consistency under "
+            "camera motion, using multi-view reconstruction as ground truth.",
+        ),
+        (
+            "Category-Level 6D Pose Estimation for Bin Picking",
+            "Our grasping pipeline raises the success rate on cluttered industrial bins "
+            "using depth from a structured-light 3D sensor.",
+        ),
+    ]
+    for title, summary in cases:
+        result = classify_item(
+            make_item(title, summary), config=app_config, source=source, now=FIXTURE_NOW
+        )
+        assert result.negative_topic_penalty == 0, (
+            f"{title!r} was penalised by {result.negative_keywords}"
+        )
+
+
+def test_medical_modality_tail_gets_negative_penalty(app_config):
+    """Anchor: 2026-07-24 candidate 5 (7327 CARDIAG, coronary-angiography segment
+    classification) reached rank 5 with zero penalty — none of `medical imaging`
+    / `computed tomography` / `histopathology` / `surgical` / `clinical` / `mri`
+    names angiography. Medical imaging keeps leaking one modality at a time, so
+    the tail is closed by modality and clinical-entity name."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    cases = [
+        (
+            "CARDIAG: A Dense Segment Classification Benchmark for Coronary Angiography",
+            "We benchmark deep architectures that densely classify pixels of angiography "
+            "images, and release the dataset.",
+            "angiography",
+        ),
+        (
+            "Frozen Foundation-Model Embeddings Discard Small-Lesion Signal",
+            "We show that frozen embeddings lose lesion-scale detail in chest radiography.",
+            "lesion",
+        ),
+        (
+            "A Leakage-Aware Comparative Benchmark for Outcome Prediction",
+            "We evaluate leakage across patient-level splits and report calibrated metrics.",
+            "patient",
+        ),
+        (
+            "MS-rPPG: Multi-spectral State Space Model for Remote Photoplethysmography",
+            "We estimate cardiac pulse from facial video under illumination change.",
+            "cardiac",
+        ),
+        (
+            "Dual-Stream Decoding for 3D Visual Perception",
+            "We decode EEG signals recorded during 3D shape viewing, releasing the dataset.",
+            "eeg",
+        ),
+        (
+            "Computational Imaging Priors for Wireless Capsule Endoscopy",
+            "Monte Carlo-guided reconstruction for capsule endoscopy video.",
+            "endoscopy",
+        ),
+    ]
+    for title, summary, phrase in cases:
+        result = classify_item(
+            make_item(title, summary), config=app_config, source=source, now=FIXTURE_NOW
+        )
+        assert phrase in result.negative_keywords, f"{phrase!r} did not fire on {title!r}"
+        assert result.recommended_ring == "Ignore"
+
+
+def test_industrial_ultrasonic_ndt_is_exempt_from_ultrasound(app_config):
+    """`ultrasound` is medical sonography, but ultrasonic NDT is a core
+    inspection modality. Industrial abstracts normally say "ultrasonic", which
+    the whole-word matcher misses anyway; the guard covers the case where one
+    says "ultrasound" instead."""
+    item = make_item(
+        "Automated Weld Defect Sizing from Phased-Array Ultrasound Volumes",
+        "We segment planar defects in non-destructive ultrasound inspection of welds "
+        "and compare against radiographic ground truth.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "ultrasound" not in result.negative_keywords
+
+
+def test_ultrasound_exemption_does_not_leak_to_medical_sonography(app_config):
+    """Guard on the guard: ordinary medical ultrasound keeps its penalty."""
+    item = make_item(
+        "Fetal Biometry Estimation from Obstetric Ultrasound Video",
+        "We estimate standard planes from ultrasound sweeps acquired in routine screening.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "ultrasound" in result.negative_keywords
+

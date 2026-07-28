@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 from datetime import datetime
 from enum import StrEnum
 from typing import Literal
@@ -84,6 +85,35 @@ class TopicsConfig(BaseModel):
 
 class NegativeTopicsConfig(BaseModel):
     negative_topics: list[str] = Field(default_factory=list)
+    # Domain-ambiguous negatives: a phrase listed here is suppressed when any of
+    # its guard phrases also appears in the item text. Keeps broad off-radar
+    # markers usable without penalising the on-radar sense of the same words
+    # (e.g. "computed tomography" is medical noise, but industrial XCT is not).
+    exemptions: dict[str, list[str]] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_negative_topics(self) -> NegativeTopicsConfig:
+        # A repeated phrase is silently corrosive rather than inert: the penalty
+        # is len(matches)-driven, so listing one phrase twice charges an item 35
+        # points instead of 25 for a single trait. Caught on 2026-07-27 when the
+        # medical-tail batch re-added `ultrasound`, already present since 07-08.
+        counts = Counter(self.negative_topics)
+        duplicates = sorted(phrase for phrase, n in counts.items() if n > 1)
+        if duplicates:
+            msg = f"negative_topics contains duplicate phrases: {', '.join(duplicates)}"
+            raise ValueError(msg)
+        unknown = sorted(set(self.exemptions) - set(self.negative_topics))
+        if unknown:
+            msg = f"exemptions reference unlisted negative topics: {', '.join(unknown)}"
+            raise ValueError(msg)
+        empty = sorted(phrase for phrase, guards in self.exemptions.items() if not guards)
+        if empty:
+            msg = f"exemptions must list at least one guard phrase: {', '.join(empty)}"
+            raise ValueError(msg)
+        return self
+
+    def guards_for(self, phrase: str) -> list[str]:
+        return self.exemptions.get(phrase, [])
 
 
 class PrioritySourcesConfig(BaseModel):
