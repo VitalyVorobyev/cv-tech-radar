@@ -142,6 +142,34 @@ enough to turn into GitHub issues. Grouped by area.
       list instead of the positive one, so per-track `negative_keywords` cannot
       fix it. Any future single-word negative should be checked for a figurative
       register before it lands.
+      2026-07-28 adds the clearest instance yet: `fashion` measured 15 Ignore / 0
+      kept, the best ratio of that round's batch, but 4 of the 15 hits are "in an
+      autoregressive / end-to-end / offline fashion" and it also fires on the
+      Fashion-MNIST dataset name. The Ignore/kept ratio alone would have shipped
+      it. Grep a candidate phrase's *surrounding words* before trusting its
+      ratio, not just its counts.
+- [ ] **Whole-word matching silently halves a phrase's coverage when the natural
+      form is plural.** `keyword_matches` wraps the phrase in `\b...\b`, so
+      `visual token` does not fire on "redundant visual tokens" — the form most
+      VLM abstracts actually use. Measured 2026-07-28: `visual token` 14 Ignore
+      hits, `visual tokens` 11, and the config now lists both. The same trap
+      applies to every multi-word phrase whose last token pluralises
+      (`3d asset`/`3d assets`, `head avatar`/`head avatars`). Either list both
+      forms when mining shows the plural is common, or teach `keyword_matches` an
+      optional trailing `s?` — the latter is a one-line change but needs a sweep
+      of the existing 97 phrases to check nothing over-matches.
+- [ ] The false-context problem also arrives through a positive keyword whose
+      *own* track is wrong, which per-track `negative_keywords` does fix.
+      2026-07-28: `pruning` is an Edge AI & Deployment positive keyword, but
+      VLM papers use it for dropping visual tokens from an LLM context window
+      (7504 Omni-Prune, 7517, 7523, 7527, 7534 in the 07-25..26 window alone).
+      Adding `token pruning` / `visual token` / `visual tokens` as track
+      negatives dropped 7534 from 14.2 to 4.2 and 7504 from 18.6 to 8.8 by
+      removing the track entirely, which is a much larger move than any negative
+      *topic* can make — suppressing a spurious track beats penalising the item.
+      Worth auditing the other generic positives (`deployment`, `benchmark`,
+      `dataset`, `reconstruction`) the same way.
+
 ### RSS and vendor sources
 
 - [ ] Extend `sources.yaml` with a small RSS pilot set.

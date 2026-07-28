@@ -163,7 +163,20 @@ tracks:
       - openvino
       - embedded vision
       - real-time inference
-    negative_keywords: []
+    # `pruning` means network pruning here, but VLM/MLLM papers use the same word
+    # for dropping *visual tokens* from a context window, and that class recurs
+    # every batch (7504 Omni-Prune, 7517 WaveZip, 7523 OmniScope, 7527
+    # CachedSearch, 7534 on 2026-07-25..26 alone). Suppressing the track match is
+    # the right fix rather than a global penalty: the papers are not off-radar
+    # because they are noisy, they are off-radar because Edge AI never applied.
+    # Probed 2026-07-28: token pruning 12 Ignore / 0 kept, visual token 14/0,
+    # visual tokens 11/0 — no kept item uses any of them. Both number forms are
+    # listed because the matcher is whole-word: `visual token` does not fire on
+    # "redundant visual tokens", which is the form most of these abstracts use.
+    negative_keywords:
+      - token pruning
+      - visual token
+      - visual tokens
 
   - id: vision-foundation-models
     name: Vision Foundation Models

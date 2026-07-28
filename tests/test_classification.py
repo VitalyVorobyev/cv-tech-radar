@@ -1447,3 +1447,135 @@ def test_ultrasound_exemption_does_not_leak_to_medical_sonography(app_config):
     result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
     assert "ultrasound" in result.negative_keywords
 
+
+def test_visual_token_pruning_paper_does_not_match_edge_ai_track(app_config):
+    """Anchor: 2026-07-25/26 queued five VLM token-efficiency papers (7504
+    Omni-Prune, 7517, 7523, 7527, 7534). `pruning` is an Edge AI positive
+    keyword, but these papers prune *visual tokens* out of an LLM context
+    window, which has nothing to do with edge deployment."""
+    item = make_item(
+        "Omni-Prune: Query-Aware Unified Token Pruning for Efficient Omnimodal Models",
+        "We reduce inference cost by dropping redundant visual tokens before the "
+        "language decoder, applying query-aware token pruning at every layer.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Edge AI & Deployment" not in result.tracks
+
+
+def test_network_pruning_paper_still_matches_edge_ai_track(app_config):
+    """Guard on the guard: the token phrases must not cost a real model-compression
+    paper its Edge AI track."""
+    item = make_item(
+        "Structured Pruning and INT8 Quantization for Real-Time Defect Detection",
+        "We prune convolution channels and export to TensorRT, measuring latency "
+        "on a Jetson Orin for inline inspection.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Edge AI & Deployment" in result.tracks
+
+
+def test_content_generation_and_domain_negatives_fire(app_config):
+    """Anchor: the 2026-07-25..27 backfill put five classes into the top-25 with
+    zero negative penalty. One case per phrase added on 2026-07-28."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    cases = [
+        (
+            "SimBEV2X: A Large-Scale Dataset for Cooperative Perception",
+            "We build a vehicle-to-everything (V2X) dataset in CARLA with lidar and "
+            "camera streams from connected vehicles and roadside units.",
+            "v2x",
+        ),
+        (
+            "CoBEV: Bird's-Eye-View Fusion for Connected Vehicles",
+            "Cooperative perception across multiple agents overcomes occlusion in "
+            "urban driving, evaluated on a new benchmark.",
+            "cooperative perception",
+        ),
+        (
+            "Head Avatars with Dynamic Explicit Hair",
+            "We reconstruct a photorealistic head avatar with strand-level hair from "
+            "monocular video and render it in real time.",
+            "head avatar",
+        ),
+        (
+            "DreamStyle3D: Efficient 3D Stylized Asset Generation",
+            "Our framework accelerates 3D content creation for gaming and virtual "
+            "reality by disentangling style from geometry.",
+            "3d content",
+        ),
+        (
+            "Layering Virtual Try-On",
+            "We synthesize layered clothing on a person image, preserving the "
+            "occlusion order between shirt, jacket and coat.",
+            "try-on",
+        ),
+        (
+            "ESRVS: Extreme Semi-Supervised Retinal Vessel Segmentation",
+            "Learning from minimal supervision is a long-standing goal in medical "
+            "image analysis, where dense expert annotations are costly.",
+            "medical image analysis",
+        ),
+        (
+            "Prototype Transfer for Coronary Vessel Segmentation",
+            "We propagate labels across an unlabeled pool for vessel segmentation "
+            "and report Dice on eight public datasets.",
+            "vessel segmentation",
+        ),
+        (
+            "JPEG AIC2026: A Dataset for Fine-Grained Assessment of Image Coding",
+            "We cover artifacts from conventional and learned image compression "
+            "codecs at twenty perceptually spaced distortion levels.",
+            "image compression",
+        ),
+        (
+            "Codebook Capacity Governs Perceptual Quality Across Resolutions",
+            "We analyze the rate-distortion tradeoff of hierarchical discrete video "
+            "codecs at matched bitrates.",
+            "rate-distortion",
+        ),
+    ]
+    for title, summary, phrase in cases:
+        result = classify_item(
+            make_item(title, summary), config=app_config, source=source, now=FIXTURE_NOW
+        )
+        assert phrase in result.negative_keywords, f"{phrase!r} did not fire on {title!r}"
+        assert result.recommended_ring == "Ignore"
+
+
+def test_core_domain_survives_the_2026_07_28_negatives(app_config):
+    """The 2026-07-28 batch was probed against the decided corpus for kept-item
+    collisions; these fixtures pin the ones that were close enough to reject a
+    broader phrase (`avatar`, `retinal`, `3d asset`, `image quality assessment`,
+    `garment`) and keep the surviving phrases honest."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    cases = [
+        (
+            "Programmable Silicon Retina on a Pixel Processor Array",
+            "We implement early vision on a focal-plane sensor processor, running "
+            "convolution in the pixel array itself.",
+        ),
+        (
+            "Articraft: An Agentic System for Scalable Articulated 3D Asset Generation",
+            "We generate simulation-ready articulated assets with joint limits for "
+            "robot manipulation training in a physics simulator.",
+        ),
+        (
+            "A Reference-Free Framework for Evaluating Single-Frame ISP Pipelines",
+            "We estimate full-reference image quality assessment metrics for a "
+            "camera image signal processing pipeline from ISO metadata.",
+        ),
+        (
+            "Automated Fabric Defect Detection for Garment Manufacturing Lines",
+            "We detect weave defects on textile rolls with an industrial line-scan "
+            "camera and report false-call rates on a production line.",
+        ),
+    ]
+    for title, summary in cases:
+        result = classify_item(
+            make_item(title, summary), config=app_config, source=source, now=FIXTURE_NOW
+        )
+        assert not result.negative_keywords, (
+            f"{title!r} unexpectedly penalised by {result.negative_keywords}"
+        )

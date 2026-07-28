@@ -364,6 +364,50 @@ negative_topics:
   - eeg
   - biopsy
   - endoscopy
+  # 2026-07-28 batch. The 07-25..07-27 weekend backfill surfaced four content
+  # classes that reached the top-25 with *zero* negative penalty, each probed
+  # against the 1200-Ignore / 269-kept decided corpus:
+  #   * Automotive V2X — 7457 (SimBEV2X, a CARLA-based V2X dataset) took rank 2
+  #     of 2026-07-27 with no penalty. The existing `autonomous driving` negative
+  #     misses it: V2X abstracts say "autonomous vehicles" and "cooperative
+  #     perception". v2x 7/0, cooperative perception 5/0 (only 2 overlap).
+  #   * Head-avatar generation — 7430 (portrait animation), 7460 and 7473 all
+  #     landed with zero penalty across three days. head avatar 4/0.
+  #   * 3D content creation and virtual try-on — the generative-asset tail that
+  #     `image generation` / `video generation` do not name. 3d content 5/0,
+  #     try-on 4/0.
+  #   * Medical tail, again — 7397 (retinal vessel segmentation) reached rank 15
+  #     of 2026-07-27 with zero penalty despite saying "medical image analysis"
+  #     in its first sentence. medical image analysis 5/0, vessel segmentation
+  #     4/0 (one overlap).
+  #   * Image coding — 7559 and 7509 carried no penalty. image compression 4/0,
+  #     rate-distortion 6/0. `image compression` already exists as a per-track
+  #     negative for Target Detection & Fiducials; this promotes it to a penalty.
+  # Deliberately rejected this round:
+  #   * `fashion` (15/0) — the highest-volume phrase available and the round's
+  #     clearest figurative-register trap: 4 of its 15 hits are "in an
+  #     autoregressive / end-to-end / offline fashion", and it also fires on the
+  #     Fashion-MNIST dataset name. `try-on` covers the real class.
+  #   * `garment` (7/0) — rejected on forward risk, not measured damage: apparel
+  #     and textile defect inspection is squarely Industrial Vision Inspection.
+  #   * `avatar` (8/1), `3d asset` (3/2), `asset generation` (3/2), `3d
+  #     generation` (2/2) — all touch kept items (2153 real-to-twin inspection,
+  #     1142 Articraft, 6091 EmbodiedGen V2, 496 Mix3R, 2005 GenRecon). Scoped to
+  #     `head avatar` / `3d content` instead.
+  #   * `retinal` (5/1) — hits 3103, "Programmable Silicon Retina on Pixel
+  #     Processor Array", a genuine sensor paper.
+  #   * `image quality assessment` (4/1) — hits 7514, kept the same day as a
+  #     reference-free ISP-pipeline evaluation method.
+  - v2x
+  - cooperative perception
+  - head avatar
+  - 3d content
+  - try-on
+  - medical image analysis
+  - vessel segmentation
+  - image compression
+  - rate-distortion
+
 # Domain-ambiguous negatives: the phrase stays in the list above, but the penalty
 # is suppressed when any guard phrase also appears in the item text. Added
 # 2026-07-22 after the 07-15..07-21 backfill showed the negative filter
