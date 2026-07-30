@@ -1579,3 +1579,221 @@ def test_core_domain_survives_the_2026_07_28_negatives(app_config):
         assert not result.negative_keywords, (
             f"{title!r} unexpectedly penalised by {result.negative_keywords}"
         )
+
+
+def test_2026_07_30_negative_topics_fire(app_config):
+    """Anchor: 18 of the 40 Ignore items across the 07-28 and 07-29 queues reached
+    the top 25 carrying zero negative penalty. Each fixture below pins one of the
+    classes mined out of that residue, using the phrasing the real abstracts
+    used."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    cases = [
+        (
+            "Group Equivariant Diffusion for Anomaly Detection in Computational Cytology",
+            "Malignant cells are rare on whole-slide images, so we train on normal "
+            "slide-negative patches and flag abnormal patches at test time.",
+            "whole-slide",
+        ),
+        (
+            "Foundation Model Embeddings for Distant Metastasis Prediction",
+            "We predict distant metastasis risk in head and neck cancer from "
+            "preoperative CT and compare against radiomics features.",
+            "cancer",
+        ),
+        (
+            "SciFigQual-Bench: A Benchmark for Scientific Figure Quality Assessment",
+            "We score each scientific figure against its caption, citing sentence "
+            "and surrounding manuscript context across five dimensions.",
+            "scientific figure",
+        ),
+        (
+            "BaFCo: A Benchmark for Complex Bangla Form Comprehension",
+            "We evaluate layout-aware models on document understanding over "
+            "scanned government forms.",
+            "document understanding",
+        ),
+        (
+            "Online Handwriting Trajectory Reconstruction from Kinematic Sensors",
+            "We map the sensor signals of a digital pen to the online handwriting "
+            "trajectory, aligning sampling rates with dynamic time warping.",
+            "handwriting",
+        ),
+        (
+            "MEDit-Bench: A Dataset for Message-Driven Narrative Video Editing",
+            "The selected shots change with the narrative an editor wishes to "
+            "convey, so we pair long-form videos with multiple editing messages.",
+            "video editing",
+        ),
+        (
+            "RDVSv2: A Large-scale Benchmark for RGB-D Video Salient Object Detection",
+            "We release dense frame-level masks for salient object detection and "
+            "fine-tune a SAM2 encoder on RGB, depth and optical flow.",
+            "salient object detection",
+        ),
+        (
+            "BG-REAL: A Real-Data Anchored Benchmark for Background Manipulation",
+            "We package a benchmark for background manipulation detection and "
+            "localization with matched authentic controls.",
+            "manipulation detection",
+        ),
+        (
+            "SARIF: Segment Anything for Robust Image Forensics",
+            "We adapt a promptable segmentation backbone to image forensics and "
+            "report pixel-level localization on spliced composites.",
+            "image forensics",
+        ),
+        (
+            "ReLATE: Reliability-Guided Evidence Fusion for UAV-Satellite Retrieval",
+            "We benchmark robustness of cross-view geo-localization under 27 "
+            "corruption types at three severity levels.",
+            "cross-view geo-localization",
+        ),
+        (
+            "A Unified Benchmark and Modality-Adaptive Network for Illumination Shift",
+            "Existing drone-view geo-localisation benchmarks capture a single "
+            "illumination condition and lack aligned infrared imagery.",
+            "drone-view",
+        ),
+        (
+            "Long-Tailed 3D Point Cloud Dataset Distillation",
+            "Current point cloud dataset distillation methods ignore the "
+            "distributional imbalance prevalent in the source splits.",
+            "dataset distillation",
+        ),
+        (
+            "Multimodal Fusion of Visual and Morphometric Features for Bird Bones",
+            "We investigate skeletal element identification and family-level "
+            "taxonomic classification of avian remains from museum collections.",
+            "taxonomic",
+        ),
+        (
+            "FLASH: Efficient Impact Fall Detection with a Hypergraph State-Space Model",
+            "Accurate fall detection at the moment an individual hits the ground "
+            "is crucial for timely intervention.",
+            "fall detection",
+        ),
+    ]
+    for title, summary, phrase in cases:
+        result = classify_item(
+            make_item(title, summary), config=app_config, source=source, now=FIXTURE_NOW
+        )
+        assert phrase in result.negative_keywords, f"{phrase!r} did not fire on {title!r}"
+        assert result.recommended_ring == "Ignore"
+
+
+def test_v2x_dataset_names_close_the_whole_word_gap(app_config):
+    """Anchor: 7747 (HeteroPROMPT) evaded the `v2x` negative added on 07-28. The
+    matcher is whole-word, so "V2XSet" and "OPV2V-H" contain no standalone `v2x`
+    token; the dataset names are what the abstract actually says."""
+    item = make_item(
+        "HeteroPROMPT: A Real-time Privacy-Preserving Heterogeneous Collaborative "
+        "Perception Framework",
+        "Experiments on the OPV2V-H and V2XSet datasets show improved average "
+        "precision with orders of magnitude fewer trainable parameters.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "v2xset" in result.negative_keywords
+    assert "opv2v" in result.negative_keywords
+    assert result.recommended_ring == "Ignore"
+
+
+def test_image_forensics_paper_does_not_match_robotics_track(app_config):
+    """Anchor: 7752 (BG-REAL) reached rank 5 of 2026-07-28 partly because
+    `manipulation` matched Robotics Vision on "background manipulation" — the
+    third distinct wrong sense of that word after image and world generation."""
+    item = make_item(
+        "BG-REAL: A Public Real-Data Anchored Benchmark for Background Manipulation "
+        "Detection and Localization",
+        "Background manipulation is a practical but under-specified image-forensics "
+        "setting, where the manipulated evidence can sit outside the salient "
+        "foreground object.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Robotics Vision" not in result.tracks
+
+
+def test_gui_agent_benchmark_does_not_match_tracking_track(app_config):
+    """Anchor: 7576 (Desktop-Delta Bench) matched Object Tracking on the bare word
+    `tracking`, from "source tracking" of desktop GUI state."""
+    item = make_item(
+        "Desktop-Delta Bench: Do Computer-Use Models Understand Desktop GUI Transitions?",
+        "We probe state verification, source tracking and context-aware control "
+        "over multi-app Linux trajectories rendered in a desktop GUI.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Object Tracking" not in result.tracks
+
+
+def test_medical_anomaly_detection_does_not_match_inspection_track(app_config):
+    """Anchor: 7621 matched Industrial Vision Inspection on `anomaly detection`
+    alone. That phrase is the track's strongest positive (28 kept items in the
+    decided corpus) and medical papers use it for the identical task, so the
+    guard is scoped to medical vocabulary rather than weakening the keyword."""
+    item = make_item(
+        "Group Equivariant Diffusion for Anomaly Detection in Computational Cytology",
+        "Anomaly detection frameworks are trained on normal slide-negative "
+        "patches of whole-slide images and applied to held-out slides.",
+    )
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
+    assert "Industrial Vision Inspection" not in result.tracks
+
+
+def test_industrial_anomaly_detection_still_matches_inspection_track(app_config):
+    """Guard on the guard: the medical phrases must not cost a real inspection
+    paper its track. 576 (AnomalyClaw, kept) is why `medical imaging` was
+    rejected as a guard and only the singular `medical image` is listed."""
+    cases = [
+        (
+            "MMVIAD: A Multi-Modal Industrial Anomaly Detection Benchmark",
+            "We release aligned RGB and 3D scans of surface defects from a "
+            "production line and benchmark unsupervised anomaly detection.",
+        ),
+        (
+            "AnomalyClaw: A Universal Visual Anomaly Detection Agent",
+            "Our tool-grounded agent generalizes across industrial inspection, "
+            "remote sensing and medical imaging without retraining.",
+        ),
+    ]
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    for title, summary in cases:
+        result = classify_item(
+            make_item(title, summary), config=app_config, source=source, now=FIXTURE_NOW
+        )
+        assert "Industrial Vision Inspection" in result.tracks, title
+
+
+def test_core_domain_survives_the_2026_07_30_negatives(app_config):
+    """Pins the kept-item collisions that forced this round's phrases to stay
+    scoped: 6669 (GPS-denied aerial geo-localization, kept Watch) rejected bare
+    `satellite` / `geo-localization`, 4395 (HERCULES, kept Evaluate) rejected
+    `collaborative perception`, and industrial OCV rejected `ocr`."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    cases = [
+        (
+            "NGPS: GPS-Denied Aerial Geo-Localization and 2.5D Reconstruction",
+            "We fuse deep satellite image matching with a multi-rate UKF whose "
+            "covariance is modulated by the RANSAC inlier ratio, running in real "
+            "time on a Jetson Orin NX.",
+        ),
+        (
+            "HERCULES: An Open-Source Simulation Framework for Multi-Robot SLAM",
+            "Our UE5 pipeline supports heterogeneous multi-robot SLAM, "
+            "collaborative perception and exploration with released ROS2 code.",
+        ),
+        (
+            "Robust Date-Code Reading on Stamped Metal Parts",
+            "We combine a line-scan camera with OCR and optical character "
+            "verification to read part markings on an inline inspection cell.",
+        ),
+    ]
+    for title, summary in cases:
+        result = classify_item(
+            make_item(title, summary), config=app_config, source=source, now=FIXTURE_NOW
+        )
+        assert not result.negative_keywords, (
+            f"{title!r} unexpectedly penalised by {result.negative_keywords}"
+        )

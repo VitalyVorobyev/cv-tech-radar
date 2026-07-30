@@ -104,11 +104,21 @@ tracks:
     # images. Probed over the corpus: 9 hits, none of them kept, and every one is
     # generative content creation or a driving world model. The narrower
     # `lighting manipulation` was rejected as a one-off phrasing.
+    #
+    # The forensics sense added 2026-07-30: 7752 (BG-REAL, a *background
+    # manipulation* detection benchmark) matched this track on `manipulation`
+    # alone and reached rank 5 of the 07-28 queue. Image forensics is the third
+    # distinct wrong sense of the word, after image generation and world
+    # generation. All three phrases are new global negative topics as well;
+    # repeating them here removes the relevance boost too.
     negative_keywords:
       - image generation
       - image editing
       - text-to-image
       - world generation
+      - manipulation detection
+      - manipulation localization
+      - image forensics
 
   - id: robot-guidance
     name: Robot Guidance
@@ -133,8 +143,13 @@ tracks:
       - re-identification
       - temporal association
       - motion model
+    # `gui` added 2026-07-30: 7576 (Desktop-Delta Bench, a computer-use-agent
+    # benchmark) matched this track on the bare word `tracking`, from "source
+    # tracking" of GUI state. Desktop-agent papers are a growing cs.CV class and
+    # they all use this vocabulary. Probed: gui 9 Ignore / 0 kept.
     negative_keywords:
       - person re-identification
+      - gui
 
   - id: industrial-vision-inspection
     name: Industrial Vision Inspection
@@ -148,7 +163,23 @@ tracks:
       - quality control
       - metrology
       - machine vision
-    negative_keywords: []
+    # `anomaly detection` is one of this track's strongest positives (28 kept
+    # items across the corpus) and is also the phrase medical papers use for
+    # exactly the same task. Added 2026-07-30 after 7621 (Group Equivariant
+    # Diffusion for Anomaly Detection in Computational Cytology) matched this
+    # track on it alone. Measured over the decided corpus: 21 Ignore / 28 kept
+    # items say `anomaly detection`; 6 of the Ignore items pair it with one of
+    # the guards below, and *no* kept item does.
+    # `medical imaging` was rejected as a guard: it hits 576 (AnomalyClaw, a kept
+    # general visual anomaly-detection agent that lists medical imaging as one
+    # application domain). The singular `medical image` does not — the matcher is
+    # whole-word — so that is the form listed.
+    negative_keywords:
+      - cytology
+      - whole-slide
+      - histopathology
+      - medical image
+      - clinical
 
   - id: edge-ai-deployment
     name: Edge AI & Deployment

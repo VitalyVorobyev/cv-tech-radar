@@ -407,6 +407,67 @@ negative_topics:
   - vessel segmentation
   - image compression
   - rate-distortion
+  # 2026-07-30 batch, mined from the 07-28 and 07-29 queues (40 Ignore items, of
+  # which 18 reached the top 25 carrying *zero* negative penalty). Counts are
+  # Ignore/kept over the 1240-Ignore / 279-kept decided corpus, and every phrase
+  # below was also eyeballed for figurative usage in its actual hits.
+  #   * Medical tail, again — 7621 (anomaly detection in computational cytology)
+  #     took rank 15 of 07-28 with zero penalty. cancer 13/0, whole-slide 7/0.
+  #   * Scholarly-figure AI — three papers in the *same* 07-29 queue (7679
+  #     SciFigQual-Bench, 7681 SciFigAlign, 7695 ICDAR ALD/E). scientific figure
+  #     3/0 hits exactly those three. Document AI more broadly: document
+  #     understanding 6/0, handwriting 4/0 (7707 matched 3D Geometry on the bare
+  #     word "reconstruction").
+  #   * Editing / saliency tasks the existing `image editing` negative misses:
+  #     video editing 11/0, salient object detection 4/0 (7632 RDVSv2).
+  #   * Image forensics — 7752 (BG-REAL) matched *Robotics Vision* because
+  #     `manipulation` fired on "background manipulation". manipulation detection
+  #     4/0, manipulation localization 3/0, image forensics 2/0. Also guarded on
+  #     the robotics-vision track in topics.yaml so the relevance boost goes too.
+  #   * Geospatial tail — 7602 and 7619 both landed with the geo-localization
+  #     class unpenalised. cross-view geo-localization 4/0, drone-view 2/0.
+  #   * Generic ML method papers riding `dataset` — dataset distillation 4/0.
+  #   * Wildlife tail — taxonomic 3/0 (7705 avian bone classification; the other
+  #     two hits are bird monitoring and fine-grained species).
+  #   * V2X, second attempt — 7747 (HeteroPROMPT) evaded the `v2x` negative added
+  #     two days ago because the matcher is whole-word and the abstract only names
+  #     the *datasets*: "V2XSet" and "OPV2V-H" do not contain a standalone "v2x"
+  #     token. v2xset 2/0, opv2v 2/0. Brittle by construction, but exact.
+  #   * fall detection 2/0 — small but unambiguous healthcare monitoring.
+  # Deliberately rejected this round, all measured:
+  #   * `satellite` (28/1), `satellite image` (4/1) and `geo-localization` (7/1) —
+  #     all three hit 6669 (NGPS, GPS-denied aerial geo-localization on a Jetson
+  #     Orin NX), a kept Watch item whose sensor-fusion design is on-radar. This
+  #     is why the geospatial negatives stay scoped to the cross-view/drone-view
+  #     retrieval task rather than naming the sensor.
+  #   * `collaborative perception` (3/2) — hits 4395 (HERCULES multi-robot SLAM
+  #     simulator, kept Evaluate) and 7172 (DRGBT-1K, kept Watch).
+  #   * `long-tailed` (7/1) — hits 717, a kept MOT paper.
+  #   * `ocr` (13/0) and `text recognition` (11/1) — rejected on forward risk plus
+  #     one kept hit: optical character verification on part markings and date
+  #     codes is a standard machine-vision function, i.e. the radar's own domain.
+  #   * `forensic` (14/0) — the highest-volume option, but the corpus already
+  #     shows the figurative register ("genuine forensic logic" in 7733, a
+  #     reasoning benchmark). Scoped to the three task names instead.
+  #   * `eye-tracking` (5/1), `gaze` (8/1), `saliency prediction` (0/2),
+  #     `bird's eye view` (16/2) — each touches a kept item.
+  - cancer
+  - whole-slide
+  - scientific figure
+  - document understanding
+  - handwriting
+  - video editing
+  - salient object detection
+  - manipulation detection
+  - manipulation localization
+  - image forensics
+  - cross-view geo-localization
+  - drone-view
+  - dataset distillation
+  - taxonomic
+  - fall detection
+  - v2xset
+  - opv2v
 
 # Domain-ambiguous negatives: the phrase stays in the list above, but the penalty
 # is suppressed when any guard phrase also appears in the item text. Added
