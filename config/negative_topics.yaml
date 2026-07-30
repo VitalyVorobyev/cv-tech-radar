@@ -173,10 +173,13 @@ negative_topics:
   # than a blunt bare `medical` to avoid penalising on-radar papers that mention
   # "medical" in passing — though the medical tail keeps growing, so bare
   # `medical` remains the consolidation option if it persists.
+  # `whole-slide image` was superseded on 2026-07-30 by the bare `whole-slide`
+  # below: the matcher is whole-word, so the longer form missed 7621, whose
+  # abstract says "whole-slide images". Keeping both would also double-count into
+  # the penalty, so only the short form survives.
   - dermatology
   - dermatological
   - computational pathology
-  - whole-slide image
   # Wildlife / ecology / agronomy noise — the 2026-07-22 backfill (07-15..07-21,
   # 557 items, 7 candidate queues) made this the single largest *uncovered* noise
   # class: NINE off-radar ecology/agriculture papers reached the top-25 with zero

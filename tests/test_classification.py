@@ -820,8 +820,10 @@ def test_computational_pathology_wsi_papers_get_negative_penalty(app_config):
     (TCGA-BRCA/NSCLC) reached the top-25 with a *zero* negative penalty: the
     existing `histopathology` negative did not fire because the abstract says
     "computational pathology" and "whole-slide image", not "histopathology".
-    The `computational pathology` and `whole-slide image` negatives fire on the
-    task and keep it in Ignore.
+    The `computational pathology` and `whole-slide` negatives fire on the task
+    and keep it in Ignore. (`whole-slide image` was the original phrase; it was
+    shortened on 2026-07-30 because the whole-word matcher missed 7621, whose
+    abstract says "whole-slide images".)
     """
     item = make_item(
         "CGRL: Concept-Guided Representation Learning for Whole-Slide Image Classification",
@@ -833,7 +835,7 @@ def test_computational_pathology_wsi_papers_get_negative_penalty(app_config):
     source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
     result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
     assert "computational pathology" in result.negative_keywords
-    assert "whole-slide image" in result.negative_keywords
+    assert "whole-slide" in result.negative_keywords
     assert result.negative_topic_penalty > 0
     assert result.recommended_ring == "Ignore"
 
@@ -842,7 +844,7 @@ def test_industrial_reconstruction_survives_dermatology_pathology_negatives(app_
     """Guard: the dermatology / pathology negatives must NOT touch a genuine
     industrial 3D-reconstruction / surface-inspection paper. The phrases are
     medical-specific (`dermatology` / `dermatological` / `computational
-    pathology` / `whole-slide image`); an industrial abstract about defect /
+    pathology` / `whole-slide`); an industrial abstract about defect /
     surface reconstruction does not contain them."""
     item = make_item(
         "Metric 3D Reconstruction for Surface Defect Inspection on a Calibrated Camera",
