@@ -177,9 +177,14 @@ negative_topics:
   # below: the matcher is whole-word, so the longer form missed 7621, whose
   # abstract says "whole-slide images". Keeping both would also double-count into
   # the penalty, so only the short form survives.
+  #
+  # `computational pathology` was likewise superseded on 2026-07-31 by the bare
+  # `pathology` in the batch below — 7829 says "pathology foundation models", not
+  # "computational pathology". Same rule as above: the longer form is strictly
+  # subsumed, and keeping both would double-count the penalty on the two items
+  # (4488, 6469) that use the two-word phrase.
   - dermatology
   - dermatological
-  - computational pathology
   # Wildlife / ecology / agronomy noise — the 2026-07-22 backfill (07-15..07-21,
   # 557 items, 7 candidate queues) made this the single largest *uncovered* noise
   # class: NINE off-radar ecology/agriculture papers reached the top-25 with zero
@@ -471,6 +476,58 @@ negative_topics:
   - fall detection
   - v2xset
   - opv2v
+  # 2026-07-31 batch, mined from the 07-30 queue — an unusually weak day: all 25
+  # candidates were suggested Ignore, the top score was 39.7, and 12 of the 23
+  # items curated Ignore carried *zero* negative penalty. Counts are Ignore/kept
+  # over the 1262-Ignore / 282-kept decided corpus.
+  #   * Captioning — 7779 (RefCaptioner, multi-reference video captioning) took
+  #     rank 3 with no penalty, matching 3D Geometry on the bare word
+  #     "reconstruction" from "video reconstruction". Bare `captioning` 19/0
+  #     subsumes both `image captioning` (4/0) and `video captioning` (5/0), so
+  #     only the short form is listed. Captioning is a language task throughout.
+  #   * Human-body tail — the `human pose` / `human mesh` / `human motion` family
+  #     added 2026-07-10 names the *task*, so it misses papers that name the
+  #     subject instead: 7861 (EgoGVAE, full-body mesh from head pose) and 7872
+  #     (4DHumanDiff, "360-degree dynamic humans"). full-body 6/0, dynamic human
+  #     5/0. `head pose` (4/0) is clean too but strictly redundant with
+  #     `full-body` on 7861, so it is omitted to avoid double-counting.
+  #   * Codec tail — 7814 (ReGenVC, talking-head video codec) carried no penalty;
+  #     `image compression` / `rate-distortion` (added 07-28) name the still-image
+  #     task only. bitrate 5/0. Bare `codec` (5/1) and `video codec` (3/1) were
+  #     both rejected: they hit 1231, a kept item that reuses AV1 motion vectors
+  #     to skip exhaustive matching.
+  #   * Computer-use agents — 7768 (OSReward, a reward-model benchmark for CUA
+  #     trajectories) reached rank 8. computer-use 4/0; a growing cs.CV class that
+  #     the VLM negatives only catch when the paper names the architecture.
+  #   * Medical, again — 7829 (pathology foundation models as mitotic-figure
+  #     detectors) landed at zero penalty. Bare `pathology` is 14/0 and was
+  #     rejected at 12/0 on 2026-07-27 over figurative-register risk; re-audited
+  #     here hit by hit, exactly ONE of the 14 is figurative ("action-forgetting
+  #     pathology", 3987 — already decided Ignore, so the stray penalty is inert)
+  #     and the other 13 are genuine medical pathology. Taking it, and retiring
+  #     `computational pathology` which it subsumes. Medical remains the #1 Ignore
+  #     class and this is the consolidation the earlier medical blocks flagged.
+  # Deliberately rejected this round, all measured:
+  #   * `knowledge distillation` (17/4) and bare `distillation` (73/11) — the
+  #     obvious phrase for 7770 (VAD, on-policy distillation) and the round's
+  #     clearest trap. Distillation is a legitimate *edge-deployment* technique
+  #     here: 595 (quantization-aware distillation), 6162, 7749 (TensorRT
+  #     deployment) and 6961 (geometric distillation from rectified stereo) are
+  #     all kept items.
+  #   * `microscopy` (11/1) and `microscopy image` (1/1) — both hit 4622, a kept
+  #     synthetic-TEM-generation paper. Same reason `electron microscopy` was
+  #     rejected on 07-27: SEM/TEM are materials *inspection* instruments.
+  #   * `4d gaussian` (4/1) — hits 1978 (NoPo4D), kept.
+  #   * `svg` (1/0), `mitotic` (1/0), `zooplankton` (1/0), `talking-head` (1/0),
+  #     `body mesh` (1/0) — each covers exactly one item. Single-item phrases are
+  #     not worth the list length; they are noted here so a recurrence is
+  #     recognisable rather than re-mined from scratch.
+  - captioning
+  - full-body
+  - dynamic human
+  - bitrate
+  - computer-use
+  - pathology
 
 # Domain-ambiguous negatives: the phrase stays in the list above, but the penalty
 # is suppressed when any guard phrase also appears in the item text. Added

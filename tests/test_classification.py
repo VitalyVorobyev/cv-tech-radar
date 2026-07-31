@@ -834,7 +834,10 @@ def test_computational_pathology_wsi_papers_get_negative_penalty(app_config):
     )
     source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
     result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
-    assert "computational pathology" in result.negative_keywords
+    # `computational pathology` was retired on 2026-07-31 in favour of the bare
+    # `pathology`, which subsumes it — 7829 says "pathology foundation models".
+    assert "pathology" in result.negative_keywords
+    assert "computational pathology" not in result.negative_keywords
     assert "whole-slide" in result.negative_keywords
     assert result.negative_topic_penalty > 0
     assert result.recommended_ring == "Ignore"
@@ -1790,6 +1793,229 @@ def test_core_domain_survives_the_2026_07_30_negatives(app_config):
             "Robust Date-Code Reading on Stamped Metal Parts",
             "We combine a line-scan camera with OCR and optical character "
             "verification to read part markings on an inline inspection cell.",
+        ),
+    ]
+    for title, summary in cases:
+        result = classify_item(
+            make_item(title, summary), config=app_config, source=source, now=FIXTURE_NOW
+        )
+        assert not result.negative_keywords, (
+            f"{title!r} unexpectedly penalised by {result.negative_keywords}"
+        )
+
+
+def test_2026_07_31_negative_topics_fire(app_config):
+    """Anchor: the 2026-07-30 queue was an unusually weak day — every one of its
+    25 candidates was suggested Ignore, and 12 of the 23 curated Ignore reached
+    the top 25 with zero negative penalty. Each fixture pins one class mined out
+    of that residue, in the phrasing the real abstracts used."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    cases = [
+        (
+            "RefCaptioner: Multi-Reference Image-Grounded Video Captioning",
+            "We require factual video descriptions with phrase-level reference "
+            "grounding and evaluate caption factuality on real-world videos.",
+            "captioning",
+        ),
+        (
+            "EgoGVAE: Ego-body Mesh Reconstruction via Guided Variational Autoencoder",
+            "We recover the full-body mesh from only the head pose, decoding "
+            "latent features into natural representations of body poses.",
+            "full-body",
+        ),
+        (
+            "4DHumanDiff: Direct Text-to-4DGS Generation for Consistent Humans",
+            # Singular by design: the matcher is whole-word, so `dynamic human`
+            # does not fire on the bare plural "dynamic humans". 7872 is caught
+            # by its other phrasing, "dynamic human assets" — measured as 5
+            # Ignore / 0 kept against 1 / 0 for the plural, so the plural is not
+            # worth a second list entry.
+            "We generate high-quality 360-degree dynamic human assets from text "
+            "prompts, represented by 4D Gaussian Splatting.",
+            "dynamic human",
+        ),
+        (
+            "ReGenVC: End-to-End Real-Time Generative Video Coding at Ultra-Low Bitrate",
+            "The encoder reduces a source clip to a compact bitstream; at a "
+            "matched ultra-low bitrate, conventional codecs collapse.",
+            "bitrate",
+        ),
+        (
+            "OSReward: Standardized Evaluation for Cross-Platform Reward Models",
+            "We benchmark judges of computer-use agent trajectories collected "
+            "from diverse agent backbones across platforms.",
+            "computer-use",
+        ),
+        (
+            "Beyond Classification: Pathology Foundation Models as Detection Encoders",
+            "We ask whether the latent space of current pathology foundation "
+            "models is spatially resolved enough for dense object detection.",
+            "pathology",
+        ),
+    ]
+    for title, summary, phrase in cases:
+        result = classify_item(
+            make_item(title, summary), config=app_config, source=source, now=FIXTURE_NOW
+        )
+        assert phrase in result.negative_keywords, (
+            f"{title!r} matched {result.negative_keywords}, expected {phrase!r}"
+        )
+        assert result.negative_topic_penalty > 0
+
+
+def test_pathology_supersedes_computational_pathology(app_config):
+    """`computational pathology` was retired in favour of the bare form. The long
+    phrase must still be caught, and must be caught exactly ONCE — keeping both
+    would have double-counted the penalty on the items that use it."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(
+        make_item(
+            "CGRL: Context-Guided Representation Learning for WSI Classification",
+            "Whole-slide image classification is widely used in computational "
+            "pathology because slide-level labels are easier to obtain.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "pathology" in result.negative_keywords
+    assert "computational pathology" not in result.negative_keywords
+
+
+def test_wrong_sense_of_reconstruction_does_not_match_3d_track(app_config):
+    """Anchor: bare `reconstruction` is the 3D track's broadest positive and was
+    the largest false-context source of the 2026-07-30 queue — five of 25
+    candidates matched here on the wrong sense of the word. A track guard is
+    worth -12, so it clears a body-only match (+10) outright."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    cases = [
+        (
+            "RefCaptioner: Multi-Reference Image-Grounded Video Captioning",
+            "Human evaluation confirms our captions enable more source-faithful "
+            "video reconstruction with open-source video generators.",
+        ),
+        (
+            "ACE-Data-0: Human-Centric Ambient Capture as Embodied Data Engine",
+            "Our engine records full-body motion and articulated hand motion "
+            "with multi-view exocentric video and object geometry.",
+        ),
+    ]
+    for title, summary in cases:
+        result = classify_item(
+            make_item(title, summary), config=app_config, source=source, now=FIXTURE_NOW
+        )
+        assert "3D Geometry & Reconstruction" not in result.tracks, (
+            f"{title!r} still matched the 3D track"
+        )
+
+
+def test_reconstruction_guard_lowers_relevance_when_track_survives(app_config):
+    """The guard is a -12 score penalty, not a hard suppression: a title-level
+    `reconstruction` match (+20) still clears it. 7861 (EgoGVAE) is that case —
+    it keeps the track but loses relevance, which is the whole point of pairing
+    the track guard with the global negative. Pins old-vs-new on one item."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    title = "EgoGVAE: Ego-body Mesh Reconstruction via Guided Variational Autoencoder"
+    guarded = classify_item(
+        make_item(
+            title,
+            "Benchmark datasets show the method improves full-body ego-body mesh "
+            "reconstruction from a single head-joint trajectory.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    control = classify_item(
+        make_item(
+            title,
+            "Benchmark datasets show the method improves ego-body mesh "
+            "reconstruction from a single head-joint trajectory.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "3D Geometry & Reconstruction" in guarded.tracks
+    assert guarded.relevance_score < control.relevance_score
+    assert guarded.final_score < control.final_score
+
+
+def test_real_3d_reconstruction_still_matches_the_track(app_config):
+    """Guard on the guard: the three phrases above must not cost a genuine
+    multi-view geometry paper its track."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(
+        make_item(
+            "Convolutional Neural Shading for High-Quality 3D Reconstruction",
+            "We reconstruct high-quality 3D shapes from multi-view images, "
+            "capturing variation in dark and textureless regions via a neural "
+            "shader and a fine-detail displacement network.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "3D Geometry & Reconstruction" in result.tracks
+    assert not result.negative_keywords
+
+
+def test_radiomics_paper_does_not_match_inspection_track(app_config):
+    """Anchor: 7787 matched Industrial Vision Inspection on `quality control`,
+    from a "quality-control strategy" for oncology imaging biomarkers."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(
+        make_item(
+            "Negative controls reveal volume-driven confounding in radiomics",
+            "READII-2-ROQC provides a scalable quality control strategy for "
+            "developing interpretable imaging biomarkers.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "Industrial Vision Inspection" not in result.tracks
+
+
+def test_vlm_tool_use_paper_does_not_match_robotics_track(app_config):
+    """Anchor: 7807 (FaithEyes) matched Robotics Vision because agentic VLMs call
+    "code-based image manipulation" a tool — the fourth wrong sense of the word
+    after image generation, world generation and forensics."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(
+        make_item(
+            "FaithEyes: Towards Faithful Tool Use via Process-Image Verification",
+            "Agentic models interleave textual reasoning with explicit tool calls "
+            "such as cropping and code-based image manipulation.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "Robotics Vision" not in result.tracks
+
+
+def test_core_domain_survives_the_2026_07_31_negatives(app_config):
+    """Pins the kept-item collisions that forced this round's phrases to stay
+    scoped: 595/7749 (quantization-aware and TensorRT distillation, kept) rejected
+    `distillation`, 4622 (synthetic TEM, kept) rejected `microscopy`, and 1231
+    (AV1 motion vectors, kept) rejected bare `codec`."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    cases = [
+        (
+            "Nano-U: Quantization-Aware Distillation for Embedded Segmentation",
+            "We combine knowledge distillation and quantization-aware training, "
+            "then export the final model through TensorRT for deployment.",
+        ),
+        (
+            "Synthetic Transmission Electron Microscopy for Data-Limited Regimes",
+            "We synthesise high-fidelity microscopy images with diffusion "
+            "probabilistic models for data-limited materials inspection.",
+        ),
+        (
+            "Motion-Vector-Guided Correspondence from Compressed Video",
+            "By leveraging motion vectors inherent to the AV1 video codec we "
+            "bypass computationally expensive exhaustive matching.",
         ),
     ]
     for title, summary in cases:
