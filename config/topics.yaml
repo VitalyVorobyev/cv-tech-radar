@@ -79,10 +79,26 @@ tracks:
     # No guard is offered for 7770: its wrong sense is distillation, and both
     # `distillation` and `knowledge distillation` hit kept items (see
     # negative_topics.yaml). That one stays uncovered by design.
+    # 2026-08-03: three more wrong senses of `reconstruction`, measured as items
+    # carrying this track that the guard would penalise (in-track Ignore/kept,
+    # over a track population of 372 Ignore / 179 kept):
+    #   * clinical 16/0 — "reconstruction parameters" in CT/CBCT acquisition and
+    #     "reconstruction residuals" in medical anomaly detection. 7925 (CBCT-IQ)
+    #     and 7949 (OCT/OCTA) are this round's instances.
+    #   * video diffusion 12/0 — generative video priors, where "reconstruction"
+    #     means re-rendering rather than geometry. Corpus-wide this phrase is
+    #     23/1, so it is deliberately scoped to this track and NOT made a global
+    #     negative. Video-diffusion priors are creeping into legitimate novel-view
+    #     work, so this is the guard most likely to need revisiting.
+    #   * multimodal large language 10/0 — already a global negative; repeating it
+    #     here strips the track as well as applying the penalty.
     negative_keywords:
       - captioning
       - full-body
       - dynamic human
+      - clinical
+      - video diffusion
+      - multimodal large language
 
   - id: 3d-sensors
     name: 3D Sensors
@@ -96,7 +112,13 @@ tracks:
       - rgb-d
       - 3d sensor
       - event camera
-    negative_keywords: []
+    # `rgb-d` is a real depth-sensor term that RGB-D salient object detection
+    # reuses verbatim — 7929 (SaliLLM) matched this track on it while being a
+    # saliency benchmark for MLLMs. `salient object detection` is already a
+    # global negative; as a guard it also removes the 3D Sensors relevance boost.
+    # 4 Ignore / 0 kept among items carrying this track (61 Ignore / 52 kept).
+    negative_keywords:
+      - salient object detection
 
   - id: robotics-vision
     name: Robotics Vision
@@ -211,6 +233,15 @@ tracks:
       # medical papers use verbatim. 3 Ignore / 0 kept; strips this track from
       # 1 Ignore / 0 kept.
       - radiomics
+      # 2026-08-03, same shape again — medical papers reusing this track's
+      # strongest positives. In-track counts over 31 Ignore / 45 kept:
+      #   * mri 4/0 — a global negative already; guarding here strips the track.
+      #   * optical coherence tomography 1/0 — 7949 (ReMoE) matched Industrial
+      #     Vision Inspection purely on `anomaly detection` in a retinal OCT
+      #     paper. One item, but this track is the radar's core domain and a
+      #     wrong track match costs more than a missed penalty.
+      - mri
+      - optical coherence tomography
 
   - id: edge-ai-deployment
     name: Edge AI & Deployment

@@ -528,6 +528,58 @@ negative_topics:
   - bitrate
   - computer-use
   - pathology
+  # 2026-08-03 batch, mined from the 07-31 queue (25 candidates, all suggested
+  # Ignore, top score 43.4; 8 of the 25 carried zero penalty). Counts are
+  # Ignore/kept over the 1283-Ignore / 291-kept decided corpus. This round the
+  # n-gram enrichment over the 515 unpenalised Ignore items returned almost
+  # nothing but generic English (`safety`, `constructed`, `document`,
+  # `attribute`) — the confirmation that topic phrases really are near their
+  # ceiling. Only the phrases below survived a hit-by-hit read.
+  #   * `closed-source` 31/0 — the highest-yield clean phrase left in the corpus,
+  #     and a genre tell rather than a topic: every one of the 31 is an MLLM/VLM
+  #     leaderboard paper reporting "N open-source and M closed-source models".
+  #     The residual risk is an open-source CV *library* release contrasting
+  #     itself with proprietary tooling — none of the 291 kept items does, and
+  #     such papers say "commercial"/"proprietary" instead, but this is the
+  #     phrase to re-audit first if an Open-Source CV Tooling item is ever
+  #     wrongly penalised.
+  #   * `forensic` 16/0 — completes the forensics family (`deepfake`,
+  #     `image forensics`, `manipulation detection` added earlier) by catching
+  #     the papers that name the field rather than the task; 7959 (RAID) and
+  #     7963 (AI-generated video attribution) are this round's instances.
+  #   * `visual generation` 6/0 — 7890 (scaling of text conditioning) had zero
+  #     penalty because unified-multimodal papers say "visual generation" where
+  #     the existing `image generation` / `video generation` entries expect the
+  #     modality named.
+  #   * `hand avatar` 1/0 — single-item, taken only because it extends the
+  #     established `head avatar` entry (2026-07-28) to the same class; 7893
+  #     (OASIS) is the hand case.
+  # Deliberately rejected this round, all measured:
+  #   * `visual evidence` (28/0) — the round's second-highest yield and its
+  #     clearest trap. 24 of the 28 are MLLM grounding papers, but 4 use the
+  #     plain sense that belongs to *our* single-view/occlusion vocabulary —
+  #     7893 says "limited visual evidence under severe self-occlusion", 6284
+  #     "past visual evidence to influence the feature space". A clean kept
+  #     count did not protect this one; reading the hits did.
+  #   * `multi-agent` (18/0) — collides with multi-robot systems; 1738 is
+  #     cooperative perception, already covered by `cooperative perception`.
+  #   * `mixture-of-experts` (17/0) — an architecture, not a domain. Three of
+  #     this round's Ignores were MoE papers, but MoE is equally available to
+  #     foundation-model work we would keep.
+  #   * `weather` (20/0) — adverse-weather robustness is a legitimate sensor
+  #     concern; 989 is a LiDAR domain-shift benchmark.
+  #   * `avatar` (9/1) hits 2153 (real-to-twin inspection), `medical` (64/5)
+  #     hits 7917 (this round's own ZSAD Evaluate), `image quality assessment`
+  #     (7/1) hits 7514 (ISP pipeline evaluation) — the recurring lesson that
+  #     the broad form of a good negative lands on the radar's own domain.
+  #   * `wireless` (4/0), `video compositing` (1/0), `landmine` (1/0),
+  #     `path gain` (1/0) — one new off-domain class each (radio-propagation
+  #     fields from point clouds, generative video compositing, demining
+  #     datasets). Noted rather than listed so a recurrence is recognisable.
+  - closed-source
+  - forensic
+  - visual generation
+  - hand avatar
 
 # Domain-ambiguous negatives: the phrase stays in the list above, but the penalty
 # is suppressed when any guard phrase also appears in the item text. Added

@@ -2025,3 +2025,142 @@ def test_core_domain_survives_the_2026_07_31_negatives(app_config):
         assert not result.negative_keywords, (
             f"{title!r} unexpectedly penalised by {result.negative_keywords}"
         )
+
+
+def test_mllm_leaderboard_paper_gets_closed_source_penalty(app_config):
+    """Anchor: 7956 (CAER) and the wider MLLM-eval class report results against
+    "N open-source and M closed-source models". `closed-source` is the
+    highest-yield clean phrase left in the corpus at 31 Ignore / 0 kept."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(
+        make_item(
+            "AgroTools: A Benchmark for Tool-Augmented Multimodal Agents",
+            "We benchmark 9 open-source and 4 closed-source models on outcome-level "
+            "task success across a suite of held-out scenarios.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "closed-source" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+
+
+def test_unified_multimodal_generation_gets_visual_generation_penalty(app_config):
+    """Anchor: 7890 carried zero penalty because unified-multimodal papers say
+    "visual generation" where `image generation` / `video generation` expect the
+    modality to be named."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(
+        make_item(
+            "Scaling Properties of Text Conditioning in Visual Generation",
+            "The converged diffusion loss scales with the amount of structured "
+            "language in the prompt, which lets us improve diffusability.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "visual generation" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+
+
+def test_retinal_oct_paper_loses_inspection_relevance(app_config):
+    """Anchor: 7949 (ReMoE) matched Industrial Vision Inspection purely on
+    `anomaly detection` in a retinal OCT/OCTA paper — the same shape as the
+    `quality control` / radiomics case, on the track's other core positive.
+
+    The guard does not strip the track here: `anomaly detection` sits in the
+    title, so it out-scores the -12 guard. What it does remove is the relevance
+    boost, which is the half that decides queue rank. Pinned as a delta against
+    the identical abstract with the medical modality named differently.
+    """
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    title = "ReMoE: Report-Guided Mixture-of-Experts for Multimodal Anomaly Detection"
+    guarded = classify_item(
+        make_item(
+            title,
+            "In retinal optical coherence tomography anomaly detection, existing "
+            "unsupervised methods rely on reconstruction residuals.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    unguarded = classify_item(
+        make_item(
+            title,
+            "In retinal scan anomaly detection, existing unsupervised methods "
+            "rely on reconstruction residuals.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "Industrial Vision Inspection" in guarded.tracks
+    assert guarded.relevance_score < unguarded.relevance_score
+
+
+def test_rgbd_saliency_benchmark_does_not_match_3d_sensors_track(app_config):
+    """Anchor: 7929 (SaliLLM) matched 3D Sensors on `rgb-d`, which RGB-D salient
+    object detection reuses verbatim from the depth-sensor vocabulary."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(
+        make_item(
+            "Is It Time for the Renaissance of Salient Object Detection?",
+            "We re-engineer RGB-D datasets with phrases, boxes and attributes to "
+            "establish a diagnostic benchmark for salient object detection.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "3D Sensors" not in result.tracks
+
+
+def test_core_domain_survives_the_2026_08_03_negatives(app_config):
+    """Pins the kept-item collisions that this round's rejected phrases would
+    have caused: 7917 (ZSAD across industrial *and medical* benchmarks, kept
+    Evaluate) rejected `medical`, 2153 (real-to-twin inspection, kept) rejected
+    bare `avatar`, 7514 (ISP pipeline evaluation, kept) rejected `image quality
+    assessment`, and 989 (LiDAR domain shift, sensor work) rejected `weather`.
+    A genuine LiDAR geometry paper must also keep its 3D Sensors track."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    cases = [
+        (
+            "VFAD: Frequency-Adaptive Representation Learning for Zero-Shot Anomaly Detection",
+            "Extensive experiments on 13 industrial and medical benchmarks show "
+            "improved defect localisation on unseen categories.",
+        ),
+        (
+            "Active Real-to-Twin Inspection: Zero-Shot Anomaly Detection on Assemblies",
+            "A digital twin avatar of the part drives next-best-view capture for "
+            "industrial surface inspection.",
+        ),
+        (
+            "A Reference-Free Framework for Evaluating Single-Frame ISP Pipelines",
+            "We perform no-reference image quality assessment of raw-to-sRGB "
+            "camera pipelines under controlled illumination.",
+        ),
+    ]
+    for title, summary in cases:
+        result = classify_item(
+            make_item(title, summary), config=app_config, source=source, now=FIXTURE_NOW
+        )
+        assert not result.negative_keywords, (
+            f"{title!r} unexpectedly penalised by {result.negative_keywords}"
+        )
+
+    lidar = classify_item(
+        make_item(
+            "CorrelationFlow: A Training-Free Geometric Approach for LiDAR Scene Flow",
+            "Connected-component labeling and correlation maximization on "
+            "bird's-eye-view occupancy images recover per-object motion under "
+            "adverse weather and long range.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "3D Sensors" in lidar.tracks
+    assert not lidar.negative_keywords
