@@ -92,6 +92,31 @@ tracks:
     #     work, so this is the guard most likely to need revisiting.
     #   * multimodal large language 10/0 — already a global negative; repeating it
     #     here strips the track as well as applying the penalty.
+    # 2026-08-04: two more wrong senses of `reconstruction`, measured as items
+    # carrying this track that the guard would penalise (over a track population
+    # of 358 Ignore / 180 kept):
+    #   * action recognition 4/0 — 8073 (Event ActivityNet) is here purely on
+    #     "action-center reconstruction LPIPS", a diagnostic metric inside a
+    #     video action-localization benchmark.
+    #   * image fusion 3/0 — infrared-visible fusion papers, where
+    #     "reconstruction" means re-synthesising the fused image.
+    # Both are also global negatives; repeating them here strips the track as
+    # well, so the item loses the relevance boost and not only the penalty.
+    #
+    # Recorded as NOT fixable: the largest single noise class in the 2026-08-04
+    # round was novel-view-synthesis / Gaussian-splatting rendering papers — 7 of
+    # 40 Ignores (8039 UniqueSplat, 8124 D^2-4DGS, 8071 FAST-GS, 8001 InfiniSplat,
+    # 8172 QuerySplat, 8059 ChunkVAE, 8135 GaussianSelector), all reaching this
+    # track on `3d reconstruction` / `reconstruction` / `multi-view` with zero
+    # penalty. Every discriminating phrase was probed against the decided corpus
+    # and every one hits kept items: `novel view synthesis` 21/9, `view synthesis`
+    # 26/9, `gaussian splatting` 48/22, `3dgs` 29/14, `psnr` 16/2, `photorealistic`
+    # 11/2, `rendering quality` 11/4, `radiance field` 0/1. The kept items
+    # (7226 GLAM-SLAM, 5079 Structured-Li-GS, 4110 geometry-preserving 3DGS for
+    # LiDAR-camera extrinsics, 6371 SalientGS) share the rendering vocabulary
+    # exactly — what separates them is the *presence* of geometry/sensor terms,
+    # which a negative_keywords list cannot express. This class needs the scoring
+    # re-weight, not another phrase.
     negative_keywords:
       - captioning
       - full-body
@@ -99,6 +124,8 @@ tracks:
       - clinical
       - video diffusion
       - multimodal large language
+      - action recognition
+      - image fusion
 
   - id: 3d-sensors
     name: 3D Sensors
@@ -297,10 +324,24 @@ tracks:
     # `world model` was probed for 7792 and REJECTED: it strips this track from
     # 1144, a kept item on geometric consistency in video world models. The
     # generic-video sense of `clip` therefore stays uncovered.
+    # 2026-08-04: three more generic-`clip` items in one round — 8154 (JEPA
+    # novelty scoring over driving clips), 8155 (SphereVideo, "frame and clip
+    # levels"), 8146 (FineMoLA, "Clip-Level Supervision"). Two of the three are
+    # guardable by the sense of the surrounding task, measured as items carrying
+    # this track that the guard would strip (track population 406 Ignore /
+    # 50 kept):
+    #   * action recognition 5/0
+    #   * audio-visual 6/0
+    # `clip-level` — the phrase all three literally use — was probed and
+    # REJECTED at 7/1: it strips 656, a kept item on clip-level uncertainty for
+    # active learning. That re-confirms the note above; the generic-video sense
+    # of `clip` is still not directly coverable.
     negative_keywords:
       - image generation
       - video generation
       - bitrate
+      - action recognition
+      - audio-visual
 
   - id: open-source-cv-tooling
     name: Open-Source CV Tooling

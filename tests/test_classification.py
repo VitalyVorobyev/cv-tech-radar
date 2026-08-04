@@ -2164,3 +2164,157 @@ def test_core_domain_survives_the_2026_08_03_negatives(app_config):
     )
     assert "3D Sensors" in lidar.tracks
     assert not lidar.negative_keywords
+
+
+def test_agentic_tool_calling_paper_gets_tool_use_penalty(app_config):
+    """Anchor: 8025 (VC-Tooler) reached the queue on `open source` alone.
+    `tool use` is 16 Ignore / 0 kept; bare `agentic` was rejected at 28/7."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(
+        make_item(
+            "VC-Tooler: Learning Compositional and Adaptive Visual Tool Use",
+            "Effective visual tool use requires grounding tool calls in visual "
+            "context and composing tools across multiple steps. We release an "
+            "open source trajectory bank.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "tool use" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+
+
+def test_industrial_anomaly_agent_keeps_its_tool_grounded_wording(app_config):
+    """The counterpart to the test above. `agentic` was rejected because it hits
+    576 (AnomalyClaw), 1832 (IndusAgent) and 6730 (O-VAD), all kept. Those items
+    say "tool-grounded"/"agent" and never "tool use" — that difference is the
+    whole reason the narrow phrase is safe, so it is pinned."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(
+        make_item(
+            "IndusAgent: Reinforcing Open-Vocabulary Industrial Anomaly Detection",
+            "An agentic system grounds its reasoning in calibrated inspection "
+            "tools to localise surface defects on production parts.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert not result.negative_keywords, (
+        f"industrial agent unexpectedly penalised by {result.negative_keywords}"
+    )
+
+
+def test_audiovisual_response_dataset_gets_penalty(app_config):
+    """Anchor: 8176 (InteracVid) carried zero penalty. `audio-visual` is the
+    round's highest fresh yield at 13 Ignore / 0 kept, 11 of them unpenalised."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(
+        make_item(
+            "InteracVid: Building a Real Interactive Audio-Visual Response Dataset",
+            "Every sample couples a preceding audio-visual context and an "
+            "external stimulus with the real interactive response that follows.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "audio-visual" in result.negative_keywords
+    assert result.negative_topic_penalty > 0
+
+
+def test_event_action_benchmark_loses_the_3d_geometry_track(app_config):
+    """Anchor: 8073 (Event ActivityNet) reached the 3D Geometry & Reconstruction
+    track purely on "action-center reconstruction LPIPS" — a diagnostic metric
+    inside a video action-localization benchmark. `action recognition` is 4/0
+    in-track and also a global negative, so the item loses the track *and* the
+    relevance boost, not only the penalty."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(
+        make_item(
+            "Event ActivityNet: A Large-Scale Simulated-Event Benchmark",
+            "We use action-center reconstruction LPIPS as a soft diagnostic and "
+            "establish baselines for annotated-segment action recognition.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "3D Geometry & Reconstruction" not in result.tracks
+    assert "action recognition" in result.negative_keywords
+
+
+def test_xai_acronym_penalised_but_interpretability_claims_are_not(app_config):
+    """Anchor: 8006 and 8138 are XAI/attribution papers. Only the acronym is safe:
+    `interpretability` (24/1), `explainable` (12/1) and `grad-cam` (2/2) all hit
+    kept items, because interpretability is a property the radar's own items
+    claim. Pinned as a pair so a later broadening is caught."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    xai = classify_item(
+        make_item(
+            "A Controlled Benchmark of Attribution Methods on Vision Transformers",
+            "Most evidence on the effectiveness of XAI attribution methods has "
+            "been established on convolutional networks.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "xai" in xai.negative_keywords
+
+    kept = classify_item(
+        make_item(
+            "Same Predictions, Different Reasons: The Effect of Quantization",
+            "We use Grad-CAM to show that post-training quantization preserves "
+            "accuracy while shifting the interpretability of edge deployments.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert not kept.negative_keywords, (
+        f"quantization study unexpectedly penalised by {kept.negative_keywords}"
+    )
+
+
+def test_novel_view_synthesis_noise_is_knowingly_uncovered(app_config):
+    """Documents the round's largest *unfixed* noise class. Seven of the 40
+    Ignores were pure novel-view-synthesis papers reaching 3D Geometry on bare
+    `reconstruction` / `multi-view`. Every discriminating phrase collides with
+    kept items (`gaussian splatting` 48/22, `novel view synthesis` 21/9, `psnr`
+    16/2), because kept geometry work uses the same rendering vocabulary.
+
+    This test asserts the *current, deliberate* behaviour: the NVS paper still
+    enters the track with no penalty. If someone later adds a splatting negative,
+    this fails and sends them to the comment in topics.yaml explaining why the
+    class needs the scoring re-weight instead.
+    """
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    nvs = classify_item(
+        make_item(
+            "UniqueSplat: View-conditioned Gaussian Splatting for Generalizable 3D Reconstruction",
+            "We propose a view-conditioned feed-forward 3D Gaussian Splatting "
+            "model that adapts Gaussians to each view query, improving PSNR on "
+            "novel view synthesis benchmarks.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "3D Geometry & Reconstruction" in nvs.tracks
+    assert not nvs.negative_keywords
+
+    geometry = classify_item(
+        make_item(
+            "GLAM-SLAM: Real-time Gaussian Large-scale Mapping via Flow Densification",
+            "Gaussian splatting is coupled to LiDAR odometry and bundle "
+            "adjustment for drift-robust large-scale dense reconstruction, "
+            "evaluated by PSNR and by trajectory error.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "3D Geometry & Reconstruction" in geometry.tracks
+    assert not geometry.negative_keywords

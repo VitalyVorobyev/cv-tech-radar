@@ -580,6 +580,64 @@ negative_topics:
   - forensic
   - visual generation
   - hand avatar
+  # 2026-08-04 curation (08-02 + 08-03 queues, 40 Ignore in 50 candidates). The
+  # round's dominant noise class — novel-view-synthesis / Gaussian-splatting
+  # rendering papers, 7 of the 40 — turned out NOT to be phrase-separable and is
+  # documented as such in topics.yaml under 3d-geometry-reconstruction. What was
+  # separable is a spread of one-class-each off-domain tails. Measured as
+  # Ignore/kept over the decided corpus (1325 Ignore / 302 kept), with the count
+  # of hits that carry NO penalty today in brackets:
+  #   * `audio-visual` 13/0 [11] — the round's highest fresh yield. Audio-video
+  #     generation and talking-head/livestream datasets; 8176 (InteracVid) is
+  #     this round's instance. Residual risk: acoustic-plus-vision sensor fusion
+  #     for inspection would use this phrase, and no kept item does today — this
+  #     is the first entry to re-audit if a sensor-fusion item is ever penalised.
+  #   * `tool use` 16/0 [6] — agentic VLM tool-calling papers (8025, VC-Tooler).
+  #     Note `agentic` itself was probed and REJECTED at 28/7: it hits the kept
+  #     industrial-agent items (576 AnomalyClaw, 1832 IndusAgent, 6730 O-VAD).
+  #     Those kept items say "tool-grounded"/"agent", never "tool use", which is
+  #     what makes the narrow phrase safe where the broad one is not.
+  #   * `action recognition` 12/0 [6] and `action understanding` 3/0 [2] —
+  #     video action/activity papers; 8073 (Event ActivityNet) reached the queue
+  #     on the 3D track via "action-center reconstruction".
+  #   * `ai-generated image` 7/0 [3] and `ai-generated video` 3/0 [1] — extend
+  #     the existing `deepfake` / `forensic` family to papers that name the
+  #     artifact rather than the field; 8155, 8166 this round. Bare
+  #     `ai-generated` was probed and REJECTED (21/1): it hits 2367, a kept
+  #     point-cloud quality benchmark.
+  #   * `image fusion` 6/0 [4] — infrared-visible fusion quality assessment
+  #     (8160). Distinct from sensor fusion, which the corpus writes as
+  #     "multi-modal"/"sensor fusion".
+  #   * `object removal` 4/0 [3] — diffusion inpainting-and-shadow-removal
+  #     (8162). Bare `inpainting` REJECTED (10/2).
+  #   * `xai` 4/0 [3] — the acronym only. The spelled-out forms were all
+  #     REJECTED: `interpretability` 24/1, `explainable` 12/1, `explainability`
+  #     6/1, `grad-cam` 2/2, `feature attribution` 1/1 — they collide with 7547
+  #     (quantization changing model reasoning) and 7982 (physics-informed steel
+  #     fatigue), both kept. Interpretability is a property the radar's own items
+  #     claim; only the field's acronym is safe to penalise.
+  #   * `document retrieval` 3/0 [3] — completes the document-AI family started
+  #     2026-07-29 (`document understanding`, `scientific figure`).
+  #   * `chart understanding` 3/0 [2] — chart/plot VQA benchmarks (8156).
+  #   * `astronomy` 3/0 [1] — thin but a clean, wholly off-domain class; 8016
+  #     (galaxy morphology) is this round's instance. `galaxy` 2/0 and
+  #     `astronomical` 1/0 left out as too thin to be worth the surface.
+  # Also probed and rejected this round: `world model` 19/3 (hits 1144, 6506,
+  # 7921 — all kept), `imitation learning` 6/3, `federated learning` 4/1 (hits
+  # 6235, a federated *industrial* defect-detection framework), `traversability`
+  # 3/1 (hits 4395 HERCULES), `fused image` 1/1.
+  - audio-visual
+  - tool use
+  - action recognition
+  - action understanding
+  - ai-generated image
+  - ai-generated video
+  - image fusion
+  - object removal
+  - xai
+  - document retrieval
+  - chart understanding
+  - astronomy
 
 # Domain-ambiguous negatives: the phrase stays in the list above, but the penalty
 # is suppressed when any guard phrase also appears in the item text. Added
