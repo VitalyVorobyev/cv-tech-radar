@@ -77,7 +77,22 @@ negative_topics:
   # is a full phrase (industrial work says defect/anomaly/surface segmentation)
   # and no positive keyword contains `ultrasound` (whole-word matched, so it
   # will not fire inside another token).
-  - medical image segmentation
+  #
+  # 2026-08-05: `medical image segmentation` (here) and `medical image analysis`
+  # (below, in the 2026-07-24 block) were both folded into the bare
+  # `medical image`, which strictly subsumes them under whole-word matching and
+  # stops the two of them stacking a redundant +10 on the same abstract. The
+  # bare form is 23 Ignore / 0 kept over the 1652-item decided corpus, 5 of
+  # those Ignores carrying no penalty at all today — 8261 (recurrent contrastive
+  # learning for imbalanced *medical image classification*) is this round's
+  # instance, which reached the queue on `github` alone. `medical imaging` stays
+  # a separate entry: it is NOT subsumed (whole-word, "image" ≠ "imaging").
+  # `medical images` is listed for the same reason — the plural is its own
+  # phrase and 8 Ignore / 0 kept.
+  # Bare `medical` remains deliberately unused: it fires inside "biomedical" and
+  # on kept items that name medicine as one application domain among many.
+  - medical image
+  - medical images
   - ultrasound
   # Vehicle re-identification noise — the 2026-07-09 daily run queued item 6227
   # (EV-MoE multi-query *vehicle* ReID + the LCRI-1K benchmark) at rank 3
@@ -411,7 +426,8 @@ negative_topics:
   - head avatar
   - 3d content
   - try-on
-  - medical image analysis
+  # `medical image analysis` folded into the bare `medical image` on 2026-08-05
+  # — see the note at the top of this file.
   - vessel segmentation
   - image compression
   - rate-distortion
@@ -638,6 +654,39 @@ negative_topics:
   - document retrieval
   - chart understanding
   - astronomy
+  # 2026-08-05 batch, mined from the 08-04 queue (25 candidates, 18 Ignore, of
+  # which 6 carried *zero* negative penalty). Counts are Ignore/kept over the
+  # 1652-Ignore / 309-kept decided corpus, in brackets the number of those
+  # Ignores that carry no penalty at all today:
+  #   * `multi-person` 7/0 [2] — extends the `human <x>` family (2026-07-17) to
+  #     the multi-subject form those abstracts actually use. 8252 (3D
+  #     multi-person motion prediction) is this round's instance; it reached the
+  #     queue on `github` alone. Bare `motion prediction` was probed and
+  #     REJECTED (2/2): it hits 4718 (SAMOFT MOT) and 6533 (Polycepta), both
+  #     kept — motion prediction is what a tracker does. `pedestrian` (9/1) and
+  #     `skeleton` (8/2) REJECTED for the same reason.
+  #   * `scene text` 7/0 [3] — in-the-wild scene-text recognition and editing
+  #     (8200 BanglaWild this round). Deliberately narrow: bare `ocr` stays out
+  #     of this file, because industrial character verification is the radar's
+  #     own domain and says "OCR" verbatim. `scene text` is the street-sign task
+  #     and shares no vocabulary with it.
+  #   * `multimodal agent` 4/0 [2] and its plural 7/0 — 8186 (Video-DeepResearch)
+  #     matched only `benchmark` + `github` and took no penalty: the existing
+  #     Video-LLM negatives (`video large language`, `video question answering`)
+  #     miss it because the abstract abbreviates to "VQA". Bare `vqa` was probed
+  #     and REJECTED (28/1) — it hits 8092 (OSMa-Bench++, a kept semantic-mapping
+  #     benchmark). `coding agents` also REJECTED (1/1), hitting 1142 Articraft.
+  #   * `dietary` 3/0 [2] — food/nutrition recognition (8244 OliveGemma).
+  #     Thin, but a wholly off-domain class with no adjacency to any track.
+  - multi-person
+  - scene text
+  - multimodal agent
+  # The plural is the *more* common form here (7/0 vs the singular's 4/0) and is
+  # what 8186 uses — "extending multimodal agents from static images". Caught on
+  # a post-change re-run of the queue, where 8186 survived the singular
+  # unchanged. Whole-word matching makes every plural its own phrase; probe both.
+  - multimodal agents
+  - dietary
 
 # Domain-ambiguous negatives: the phrase stays in the list above, but the penalty
 # is suppressed when any guard phrase also appears in the item text. Added

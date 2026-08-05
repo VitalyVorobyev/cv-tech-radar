@@ -425,8 +425,12 @@ def test_medical_image_segmentation_papers_get_negative_penalty(app_config):
     *zero* negative penalty — they matched the Vision Foundation Models track
     via `sam` plus `benchmark` / `github`, and the older `medical imaging` /
     `medical segmentation` negatives missed the phrase these abstracts use:
-    "medical image segmentation". The `medical image segmentation` negative
-    fires on the task and keeps the recommended ring at Ignore.
+    "medical image segmentation". The negative fires on the task and keeps the
+    recommended ring at Ignore.
+
+    2026-08-05: the phrase was shortened to the bare `medical image`, which
+    strictly subsumes it — see
+    `test_medical_image_subsumes_the_two_longer_medical_phrases`.
     """
     item = make_item(
         "HPR-SAM: Prompt-free SAM for Medical Image Segmentation",
@@ -436,7 +440,7 @@ def test_medical_image_segmentation_papers_get_negative_penalty(app_config):
     )
     source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
     result = classify_item(item, config=app_config, source=source, now=FIXTURE_NOW)
-    assert "medical image segmentation" in result.negative_keywords
+    assert "medical image" in result.negative_keywords
     assert result.negative_topic_penalty > 0
     assert result.recommended_ring == "Ignore"
 
@@ -1520,7 +1524,7 @@ def test_content_generation_and_domain_negatives_fire(app_config):
             "ESRVS: Extreme Semi-Supervised Retinal Vessel Segmentation",
             "Learning from minimal supervision is a long-standing goal in medical "
             "image analysis, where dense expert annotations are costly.",
-            "medical image analysis",
+            "medical image",
         ),
         (
             "Prototype Transfer for Coronary Vessel Segmentation",
@@ -2318,3 +2322,234 @@ def test_novel_view_synthesis_noise_is_knowingly_uncovered(app_config):
     )
     assert "3D Geometry & Reconstruction" in geometry.tracks
     assert not geometry.negative_keywords
+
+
+def test_extrinsic_rotation_calibration_reaches_the_calibration_track(app_config):
+    """Anchor: 8262 (PLS-Calib) scored 21.9 and matched only 3D Sensors, on
+    `event camera` — the Calibration & Camera Models track never fired despite an
+    abstract centred on extrinsic calibration. Whole-word matching is the cause:
+    "extrinsic *rotation* calibration" is not the phrase `extrinsic calibration`,
+    and "circular calibration *targets*" is not `calibration target`.
+
+    Pins both halves of the 2026-08-05 fix — the added phrase and the plural.
+    """
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    result = classify_item(
+        make_item(
+            "PLS-Calib: A Partial Least Squares Framework for Event Camera and "
+            "Odometry Calibration under Ground Motion Constraints",
+            "Accurate extrinsic rotation calibration between sensors is fundamental "
+            "to robotic perception. We introduce a polarity-aware event "
+            "representation which enhances spatiotemporal contrast in circular "
+            "calibration targets, improving calibration accuracy over "
+            "state-of-the-art methods.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "Calibration & Camera Models" in result.tracks
+    assert "Target Detection & Fiducials" in result.tracks
+    assert "rotation calibration" in result.positive_keywords
+    assert "calibration targets" in result.positive_keywords
+
+
+def test_time_series_anomaly_detection_is_docked_on_the_inspection_track(app_config):
+    """Anchor: 8191 (PRISM) matched Industrial Vision Inspection on the bare
+    phrase `anomaly detection` while being a *time-series* AD paper for finance
+    and cloud computing.
+
+    Pins what the guard actually does, which is worth being precise about: it
+    subtracts a flat 12 from the track score, so a *title* match (+18) survives
+    at 6 and only a body-only match (+10) is stripped outright. PRISM says
+    "Anomaly Detection" in its title, so it keeps the track but loses two thirds
+    of its relevance — enough to move it 27.7 -> 22.0 overall. Anyone later
+    surprised that the track is still listed should read this rather than
+    reach for a bigger hammer.
+    """
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    tsad = classify_item(
+        make_item(
+            "PRISM: Time Series to Image Representations for Multivariate Anomaly Detection",
+            "Time series anomaly detection underpins applications in predictive "
+            "maintenance, finance, and cloud computing. We map multivariate series "
+            "to multi-channel images and reuse ImageNet-pretrained encoders.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert tsad.relevance_score == 6.0
+
+    body_only = classify_item(
+        make_item(
+            "PRISM: Representations for Multivariate Sensor Streams",
+            "Time series anomaly detection underpins predictive maintenance, "
+            "finance, and cloud computing workloads.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "Industrial Vision Inspection" not in body_only.tracks
+
+    inspection = classify_item(
+        make_item(
+            "Surface Inspection of Rolled Steel with Learned Defect Detection",
+            "Our machine vision system performs visual inspection and defect "
+            "detection on the production line, with anomaly detection thresholds "
+            "tuned per batch.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "Industrial Vision Inspection" in inspection.tracks
+    assert inspection.relevance_score > tsad.relevance_score
+
+
+def test_quantization_and_ptq_noise_stays_off_geometry_and_edge_tracks(app_config):
+    """Anchors 8193 (low-bit PTQ, where "reconstruction" means re-fitting a
+    quantized layer) and 8303 (bit-serial schedule for diffusion denoising steps).
+    Both matched tracks on the wrong sense of a strong positive. The kept half
+    pins that ordinary edge-deployment quantization work is untouched."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    ptq = classify_item(
+        make_item(
+            "Low-Dimensional Subspace Optimization for Neural Network Quantization",
+            "Low-bit quantization suffers accuracy degradation on compact networks. "
+            "PTQ reconstructs fixed pretrained models without improving inherent "
+            "quantization friendliness, evaluated on ImageNet and CIFAR-100.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "3D Geometry & Reconstruction" not in ptq.tracks
+
+    diffusion = classify_item(
+        make_item(
+            "TASQ: Temporal-Adaptive Bit Sparsification Quantization for Diffusion Models",
+            "Static quantization assigns one weight precision to every denoising "
+            "step. A Temporal-Precision Engine maps the learned schedule to "
+            "bit-serial execution, reducing execution cycles on SDXL-Turbo.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "Edge AI & Deployment" not in diffusion.tracks
+
+    kept = classify_item(
+        make_item(
+            "INT8 Quantization for Real-Time Defect Detection on Embedded Vision",
+            "We export the detector to ONNX and TensorRT, apply quantization and "
+            "pruning, and measure real-time inference latency on the edge device.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "Edge AI & Deployment" in kept.tracks
+
+
+def test_medical_image_subsumes_the_two_longer_medical_phrases(app_config):
+    """`medical image segmentation` and `medical image analysis` were folded into
+    the bare `medical image` on 2026-08-05: it strictly subsumes both under
+    whole-word matching and stops them stacking a redundant +10. 8261 (imbalanced
+    medical image *classification*) is the form neither longer phrase caught.
+
+    The negative half pins the deliberate boundary: `medical imaging` is a
+    separate entry because "image" does not match "imaging", and bare `medical`
+    stays unused so kept items that merely name medicine as one application
+    domain are not penalised.
+    """
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    for phrase in (
+        "medical image segmentation is dominated by U-Net variants",
+        "we advance medical image analysis with foundation models",
+        "recurrent contrastive learning for imbalanced medical image classification",
+    ):
+        result = classify_item(
+            make_item("Medical Study", phrase),
+            config=app_config,
+            source=source,
+            now=FIXTURE_NOW,
+        )
+        assert "medical image" in result.negative_keywords, phrase
+
+    biomedical = classify_item(
+        make_item(
+            "AnomalyClaw: A General Visual Anomaly Detection Agent",
+            "The agent generalises across industrial surface inspection, "
+            "biomedical screening and remote inspection domains.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "medical image" not in biomedical.negative_keywords
+
+
+def test_multi_person_penalised_but_motion_prediction_in_tracking_is_not(app_config):
+    """`multi-person` (7/0) extends the `human <x>` family to the multi-subject
+    form; bare `motion prediction` was REJECTED (2/2) because predicting motion is
+    what a tracker does. Pinned as a pair so a later broadening is caught."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    human = classify_item(
+        make_item(
+            "Residual Flow Matching for 3D Multi-Person Motion Prediction",
+            "3D multi-person motion prediction requires modeling both individual "
+            "kinematics and inter-person interactions over skeletal sequences.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "multi-person" in human.negative_keywords
+
+    tracker = classify_item(
+        make_item(
+            "SAMOFT: Robust Multi-Object Tracking via Region and Motion Prediction",
+            "Our tracker couples data association with motion prediction to keep "
+            "identities stable through occlusion in multi-object tracking.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert not tracker.negative_keywords, (
+        f"MOT tracker unexpectedly penalised by {tracker.negative_keywords}"
+    )
+
+
+def test_scene_text_penalised_but_industrial_ocr_is_not(app_config):
+    """`scene text` (7/0) targets in-the-wild street-sign recognition. Bare `ocr`
+    stays deliberately out of negative_topics.yaml — industrial character
+    verification is the radar's own domain and says "OCR" verbatim."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    scene = classify_item(
+        make_item(
+            "Out-of-Length Scene Text Recognition: A Two-Axis Diagnosis",
+            "In-the-wild scene text recognition degrades on long words; we "
+            "diagnose the failure and propose a training-free fix.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "scene text" in scene.negative_keywords
+
+    industrial = classify_item(
+        make_item(
+            "OCR-Based Date-Code Verification on the Packaging Line",
+            "An industrial inspection system reads laser-etched date codes with "
+            "OCR and flags misprints during quality control.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert not industrial.negative_keywords, (
+        f"industrial OCR unexpectedly penalised by {industrial.negative_keywords}"
+    )

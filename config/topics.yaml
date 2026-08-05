@@ -25,6 +25,22 @@ tracks:
       - bundle adjustment
       - hand-eye
       - homography
+      # 2026-08-05, a false *negative* for once. 8262 (PLS-Calib: extrinsic
+      # rotation calibration between an event camera and wheel odometry under
+      # ground-plane motion) scored 21.9 and matched only 3D Sensors, on
+      # `event camera` — this track never fired despite an abstract centred on
+      # extrinsic calibration. Cause is whole-word matching: the abstract says
+      # "extrinsic *rotation* calibration", which is not the contiguous phrase
+      # `extrinsic calibration`, and "circular calibration *targets*", which is
+      # not `calibration target`. Both additions are measured over the full
+      # 8325-item corpus, not just the decided part:
+      #   * `rotation calibration` — 1 hit, kept. Narrow by construction.
+      #   * `calibration accuracy` — 4 hits, 3 kept (4110 LiDAR-camera extrinsics
+      #     via 3DGS, 6889 CalibBEV, 8262) and 1 Ignore that is already heavily
+      #     penalised as autonomous-driving data. This is the generalising one:
+      #     calibration papers report accuracy, evaluation papers do not.
+      - rotation calibration
+      - calibration accuracy
     negative_keywords: []
 
   - id: target-detection-fiducials
@@ -37,6 +53,11 @@ tracks:
       - aruco
       - charuco
       - calibration target
+      # The plural is its own phrase under whole-word matching: `calibration
+      # target` does not fire on "circular calibration targets" (8262, 2026-08-05)
+      # or on 5622 (rolling-shutter self-calibration). 3 corpus hits, 2 decided,
+      # both Evaluate, zero Ignore.
+      - calibration targets
       - marker detection
       - corner detection
       - subpixel
@@ -117,6 +138,21 @@ tracks:
     # exactly — what separates them is the *presence* of geometry/sensor terms,
     # which a negative_keywords list cannot express. This class needs the scoring
     # re-weight, not another phrase.
+    #
+    # 2026-08-05: two more wrong senses of `reconstruction`, both from the 08-04
+    # queue, measured corpus-wide (Ignore/kept over 1652/309):
+    #   * low-bit 4/0 — post-training quantization, where "reconstruction" means
+    #     re-fitting a quantized layer to its full-precision output. 8193 (NAP)
+    #     is this round's instance: ImageNet/CIFAR quantization, no geometry
+    #     anywhere in it. `post-training quantization` was probed and REJECTED
+    #     (5/2) — it hits 7481 (on-device model adaptation) and 7547, both kept.
+    #   * electron tomography 1/0 — 8268 (NanoMorph-3D) reconstructs
+    #     nanomaterials from TEM tilt series. Materials-science instrumentation;
+    #     the missing-wedge problem has no analogue in our 3D work. `nanomaterial`
+    #     (1/0) is listed alongside it so the guard fires on either wording.
+    # All three are thin, but this track's `reconstruction` positive is the
+    # radar's single largest false-context source and each guard is provably
+    # zero-cost. No global negative is warranted for any of them.
     negative_keywords:
       - captioning
       - full-body
@@ -126,6 +162,10 @@ tracks:
       - multimodal large language
       - action recognition
       - image fusion
+      - low-bit
+      - electron tomography
+      - nanomaterial
+      - nanomaterials
 
   - id: 3d-sensors
     name: 3D Sensors
@@ -269,6 +309,14 @@ tracks:
       #     wrong track match costs more than a missed penalty.
       - mri
       - optical coherence tomography
+      # 2026-08-05: the same shape once more, but non-medical for a change.
+      # 8191 (PRISM) matched this track on `anomaly detection` alone while being
+      # a *time-series* anomaly-detection paper whose named applications are
+      # finance and cloud computing — it renders series as images only to reuse
+      # ImageNet backbones. 7 Ignore / 0 kept corpus-wide; scoped here rather
+      # than made a global negative because the phrase is harmless outside this
+      # track and the fault is the track match, not the item's presence.
+      - time series
 
   - id: edge-ai-deployment
     name: Edge AI & Deployment
@@ -293,10 +341,24 @@ tracks:
     # visual tokens 11/0 — no kept item uses any of them. Both number forms are
     # listed because the matcher is whole-word: `visual token` does not fire on
     # "redundant visual tokens", which is the form most of these abstracts use.
+    # 2026-08-05: `quantization` has the same problem `pruning` does — it is a
+    # real Edge AI positive that diffusion-generation papers use verbatim. 8303
+    # (TASQ) matched this track on `quantization` + `github` while being a
+    # bit-serial precision schedule for PixArt/SANA/SDXL denoising steps. Bare
+    # `diffusion model` was probed and REJECTED (24/2): it hits 5411 (latent
+    # posterior sampling for 3D structure) and 6982 (a diffusion-based tracker),
+    # both kept. The two phrases below are specific to the generation-efficiency
+    # sub-genre — 1/0 and 1/0, thin but zero-cost — and neither appears in any
+    # kept item's vocabulary.
     negative_keywords:
       - token pruning
       - visual token
       - visual tokens
+      - denoising step
+      # 3/0 for the plural vs 1/0 for the singular — TASQ says "every denoising
+      # step" but most of this genre says "across denoising steps".
+      - denoising steps
+      - bit-serial
 
   - id: vision-foundation-models
     name: Vision Foundation Models
