@@ -687,6 +687,24 @@ negative_topics:
   # unchanged. Whole-word matching makes every plural its own phrase; probe both.
   - multimodal agents
   - dietary
+  # 2026-08-06 curation. Corpus-wide counts are Ignore/kept over the decided set:
+  #   * `video-language` 4/0 (29 corpus) — the hyphen variant the Video-LLM genre
+  #     actually uses. `vision-language` has been a negative since 2026-05-11 but
+  #     never fires on these: 8434 (CLIP-CC-Bench) says "Video-Language Models"
+  #     throughout and took zero penalty. The matcher treats `-` and space alike,
+  #     so this one phrase covers "video language model(s)" too.
+  #   * `long-form video` 8/0 (20 corpus) — the other half of the same class:
+  #     paragraph-level captioning and long-video QA benchmarks. Complements
+  #     `video question answering` (2026-07-13), which misses caption-only work.
+  #   * `railway` 2/0 (5 corpus) — rail perception is a small but coherent
+  #     off-domain cluster; two of the 25 slots on 2026-08-05 went to it (8373
+  #     GitOps annotation catalog, 8376 DB InfraGO multi-sensor dataset). Bare
+  #     `rail` was not used: 3 corpus hits and it risks firing on "guard rail"
+  #     and similar. Checked all 11 corpus occurrences of `railway` — every one
+  #     is rail-domain, none industrial-inspection adjacent.
+  - video-language
+  - long-form video
+  - railway
 
 # Domain-ambiguous negatives: the phrase stays in the list above, but the penalty
 # is suppressed when any guard phrase also appears in the item text. Added

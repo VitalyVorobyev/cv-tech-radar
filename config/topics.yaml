@@ -232,6 +232,10 @@ tracks:
       # strips this track from 1 Ignore / 0 kept item. Left out of the global
       # negative list: `image editing` already penalises the same class.
       - image manipulation
+      # `navigation` has the same PCB-routing wrong sense as `path planning` on
+      # Robot Guidance — 8419 (OmniRouting) matched both tracks. See the note
+      # there for why `pcb` itself is not usable as a guard. 1 Ignore / 0 kept.
+      - electronic design automation
 
   - id: robot-guidance
     name: Robot Guidance
@@ -244,7 +248,17 @@ tracks:
       - hand-eye calibration
       - path planning
       - pose refinement
-    negative_keywords: []
+    # `path planning` also means *trace* routing on a circuit board. 2026-08-06:
+    # 8419 (OmniRouting, an LLM benchmark for PCB routing) reached this track and
+    # Robotics Vision on `path planning` + `navigation` and took a top-10 queue
+    # slot with no vision content at all. `pcb` and `printed circuit board` were
+    # probed and REJECTED as guards — both hit kept items (2674, PCB defect
+    # detection; 3175), because board *inspection* is the radar's own domain. The
+    # EDA design sense has its own vocabulary, so guard on that instead: 1
+    # in-track Ignore / 0 kept. One item, but this is a core track and a wrong
+    # track match costs more than a missed penalty.
+    negative_keywords:
+      - electronic design automation
 
   - id: object-tracking
     name: Object Tracking
@@ -317,6 +331,33 @@ tracks:
       # than made a global negative because the phrase is harmless outside this
       # track and the fault is the track match, not the item's presence.
       - time series
+      # 2026-08-06, two more wrong senses of this track's positives in one queue:
+      #   * `ultrasound` — 8365 (FUSEP, a fetal-ultrasound screening benchmark)
+      #     matched this track on `quality control`, from "quality control on
+      #     ultrasound images". It is already a global negative topic, so the
+      #     penalty fired but the track match survived. 2 in-track Ignore / 0
+      #     kept, and all 224 corpus occurrences are clinical — industrial NDT
+      #     says "ultrasonic" (2 corpus hits, neither in this track), so our own
+      #     domain is untouched. NOTE the asymmetry: negative_topics.yaml scopes
+      #     `ultrasound` through its `exemptions:` map, but track guards have no
+      #     such escape hatch — classify_item applies negative_keywords
+      #     unconditionally. Bare `ultrasound` is only safe here because the two
+      #     senses do not share a word; do not copy this pattern for a phrase
+      #     that needs an exemption.
+      #   * surveillance video anomaly detection — 8337 (VQ-VAD, pose-based
+      #     anomaly detection in surveillance footage) matched on `anomaly
+      #     detection`. Bare `surveillance` was probed and REJECTED: it hits kept
+      #     item 24 (SphereVAD). The two-word forms do not. `video anomaly
+      #     detection` was rejected for the same reason — it hits kept 6730
+      #     (O-VAD, *industrial* video anomaly detection), which is exactly the
+      #     item this guard must never touch. `surveillance video` was probed and
+      #     also REJECTED: its only in-track effect is stripping 5241, a
+      #     cross-dataset audit showing frozen-backbone AD collapses to chance
+      #     off its training scene — it is framed on surveillance data but tests
+      #     a PaDiM-style Mahalanobis detector, so the finding is industrial-AD
+      #     relevant and the track match is earned.
+      - ultrasound
+      - surveillance footage
 
   - id: edge-ai-deployment
     name: Edge AI & Deployment
@@ -398,12 +439,19 @@ tracks:
     # REJECTED at 7/1: it strips 656, a kept item on clip-level uncertainty for
     # active learning. That re-confirms the note above; the generic-video sense
     # of `clip` is still not directly coverable.
+    # 2026-08-06: one corner of it finally is. 8393 (EgoCross, an egocentric
+    # video-QA challenge report) reached this track on `clip` from "egocentric
+    # video clip". The explicit two-word `video clip` is 3 in-track / 2 Ignore /
+    # 0 kept — narrow, but unlike `clip-level` it never fires on the model name
+    # or on a kept item. This does not close the class; abstracts that say only
+    # "clips" or "short-clip" (8434, CLIP-CC-Bench) stay uncovered.
     negative_keywords:
       - image generation
       - video generation
       - bitrate
       - action recognition
       - audio-visual
+      - video clip
 
   - id: open-source-cv-tooling
     name: Open-Source CV Tooling

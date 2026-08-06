@@ -2553,3 +2553,210 @@ def test_scene_text_penalised_but_industrial_ocr_is_not(app_config):
     assert not industrial.negative_keywords, (
         f"industrial OCR unexpectedly penalised by {industrial.negative_keywords}"
     )
+
+
+def test_ultrasound_guard_strips_inspection_track_but_ultrasonic_ndt_keeps_it(app_config):
+    """8365 (FUSEP, fetal ultrasound) reached Industrial Vision Inspection on
+    `quality control`. The guard is safe only because the two senses use
+    different words: medical says "ultrasound", industrial NDT says "ultrasonic".
+    Track guards bypass the `exemptions:` map in negative_topics.yaml, so this
+    pair is pinned to catch a later broadening."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    medical = classify_item(
+        make_item(
+            "FUSEP: A Benchmark for Early Pregnancy Fetal Ultrasound Screening",
+            "We report quality control on ultrasound images across three hospitals "
+            "with box-level expert annotations for screening.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "Industrial Vision Inspection" not in medical.tracks
+
+    ndt = classify_item(
+        make_item(
+            "Ultrasonic Weld Inspection with Learned Defect Detection",
+            "Non-destructive ultrasonic testing of welds supports automated defect "
+            "detection and quality control on the production line.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "Industrial Vision Inspection" in ndt.tracks
+
+
+def test_surveillance_footage_guard_but_industrial_vad_keeps_track(app_config):
+    """8337 (VQ-VAD) reached Industrial Vision Inspection on `anomaly detection`
+    from surveillance footage. Bare `surveillance` and `video anomaly detection`
+    were both REJECTED as guards: they hit kept items 24 (SphereVAD) and 6730
+    (O-VAD, *industrial* video anomaly detection).
+
+    The guard subtracts from the track score rather than always stripping the
+    track: 8337 says "Anomaly Detection" in its *title* (+18), so it keeps the
+    track at reduced weight. Asserting the reduction rather than removal is what
+    the guard actually promises."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    title = "VQ-VAD: Vector-Quantized Motion Representation for Video Anomaly Detection"
+    surveillance = classify_item(
+        make_item(
+            title,
+            "Pose-based anomaly detection mitigates the visual variability of "
+            "surveillance footage, including changes in lighting and viewpoint.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    neutral = classify_item(
+        make_item(
+            title,
+            "Pose-based anomaly detection mitigates the visual variability of "
+            "recorded scenes, including changes in lighting and viewpoint.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert surveillance.relevance_score < neutral.relevance_score
+
+    industrial = classify_item(
+        make_item(
+            "O-VAD: Industrial Video Anomaly Detection through Object-Centric Tracking",
+            "We detect process anomalies on the line by combining video anomaly "
+            "detection with object-centric tracking for visual inspection.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "Industrial Vision Inspection" in industrial.tracks
+    assert not industrial.negative_keywords
+
+
+def test_eda_routing_guard_but_pcb_inspection_keeps_its_tracks(app_config):
+    """8419 (OmniRouting) reached Robot Guidance + Robotics Vision on the EDA
+    sense of `path planning` / `navigation`. `pcb` and `printed circuit board`
+    were REJECTED as guards — both hit kept items, because board *inspection* is
+    the radar's own domain."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    eda = classify_item(
+        make_item(
+            "OmniRouting: A Multimodal Benchmark for Constraint-Aware PCB Routing",
+            "Routing is a critical stage of electronic design automation; we test "
+            "path planning and navigation over netlists under design-rule constraints.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "Robot Guidance" not in eda.tracks
+    assert "Robotics Vision" not in eda.tracks
+
+    inspection = classify_item(
+        make_item(
+            "Masked Pretraining for PCB Defect Detection",
+            "Surface inspection of printed circuit board assemblies with defect "
+            "detection under industrial inspection conditions.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "Industrial Vision Inspection" in inspection.tracks
+
+
+def test_video_clip_guard_but_clip_foundation_model_keeps_vfm_track(app_config):
+    """8393 (EgoCross) reached Vision Foundation Models on `clip` from "egocentric
+    video clip". `clip-level` was REJECTED earlier at 7/1; the two-word `video
+    clip` never fires on the model name."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    generic = classify_item(
+        make_item(
+            "The First EgoCross Challenge: Cross-Domain Egocentric Video QA",
+            "Each test example consists of an egocentric video clip, a question, "
+            "and four candidate answers.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "Vision Foundation Models" not in generic.tracks
+
+    model = classify_item(
+        make_item(
+            "Probing CLIP and DINOv2 Features for Dense Correspondence",
+            "We compare frozen CLIP and DINOv2 backbones as a vision foundation "
+            "model for dense matching.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "Vision Foundation Models" in model.tracks
+
+
+def test_video_language_and_long_form_video_penalised_but_tracking_is_not(app_config):
+    """`vision-language` has been a negative since 2026-05-11 but never fires on
+    the Video-LLM genre, which writes "Video-Language". Pinned with a video
+    tracking item to catch a broadening that would swallow legitimate video work."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    video_llm = classify_item(
+        make_item(
+            "CLIP-CC-Bench: Paragraph-Level Video Descriptions in Video-Language Models",
+            "An evaluation suite for long-form video description built from movie "
+            "content segmented into 90-second segments.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "video-language" in video_llm.negative_keywords
+    assert "long-form video" in video_llm.negative_keywords
+
+    tracker = classify_item(
+        make_item(
+            "Long-Horizon Multi-Object Tracking in Industrial Video",
+            "Temporal association keeps identities stable across occlusion on the "
+            "conveyor, using a motion model for object tracking.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert not tracker.negative_keywords, (
+        f"video tracker unexpectedly penalised by {tracker.negative_keywords}"
+    )
+
+
+def test_railway_penalised_but_industrial_inspection_is_not(app_config):
+    """Rail perception is a small off-domain cluster that took 2 of 25 slots on
+    2026-08-05. Bare `rail` was deliberately not used — it risks firing on "guard
+    rail" and similar."""
+    source = Source(key="arxiv-cs-cv", name="arXiv cs.CV", kind="arxiv", url="", priority=1)
+    rail = classify_item(
+        make_item(
+            "A Multi-Sensor Dataset for Monitoring Rail Vehicle Environments",
+            "A multi-sensor dataset tailored to railway environment perception "
+            "with 7 million annotations for automated train operation.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert "railway" in rail.negative_keywords
+
+    industrial = classify_item(
+        make_item(
+            "Guard Rail Weld Seam Surface Inspection",
+            "Automated surface inspection of weld seams uses defect detection "
+            "during industrial inspection and quality control.",
+        ),
+        config=app_config,
+        source=source,
+        now=FIXTURE_NOW,
+    )
+    assert not industrial.negative_keywords, (
+        f"industrial inspection unexpectedly penalised by {industrial.negative_keywords}"
+    )
