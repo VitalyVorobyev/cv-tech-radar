@@ -49,7 +49,10 @@ export function SettingsNegativeTopicsView() {
     setSaving(true);
     setSaveError(null);
     try {
-      const payload: NegativeTopicsConfig = { negative_topics: terms };
+      const payload: NegativeTopicsConfig = {
+        negative_topics: terms,
+        exemptions: data?.exemptions ?? {},
+      };
       const res = await api.putNegativeTopicsConfig(payload);
       setBaseline(terms);
       setSavedAt(res.saved_at);

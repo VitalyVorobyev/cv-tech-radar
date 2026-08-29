@@ -73,6 +73,9 @@ def classify_item(
         topic
         for topic in config.negative_topics.negative_topics
         if keyword_matches(topic, full_text)
+        and not any(
+            keyword_matches(guard, full_text) for guard in config.negative_topics.guards_for(topic)
+        )
     ]
     negative_penalty = min(100.0, 25.0 + max(len(negative_keywords) - 1, 0) * 10.0)
     if not negative_keywords:

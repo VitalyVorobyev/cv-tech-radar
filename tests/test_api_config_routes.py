@@ -117,3 +117,18 @@ def test_post_reload_returns_timestamp(cfg_client):
     response = client.post("/api/config/reload")
     assert response.status_code == 200
     assert "reloaded_at" in response.json()
+
+
+def test_put_negative_topics_preserves_exemptions(cfg_client):
+    """The config writer drops keys absent from the payload, so a UI save that
+    only edits the phrase list must still echo `exemptions` back."""
+    client, config_dir = cfg_client
+    current = load_app_config(config_dir).negative_topics.model_dump()
+    assert current["exemptions"], "fixture config should carry exemption guards"
+    current["negative_topics"].append("indoor mapping")
+    response = client.put("/api/config/negative-topics", json=current)
+    assert response.status_code == 200, response.text
+
+    reloaded = load_app_config(config_dir).negative_topics
+    assert reloaded.guards_for("computed tomography")
+    assert reloaded.guards_for("super-resolution")
