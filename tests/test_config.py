@@ -134,3 +134,53 @@ artifacts:
     )
     with pytest.raises(ConfigError):
         load_app_config(config_dir)
+
+
+def test_negative_topic_exemption_for_unlisted_phrase_fails(tmp_path):
+    config_dir = copy_config(tmp_path)
+    (config_dir / "negative_topics.yaml").write_text(
+        """
+negative_topics:
+  - computed tomography
+exemptions:
+  magnetic resonance imaging:
+    - industrial
+""",
+        encoding="utf-8",
+    )
+    with pytest.raises(ConfigError):
+        load_app_config(config_dir)
+
+
+def test_negative_topic_exemption_without_guards_fails(tmp_path):
+    config_dir = copy_config(tmp_path)
+    (config_dir / "negative_topics.yaml").write_text(
+        """
+negative_topics:
+  - computed tomography
+exemptions:
+  computed tomography: []
+""",
+        encoding="utf-8",
+    )
+    with pytest.raises(ConfigError):
+        load_app_config(config_dir)
+
+
+def test_duplicate_negative_topic_fails(tmp_path):
+    """A repeated phrase double-charges the penalty (35 instead of 25 for one
+    trait) rather than being inert, because the penalty scales with the number
+    of matches. Regression for 2026-07-27, when the medical-tail batch re-added
+    `ultrasound`, already listed since 2026-07-08."""
+    config_dir = copy_config(tmp_path)
+    (config_dir / "negative_topics.yaml").write_text(
+        """
+negative_topics:
+  - ultrasound
+  - computed tomography
+  - ultrasound
+""",
+        encoding="utf-8",
+    )
+    with pytest.raises(ConfigError):
+        load_app_config(config_dir)

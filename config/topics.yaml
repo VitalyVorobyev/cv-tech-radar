@@ -25,6 +25,22 @@ tracks:
       - bundle adjustment
       - hand-eye
       - homography
+      # 2026-08-05, a false *negative* for once. 8262 (PLS-Calib: extrinsic
+      # rotation calibration between an event camera and wheel odometry under
+      # ground-plane motion) scored 21.9 and matched only 3D Sensors, on
+      # `event camera` — this track never fired despite an abstract centred on
+      # extrinsic calibration. Cause is whole-word matching: the abstract says
+      # "extrinsic *rotation* calibration", which is not the contiguous phrase
+      # `extrinsic calibration`, and "circular calibration *targets*", which is
+      # not `calibration target`. Both additions are measured over the full
+      # 8325-item corpus, not just the decided part:
+      #   * `rotation calibration` — 1 hit, kept. Narrow by construction.
+      #   * `calibration accuracy` — 4 hits, 3 kept (4110 LiDAR-camera extrinsics
+      #     via 3DGS, 6889 CalibBEV, 8262) and 1 Ignore that is already heavily
+      #     penalised as autonomous-driving data. This is the generalising one:
+      #     calibration papers report accuracy, evaluation papers do not.
+      - rotation calibration
+      - calibration accuracy
     negative_keywords: []
 
   - id: target-detection-fiducials
@@ -37,10 +53,23 @@ tracks:
       - aruco
       - charuco
       - calibration target
+      # The plural is its own phrase under whole-word matching: `calibration
+      # target` does not fire on "circular calibration targets" (8262, 2026-08-05)
+      # or on 5622 (rolling-shutter self-calibration). 3 corpus hits, 2 decided,
+      # both Evaluate, zero Ignore.
+      - calibration targets
       - marker detection
       - corner detection
       - subpixel
-    negative_keywords: []
+    # `checkerboard` is also the name of the autoregressive context pattern in
+    # learned image compression — 2026-07-21 candidate 18 (6653, "Wavefront
+    # Parallelization for Efficient Learned Image Compression") entered the queue
+    # on the *calibration-target* track purely because it cites the checkerboard
+    # context model. Nothing in this track's vocabulary overlaps compression, so
+    # the guard cannot cost a real fiducial paper its track.
+    negative_keywords:
+      - image compression
+      - context model
 
   - id: 3d-geometry-reconstruction
     name: 3D Geometry & Reconstruction
@@ -57,7 +86,86 @@ tracks:
       - pose estimation
       - epipolar
       - triangulation
-    negative_keywords: []
+    # Bare `reconstruction` is this track's broadest positive and the single
+    # largest false-context source in the 2026-07-30 queue: FIVE of its 25
+    # candidates matched here on the wrong sense of the word — 7779 ("video
+    # reconstruction" in a captioning paper), 7770 ("target reconstruction" in a
+    # distillation paper), 7872 and 7861 (human-body generation/mesh). Narrowing
+    # the keyword is not an option (it is the track's core term), so the wrong
+    # senses are guarded by their own vocabulary instead.
+    # Measured over the decided corpus, as items carrying this track that the
+    # guard would strip: captioning 3 Ignore / 0 kept, full-body 4/0,
+    # dynamic human 5/0. All three are also global negatives — repeating them
+    # here removes the relevance boost, not just the penalty.
+    # No guard is offered for 7770: its wrong sense is distillation, and both
+    # `distillation` and `knowledge distillation` hit kept items (see
+    # negative_topics.yaml). That one stays uncovered by design.
+    # 2026-08-03: three more wrong senses of `reconstruction`, measured as items
+    # carrying this track that the guard would penalise (in-track Ignore/kept,
+    # over a track population of 372 Ignore / 179 kept):
+    #   * clinical 16/0 — "reconstruction parameters" in CT/CBCT acquisition and
+    #     "reconstruction residuals" in medical anomaly detection. 7925 (CBCT-IQ)
+    #     and 7949 (OCT/OCTA) are this round's instances.
+    #   * video diffusion 12/0 — generative video priors, where "reconstruction"
+    #     means re-rendering rather than geometry. Corpus-wide this phrase is
+    #     23/1, so it is deliberately scoped to this track and NOT made a global
+    #     negative. Video-diffusion priors are creeping into legitimate novel-view
+    #     work, so this is the guard most likely to need revisiting.
+    #   * multimodal large language 10/0 — already a global negative; repeating it
+    #     here strips the track as well as applying the penalty.
+    # 2026-08-04: two more wrong senses of `reconstruction`, measured as items
+    # carrying this track that the guard would penalise (over a track population
+    # of 358 Ignore / 180 kept):
+    #   * action recognition 4/0 — 8073 (Event ActivityNet) is here purely on
+    #     "action-center reconstruction LPIPS", a diagnostic metric inside a
+    #     video action-localization benchmark.
+    #   * image fusion 3/0 — infrared-visible fusion papers, where
+    #     "reconstruction" means re-synthesising the fused image.
+    # Both are also global negatives; repeating them here strips the track as
+    # well, so the item loses the relevance boost and not only the penalty.
+    #
+    # Recorded as NOT fixable: the largest single noise class in the 2026-08-04
+    # round was novel-view-synthesis / Gaussian-splatting rendering papers — 7 of
+    # 40 Ignores (8039 UniqueSplat, 8124 D^2-4DGS, 8071 FAST-GS, 8001 InfiniSplat,
+    # 8172 QuerySplat, 8059 ChunkVAE, 8135 GaussianSelector), all reaching this
+    # track on `3d reconstruction` / `reconstruction` / `multi-view` with zero
+    # penalty. Every discriminating phrase was probed against the decided corpus
+    # and every one hits kept items: `novel view synthesis` 21/9, `view synthesis`
+    # 26/9, `gaussian splatting` 48/22, `3dgs` 29/14, `psnr` 16/2, `photorealistic`
+    # 11/2, `rendering quality` 11/4, `radiance field` 0/1. The kept items
+    # (7226 GLAM-SLAM, 5079 Structured-Li-GS, 4110 geometry-preserving 3DGS for
+    # LiDAR-camera extrinsics, 6371 SalientGS) share the rendering vocabulary
+    # exactly — what separates them is the *presence* of geometry/sensor terms,
+    # which a negative_keywords list cannot express. This class needs the scoring
+    # re-weight, not another phrase.
+    #
+    # 2026-08-05: two more wrong senses of `reconstruction`, both from the 08-04
+    # queue, measured corpus-wide (Ignore/kept over 1652/309):
+    #   * low-bit 4/0 — post-training quantization, where "reconstruction" means
+    #     re-fitting a quantized layer to its full-precision output. 8193 (NAP)
+    #     is this round's instance: ImageNet/CIFAR quantization, no geometry
+    #     anywhere in it. `post-training quantization` was probed and REJECTED
+    #     (5/2) — it hits 7481 (on-device model adaptation) and 7547, both kept.
+    #   * electron tomography 1/0 — 8268 (NanoMorph-3D) reconstructs
+    #     nanomaterials from TEM tilt series. Materials-science instrumentation;
+    #     the missing-wedge problem has no analogue in our 3D work. `nanomaterial`
+    #     (1/0) is listed alongside it so the guard fires on either wording.
+    # All three are thin, but this track's `reconstruction` positive is the
+    # radar's single largest false-context source and each guard is provably
+    # zero-cost. No global negative is warranted for any of them.
+    negative_keywords:
+      - captioning
+      - full-body
+      - dynamic human
+      - clinical
+      - video diffusion
+      - multimodal large language
+      - action recognition
+      - image fusion
+      - low-bit
+      - electron tomography
+      - nanomaterial
+      - nanomaterials
 
   - id: 3d-sensors
     name: 3D Sensors
@@ -71,7 +179,13 @@ tracks:
       - rgb-d
       - 3d sensor
       - event camera
-    negative_keywords: []
+    # `rgb-d` is a real depth-sensor term that RGB-D salient object detection
+    # reuses verbatim — 7929 (SaliLLM) matched this track on it while being a
+    # saliency benchmark for MLLMs. `salient object detection` is already a
+    # global negative; as a guard it also removes the 3D Sensors relevance boost.
+    # 4 Ignore / 0 kept among items carrying this track (61 Ignore / 52 kept).
+    negative_keywords:
+      - salient object detection
 
   - id: robotics-vision
     name: Robotics Vision
@@ -84,7 +198,44 @@ tracks:
       - slam
       - navigation
       - manipulation
-    negative_keywords: []
+    # `manipulation` means image manipulation as often as robot manipulation —
+    # 2026-07-21 candidate 7 (6632, ExpertVerse, a knowledge-intensive *image
+    # generation* benchmark) matched this track on "semantic manipulation" alone.
+    # These three phrases are already global negative topics; repeating them here
+    # removes the spurious relevance boost as well as the score penalty.
+    #
+    # `world generation` added 2026-07-23: 7215 (GS-Agent, LLM-agent-driven 4D
+    # world creation) matched this track on "camera and lighting manipulation"
+    # and says none of the three phrases above — it generates *worlds*, not
+    # images. Probed over the corpus: 9 hits, none of them kept, and every one is
+    # generative content creation or a driving world model. The narrower
+    # `lighting manipulation` was rejected as a one-off phrasing.
+    #
+    # The forensics sense added 2026-07-30: 7752 (BG-REAL, a *background
+    # manipulation* detection benchmark) matched this track on `manipulation`
+    # alone and reached rank 5 of the 07-28 queue. Image forensics is the third
+    # distinct wrong sense of the word, after image generation and world
+    # generation. All three phrases are new global negative topics as well;
+    # repeating them here removes the relevance boost too.
+    negative_keywords:
+      - image generation
+      - image editing
+      - text-to-image
+      - world generation
+      - manipulation detection
+      - manipulation localization
+      - image forensics
+      # `image manipulation` added 2026-07-31: 7807 (FaithEyes) matched this
+      # track because agentic VLMs call "code-based image manipulation" a tool.
+      # That is the fourth distinct wrong sense of the word, after image
+      # generation, world generation and forensics. 2 Ignore / 0 kept, and it
+      # strips this track from 1 Ignore / 0 kept item. Left out of the global
+      # negative list: `image editing` already penalises the same class.
+      - image manipulation
+      # `navigation` has the same PCB-routing wrong sense as `path planning` on
+      # Robot Guidance — 8419 (OmniRouting) matched both tracks. See the note
+      # there for why `pcb` itself is not usable as a guard. 1 Ignore / 0 kept.
+      - electronic design automation
 
   - id: robot-guidance
     name: Robot Guidance
@@ -97,7 +248,17 @@ tracks:
       - hand-eye calibration
       - path planning
       - pose refinement
-    negative_keywords: []
+    # `path planning` also means *trace* routing on a circuit board. 2026-08-06:
+    # 8419 (OmniRouting, an LLM benchmark for PCB routing) reached this track and
+    # Robotics Vision on `path planning` + `navigation` and took a top-10 queue
+    # slot with no vision content at all. `pcb` and `printed circuit board` were
+    # probed and REJECTED as guards — both hit kept items (2674, PCB defect
+    # detection; 3175), because board *inspection* is the radar's own domain. The
+    # EDA design sense has its own vocabulary, so guard on that instead: 1
+    # in-track Ignore / 0 kept. One item, but this is a core track and a wrong
+    # track match costs more than a missed penalty.
+    negative_keywords:
+      - electronic design automation
 
   - id: object-tracking
     name: Object Tracking
@@ -109,8 +270,13 @@ tracks:
       - re-identification
       - temporal association
       - motion model
+    # `gui` added 2026-07-30: 7576 (Desktop-Delta Bench, a computer-use-agent
+    # benchmark) matched this track on the bare word `tracking`, from "source
+    # tracking" of GUI state. Desktop-agent papers are a growing cs.CV class and
+    # they all use this vocabulary. Probed: gui 9 Ignore / 0 kept.
     negative_keywords:
       - person re-identification
+      - gui
 
   - id: industrial-vision-inspection
     name: Industrial Vision Inspection
@@ -124,7 +290,74 @@ tracks:
       - quality control
       - metrology
       - machine vision
-    negative_keywords: []
+    # `anomaly detection` is one of this track's strongest positives (28 kept
+    # items across the corpus) and is also the phrase medical papers use for
+    # exactly the same task. Added 2026-07-30 after 7621 (Group Equivariant
+    # Diffusion for Anomaly Detection in Computational Cytology) matched this
+    # track on it alone. Measured over the decided corpus: 21 Ignore / 28 kept
+    # items say `anomaly detection`; 6 of the Ignore items pair it with one of
+    # the guards below, and *no* kept item does.
+    # `medical imaging` was rejected as a guard: it hits 576 (AnomalyClaw, a kept
+    # general visual anomaly-detection agent that lists medical imaging as one
+    # application domain). The singular `medical image` does not — the matcher is
+    # whole-word — so that is the form listed.
+    negative_keywords:
+      - cytology
+      - whole-slide
+      - histopathology
+      - medical image
+      - clinical
+      # `radiomics` added 2026-07-31: 7787 (volume-driven confounding in
+      # radiomics features) matched this track on `quality control`, from its
+      # "scalable quality-control strategy" for oncology biomarkers. Same shape
+      # as the `anomaly detection` case above — a strong inspection positive that
+      # medical papers use verbatim. 3 Ignore / 0 kept; strips this track from
+      # 1 Ignore / 0 kept.
+      - radiomics
+      # 2026-08-03, same shape again — medical papers reusing this track's
+      # strongest positives. In-track counts over 31 Ignore / 45 kept:
+      #   * mri 4/0 — a global negative already; guarding here strips the track.
+      #   * optical coherence tomography 1/0 — 7949 (ReMoE) matched Industrial
+      #     Vision Inspection purely on `anomaly detection` in a retinal OCT
+      #     paper. One item, but this track is the radar's core domain and a
+      #     wrong track match costs more than a missed penalty.
+      - mri
+      - optical coherence tomography
+      # 2026-08-05: the same shape once more, but non-medical for a change.
+      # 8191 (PRISM) matched this track on `anomaly detection` alone while being
+      # a *time-series* anomaly-detection paper whose named applications are
+      # finance and cloud computing — it renders series as images only to reuse
+      # ImageNet backbones. 7 Ignore / 0 kept corpus-wide; scoped here rather
+      # than made a global negative because the phrase is harmless outside this
+      # track and the fault is the track match, not the item's presence.
+      - time series
+      # 2026-08-06, two more wrong senses of this track's positives in one queue:
+      #   * `ultrasound` — 8365 (FUSEP, a fetal-ultrasound screening benchmark)
+      #     matched this track on `quality control`, from "quality control on
+      #     ultrasound images". It is already a global negative topic, so the
+      #     penalty fired but the track match survived. 2 in-track Ignore / 0
+      #     kept, and all 224 corpus occurrences are clinical — industrial NDT
+      #     says "ultrasonic" (2 corpus hits, neither in this track), so our own
+      #     domain is untouched. NOTE the asymmetry: negative_topics.yaml scopes
+      #     `ultrasound` through its `exemptions:` map, but track guards have no
+      #     such escape hatch — classify_item applies negative_keywords
+      #     unconditionally. Bare `ultrasound` is only safe here because the two
+      #     senses do not share a word; do not copy this pattern for a phrase
+      #     that needs an exemption.
+      #   * surveillance video anomaly detection — 8337 (VQ-VAD, pose-based
+      #     anomaly detection in surveillance footage) matched on `anomaly
+      #     detection`. Bare `surveillance` was probed and REJECTED: it hits kept
+      #     item 24 (SphereVAD). The two-word forms do not. `video anomaly
+      #     detection` was rejected for the same reason — it hits kept 6730
+      #     (O-VAD, *industrial* video anomaly detection), which is exactly the
+      #     item this guard must never touch. `surveillance video` was probed and
+      #     also REJECTED: its only in-track effect is stripping 5241, a
+      #     cross-dataset audit showing frozen-backbone AD collapses to chance
+      #     off its training scene — it is framed on surveillance data but tests
+      #     a PaDiM-style Mahalanobis detector, so the finding is industrial-AD
+      #     relevant and the track match is earned.
+      - ultrasound
+      - surveillance footage
 
   - id: edge-ai-deployment
     name: Edge AI & Deployment
@@ -139,11 +372,44 @@ tracks:
       - openvino
       - embedded vision
       - real-time inference
-    negative_keywords: []
+    # `pruning` means network pruning here, but VLM/MLLM papers use the same word
+    # for dropping *visual tokens* from a context window, and that class recurs
+    # every batch (7504 Omni-Prune, 7517 WaveZip, 7523 OmniScope, 7527
+    # CachedSearch, 7534 on 2026-07-25..26 alone). Suppressing the track match is
+    # the right fix rather than a global penalty: the papers are not off-radar
+    # because they are noisy, they are off-radar because Edge AI never applied.
+    # Probed 2026-07-28: token pruning 12 Ignore / 0 kept, visual token 14/0,
+    # visual tokens 11/0 — no kept item uses any of them. Both number forms are
+    # listed because the matcher is whole-word: `visual token` does not fire on
+    # "redundant visual tokens", which is the form most of these abstracts use.
+    # 2026-08-05: `quantization` has the same problem `pruning` does — it is a
+    # real Edge AI positive that diffusion-generation papers use verbatim. 8303
+    # (TASQ) matched this track on `quantization` + `github` while being a
+    # bit-serial precision schedule for PixArt/SANA/SDXL denoising steps. Bare
+    # `diffusion model` was probed and REJECTED (24/2): it hits 5411 (latent
+    # posterior sampling for 3D structure) and 6982 (a diffusion-based tracker),
+    # both kept. The two phrases below are specific to the generation-efficiency
+    # sub-genre — 1/0 and 1/0, thin but zero-cost — and neither appears in any
+    # kept item's vocabulary.
+    negative_keywords:
+      - token pruning
+      - visual token
+      - visual tokens
+      - denoising step
+      # 3/0 for the plural vs 1/0 for the singular — TASQ says "every denoising
+      # step" but most of this genre says "across denoising steps".
+      - denoising steps
+      - bit-serial
 
   - id: vision-foundation-models
     name: Vision Foundation Models
     quadrant: models
+    # Bare `multimodal` was dropped after 2026-07-08 curation: across the
+    # 07-03..07-07 backfill it matched 26 Ignore items and 0 promoted items —
+    # it fires on generic VLM/MLLM papers (the breadth noise already partly
+    # caught by the `multimodal large language` / `omnimodal` negative topics).
+    # Genuine foundation-model work still matches sam / dinov2 / clip /
+    # visual language model / vision foundation model / foundation model.
     positive_keywords:
       - vision foundation model
       - segmentation anything
@@ -151,15 +417,51 @@ tracks:
       - dinov2
       - clip
       - visual language model
-      - multimodal
       - foundation model
+    # `clip` means the CLIP model here, but it is also the ordinary English word
+    # for a video segment, and codec/world-model papers use it constantly: 7792
+    # ("any demonstrated clip") and 7814 ("reduces a source clip to a compact
+    # bitstream") both entered the 2026-07-30 queue on this track alone. Only the
+    # codec sense is guardable — `bitrate` 5 Ignore / 0 kept, strips this track
+    # from 1 Ignore / 0 kept.
+    # `world model` was probed for 7792 and REJECTED: it strips this track from
+    # 1144, a kept item on geometric consistency in video world models. The
+    # generic-video sense of `clip` therefore stays uncovered.
+    # 2026-08-04: three more generic-`clip` items in one round — 8154 (JEPA
+    # novelty scoring over driving clips), 8155 (SphereVideo, "frame and clip
+    # levels"), 8146 (FineMoLA, "Clip-Level Supervision"). Two of the three are
+    # guardable by the sense of the surrounding task, measured as items carrying
+    # this track that the guard would strip (track population 406 Ignore /
+    # 50 kept):
+    #   * action recognition 5/0
+    #   * audio-visual 6/0
+    # `clip-level` — the phrase all three literally use — was probed and
+    # REJECTED at 7/1: it strips 656, a kept item on clip-level uncertainty for
+    # active learning. That re-confirms the note above; the generic-video sense
+    # of `clip` is still not directly coverable.
+    # 2026-08-06: one corner of it finally is. 8393 (EgoCross, an egocentric
+    # video-QA challenge report) reached this track on `clip` from "egocentric
+    # video clip". The explicit two-word `video clip` is 3 in-track / 2 Ignore /
+    # 0 kept — narrow, but unlike `clip-level` it never fires on the model name
+    # or on a kept item. This does not close the class; abstracts that say only
+    # "clips" or "short-clip" (8434, CLIP-CC-Bench) stay uncovered.
     negative_keywords:
       - image generation
       - video generation
+      - bitrate
+      - action recognition
+      - audio-visual
+      - video clip
 
   - id: open-source-cv-tooling
     name: Open-Source CV Tooling
     quadrant: tooling
+    # `github` is retained despite being a weak signal (40/118 Ignore, 1 promo in
+    # the 2026-07-08 backfill): dropping it pushed the legitimate MMVIAD industrial
+    # anomaly-detection anchor below the Watch threshold (see
+    # test_industrial_inspection_dataset_still_matches_track). A repo link is also
+    # rewarded in score_implementation, so it is a mild double-count we tolerate to
+    # avoid that false negative.
     positive_keywords:
       - opencv
       - open-source

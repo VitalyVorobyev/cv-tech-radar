@@ -379,6 +379,9 @@ export interface TopicsConfig {
 
 export interface NegativeTopicsConfig {
   negative_topics: string[];
+  // Guard phrases that suppress a negative topic. Not editable here, but must be
+  // echoed back on save: the config writer drops keys absent from the payload.
+  exemptions?: Record<string, string[]>;
 }
 
 export interface ScoreWeights {
