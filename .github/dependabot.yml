@@ -1,16 +1,32 @@
 version: 2
+
+# Grouping keeps the weekly PR count in single digits. Without it each of the
+# three ecosystems can open its own limit's worth of individual PRs, and the
+# Python ones all collide on pyproject.toml + uv.lock, so they have to be
+# rebased one after another.
 updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      actions:
+        patterns:
+          - "*"
 
   - package-ecosystem: uv
     directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      python-minor:
+        update-types:
+          - minor
+          - patch
+      # Majors stay individual: they are the ones that need a real read of the
+      # changelog before merging.
 
   # Frontend JS deps (bun.lock uses the npm registry / npm ecosystem).
   - package-ecosystem: npm
@@ -18,3 +34,42 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      typescript-eslint:
+        patterns:
+          - "@typescript-eslint/*"
+      vite:
+        patterns:
+          - "vite"
+          - "vitest"
+          - "@vitejs/*"
+      testing-library:
+        patterns:
+          - "@testing-library/*"
+      fontsource:
+        patterns:
+          - "@fontsource-variable/*"
+      tailwind:
+        patterns:
+          - "tailwindcss"
+          - "@tailwindcss/*"
+      frontend-minor:
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # TypeScript 7.0 (the Go port) ships no programmatic compiler API until
+      # 7.1, so typescript-eslint cannot load it and `bun run lint` breaks.
+      # Microsoft's workaround is a side-by-side @typescript/typescript6 alias,
+      # which is not worth the complexity here. Drop this ignore once
+      # typescript-eslint announces TS 7 support.
+      # Refs: typescript-eslint/typescript-eslint#12518
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
