@@ -16,6 +16,22 @@ tracks:
       - extrinsic parameter
       - geometric calibration
       - photometric calibration
+      # Added 2026-08-18. Item 9634 (Beyond Control Points: Arcsecond
+      # Relative-Motion Estimation of Vision Measurement Platforms, Evaluate)
+      # ranked only 18 in the 08-14 queue. It is photogrammetric metrology —
+      # long-range deformation monitoring, control fields, error propagation
+      # through absolute-pose differencing — and it routed on `absolute pose`,
+      # `rgb-d` and `stereo` alone because the calibration track has no word for
+      # the reference-geometry side of calibration.
+      # Keep rate over 1981 curated items, against a 20.3% base rate:
+      #   control points 50% (4 hits).
+      # 2.5x the base rate, and both kept hits are exactly this class (9634 and
+      # 8382, Differential 6-DOF Pose Estimation with First-Order Immunity to
+      # Camera perturbation). Low volume by design — the phrase is specific.
+      # Rejected: `deformation` (27% over 30 hits, barely above base and mostly
+      # non-rigid mesh work), `measurement accuracy` and `dimensional
+      # measurement` (1 and 0 hits).
+      - control points
       - lens distortion
       - radial distortion
       - tangential distortion
@@ -86,6 +102,78 @@ tracks:
       - pose estimation
       - epipolar
       - triangulation
+      # Added 2026-08-07. Coverage hole found while removing `github` as a
+      # topic proxy: genuine matching/stereo papers (4658 Lite Any Stereo V2,
+      # 4674 REDI-Match, 2772 SFMambaNet) were reaching the queue only on
+      # incidental signals because the track had no word for correspondence.
+      # Keep rate over 1702 curated items, against an 18.8% base rate:
+      #   stereo matching 73% (11), dense matching 67% (6), image matching
+      #   67% (6), photogrammetry 67% (6), disparity 53% (15), surface
+      #   reconstruction 50% (14), optical flow 48% (21), correspondence
+      #   44% (50), feature matching 38% (16), point cloud registration
+      #   100% (3).
+      # Rejected as uninformative: `descriptor` (19%, dead on the base rate),
+      # `keypoint` (26%), `local feature` (25%).
+      - stereo matching
+      - disparity
+      - surface reconstruction
+      - photogrammetry
+      # Added 2026-08-18 as the morphological sibling of `photogrammetry`
+      # above: the matcher is whole-word, so `\bphotogrammetry\b` never fires
+      # on "photogrammetric bundle adjustment" or "photogrammetric network".
+      # 4 hits, 75% kept against a 20.3% base rate, all of them survey-grade
+      # measurement work. Same class of miss as radiology / radiological in
+      # negative_topics.yaml.
+      - photogrammetric
+      - correspondence
+      - dense matching
+      - image matching
+      - feature matching
+      - point cloud registration
+      - optical flow
+      # Added 2026-08-14. Item 9266 (Fast Iterative Five point Relative Pose
+      # Estimation, Prototype) ranked only 14 in its queue: the track had no
+      # word for relative-pose / robust-estimation geometry, so a paper whose
+      # whole subject is the five-point problem inside RANSAC was routing on
+      # `ground truth` and `pose estimation` alone. `structure from motion`
+      # also missed it — the abstract says "Structure and Motion".
+      # Keep rate over 1986 curated items, against a 21.1% base rate:
+      #   robust estimation 100% (5), structure and motion 100% (2), 6dof
+      #   100% (3), absolute pose 100% (4), ransac 78% (9), pnp 78% (9),
+      #   camera pose 61% (31), relative pose 62% (13), 6-dof 54% (24).
+      # These add almost no NEW items (the incremental-coverage check is 0-7
+      # each) — that is the point. They are re-ranking vocabulary: geometry
+      # papers that already matched the track on one generic word now match on
+      # their actual subject, so they stop tying with format-track noise.
+      # Both `6-dof` and `6dof` are listed because the matcher splits on
+      # `[\s-]+`: `6-dof` compiles to `6[\s-]+dof` and does not match "6dof".
+      # `perspective-n-point` was dropped in favour of bare `pnp` to avoid
+      # double-scoring abstracts that spell out the term and then abbreviate.
+      # Rejected as uninformative: `rectification` (22%, 8 incremental items
+      # but only 1 kept), `visual odometry` on this track (29%),
+      # `vanishing point` (1 hit, 0 kept), `essential matrix` (2 hits).
+      # A/B over 60 dates: zero kept items dropped out of any queue; 9266 goes
+      # rank 14 -> 1, 2900 (absolute pose, event cameras) 10 -> 3, 5086
+      # (SemCityLoc 6DoF) 13 -> 5, 6953 (CSS-BA bundle adjustment) 18 -> 11.
+      - relative pose
+      - camera pose
+      - ransac
+      - pnp
+      - absolute pose
+      - robust estimation
+      - structure and motion
+      - 6-dof
+      - 6dof
+    # `multi-view clustering` added 2026-08-18 as a false-context guard.
+    # `multi-view` is a genuine geometry keyword here, but multi-view
+    # clustering is a representation-learning topic that shares nothing with
+    # it except the words — 9449 (Variational Incomplete Multi-View Clustering)
+    # reached rank 8 of the 08-16 queue on `multi-view` alone, with no other
+    # keyword and no penalty. The phrase hits 1 item over 1981 curated items
+    # and zero kept items, so the guard cannot cost a real multi-view geometry
+    # paper. Chosen as a track guard rather than a negative topic because the
+    # wrong sense is track-local: -12 on the track score is worth ~3x the
+    # -25 global penalty after the 0.55 relevance weight.
     # Bare `reconstruction` is this track's broadest positive and the single
     # largest false-context source in the 2026-07-30 queue: FIVE of its 25
     # candidates matched here on the wrong sense of the word — 7779 ("video
@@ -166,6 +254,7 @@ tracks:
       - electron tomography
       - nanomaterial
       - nanomaterials
+      - multi-view clustering
 
   - id: 3d-sensors
     name: 3D Sensors
@@ -179,6 +268,22 @@ tracks:
       - rgb-d
       - 3d sensor
       - event camera
+      # Added 2026-08-12. Coverage hole exposed while A/B-ing the removal of
+      # `benchmark`: two of the four kept items that removal dropped were
+      # event-sensor papers (564 M2E-UAV, 7488 Neuromorphic Object Detection)
+      # that were riding the format track because this one had no word for
+      # them. `event camera` matches only that exact phrase, so the whole
+      # "event-based <task>" literature was invisible here.
+      # Keep rate over 1827 curated items, against a 19.4% base rate:
+      #   event-based 60.0% (30 hits, 18 kept), neuromorphic 55.6% (9, 5).
+      # That is 3x the base rate — the strongest sensor vocabulary available.
+      # Rejected: `event stream` (5 hits, 20% keep) and `dynamic range` — the
+      # latter looks strong (18 uncovered items, 9 kept) but every one of them
+      # is an event-camera paper using "high dynamic range" as boilerplate, so
+      # putting it on Sensors would double-count this same class across two
+      # tracks via the strongest + 0.6*rest relevance formula.
+      - event-based
+      - neuromorphic
     # `rgb-d` is a real depth-sensor term that RGB-D salient object detection
     # reuses verbatim — 7929 (SaliLLM) matched this track on it while being a
     # saliency benchmark for MLLMs. `salient object detection` is already a
@@ -198,6 +303,19 @@ tracks:
       - slam
       - navigation
       - manipulation
+      # Added 2026-08-07: 63% kept over 8 curated items (base rate 18.8%).
+      # Item 3474 (SG2Loc) was routing on the bare word `robotics` alone.
+      - visual localization
+    # Added 2026-08-11. `navigation` is the weakest keyword on this track: 91
+    # matches, and when it is the SOLE keyword carrying the track the keep rate
+    # is 12.1% against a 19.3% base rate. The dominant wrong sense is
+    # vision-and-language navigation, which has its own vocabulary and so can be
+    # guarded per-track rather than penalised globally (a track guard is -12 on
+    # the track score, worth ~3x a negative topic). Both phrasings hit zero kept
+    # items over 1802 curated items, so no exemption is needed. Scoped
+    # replacements for `navigation` itself were measured and rejected as too
+    # thin to carry the track: `robot navigation` 4 hits, `visual navigation` 1,
+    # `navigation system` 0.
     # `manipulation` means image manipulation as often as robot manipulation —
     # 2026-07-21 candidate 7 (6632, ExpertVerse, a knowledge-intensive *image
     # generation* benchmark) matched this track on "semantic manipulation" alone.
@@ -236,6 +354,8 @@ tracks:
       # Robot Guidance — 8419 (OmniRouting) matched both tracks. See the note
       # there for why `pcb` itself is not usable as a guard. 1 Ignore / 0 kept.
       - electronic design automation
+      - vision-language navigation
+      - vision-and-language navigation
 
   - id: robot-guidance
     name: Robot Guidance
@@ -285,11 +405,56 @@ tracks:
       - industrial inspection
       - visual inspection
       - defect detection
+      # Added 2026-08-12. The bare morphological forms are the radar's single
+      # strongest vocabulary and none of them were listed — whole-word matching
+      # meant `defect detection` missed "defect segmentation", "defect
+      # evidence" and "surface defects", and the two two-word `* inspection`
+      # phrases missed "Semiconductor Inspection" and "Real-to-Twin Inspection".
+      # Keep rate over 1827 curated items, against a 19.4% base rate:
+      #   defect 82.1% (28 hits), defects 77.3% (22), inspection 57.8% (45),
+      #   manufacturing 69.2% (13).
+      # `defect` at 4.2x the base rate is the highest-signal keyword measured
+      # anywhere in this config.
+      # Kept ADDITIVE on purpose. Consolidating — dropping `industrial
+      # inspection` / `visual inspection` / `defect detection` in favour of the
+      # bare forms they subsume — was A/B'd and REJECTED: it demoted item 2042
+      # (Industrial Inspection DINOv3, Evaluate) from rank 3 to 10 and dropped
+      # 4622. Unlike the `open source` / `open-source` duplicate this is not
+      # double-scoring for free: the long forms are strictly more on-domain
+      # than the bare ones, and the extra weight encodes that.
+      # Rejected as already covered (zero incremental items over the whole
+      # corpus): `textureless`, `surface normal`, `mot`, `orin`.
+      - inspection
+      - defect
+      - defects
+      - manufacturing
       - anomaly detection
       - surface inspection
       - quality control
       - metrology
       - machine vision
+      # Added 2026-08-18. Coverage hole exposed by item 9453 (YOLO26-RD,
+      # Evaluate) landing at rank 23 of the 08-16 queue on the single word
+      # `dataset`: it carries two modules built for exactly this track — a
+      # 494-parameter differentiable CLAHE that adapts contrast per tile inside
+      # the network, and a Sobel-gated space-to-depth downsample — but its
+      # subject words are "damage" and "pavement distress", and the track had
+      # no word for damage or cracking at all.
+      # Keep rate over 1981 curated items, against a 20.3% base rate:
+      #   crack 86% (7 hits), damage detection 100% (2), non-destructive 67% (3).
+      # `crack` at 4.2x the base rate matches `defect`: its hits are structural
+      # crack segmentation, steel fatigue micrographs and infrastructure
+      # inspection, with one miss.
+      # Rejected: `scratch` (22%, dead on the base rate — dominated by "trained
+      # from scratch"), `pavement` (33%, 3 hits), `clahe` (25%),
+      # `illumination` (26% over 61 hits — high volume, no signal),
+      # `distress` (1 hit), `wear` (2 hits, 0 kept), `corrosion`/`weld` (0 hits
+      # — kept out until the vocabulary actually appears).
+      # `surface defect` (100%, 4) was dropped as pure redundancy: bare
+      # `defect` already covers every one of its hits.
+      - crack
+      - damage detection
+      - non-destructive
     # `anomaly detection` is one of this track's strongest positives (28 kept
     # items across the corpus) and is also the phrase medical papers use for
     # exactly the same task. Added 2026-07-30 after 7621 (Group Equivariant
@@ -358,6 +523,39 @@ tracks:
       #     relevant and the track match is earned.
       - ultrasound
       - surveillance footage
+      # Added 2026-08-24. Two false-context senses reach this track through its
+      # own strongest keywords, and a per-track guard is worth ~3x a negative
+      # topic (-12 on the track score vs ~-3.8 on the final score).
+      #
+      # `ai-generated image`: 9849 (AGIDefect-4K) hit rank 2 of the 08-21 queue
+      # because its "defects" are generative artifacts in synthesised images,
+      # firing `defect`, `defect detection` AND `defects` at once. 1 on-track
+      # hit, 0 kept.
+      #
+      # `clinical`: medical papers reach this track on the phrase "manual
+      # visual inspection" — 9974 (X-LMC, collateral scoring from digital
+      # subtraction angiography) reached rank 7 of the 08-19 queue that way,
+      # and the global `clinical` negative alone was not enough to sink it.
+      # 5 on-track hits, 0 kept.
+      #
+      # Rejected as guards on this track because they hit kept items:
+      # `video anomaly detection` (15 on-track hits, 5 kept — incl. 6730 O-VAD
+      # industrial video anomaly detection and 9143 frame-level AUC auditing)
+      # and `surveillance` (7, 2). Not added because they have zero on-track
+      # hits today and would be speculative: `forensic`, `forgery`, `deepfake`
+      # — the global negatives above already cover that class.
+      - ai-generated image
+      #
+      # `transcription` added 2026-08-28. 10420 (AraMS-28k, a historical Arabic
+      # manuscript dataset) reached rank 8 of the 08-27 queue matching this
+      # track on `quality control` in the editorial sense — the manuscript's
+      # transcriptions are what is being quality-controlled, not a part. The
+      # global `transcription` negative alone left it at rank ~13; the track
+      # guard is what evicts it, the usual ~3x (-12 on the track score vs -3.8
+      # on the final score). 1 on-track hit, 0 kept — the same standard
+      # `ai-generated image` was accepted on.
+      - transcription
+      - transcriptions
 
   - id: edge-ai-deployment
     name: Edge AI & Deployment
@@ -372,6 +570,34 @@ tracks:
       - openvino
       - embedded vision
       - real-time inference
+      # Added 2026-08-11 to close a coverage hole exposed while probing
+      # `deployment`. Item 7685 ("Lottery Tickets Are Not Deployment Tickets",
+      # Evaluate) reached this track on the single word `deployment` because its
+      # abstract says "sparsification, compression" and never "pruning"; 6162
+      # (ZipDepth, Watch) says "embedded and mobile platforms", which
+      # `embedded vision` does not match. Keep rate over 1802 curated items
+      # against a 19.3% base rate:
+      #   tinyml 100% (1), microcontroller 100% (2), jetson 75% (8),
+      #   sparsification 60% (5), on-device 56% (9), embedded 42% (26),
+      #   fps 33% (49).
+      # Rejected as uninformative: `inference time` 20% (49, dead on the base
+      # rate), `throughput` 13% (15), `low-power` 17% (6).
+      - embedded
+      - on-device
+      - jetson
+      - microcontroller
+      - tinyml
+      - sparsification
+      - fps
+      # `deployment` KEPT after measurement. It is boilerplate motivation
+      # language - 211 matches, 179 of them as the sole keyword carrying this
+      # track, at a 17.9% keep rate that is dead on the 19.3% base rate, i.e.
+      # zero information, exactly the profile that got `github` removed.
+      # Removing it was A/B'd anyway and REJECTED: 26 Ignore items pushed out,
+      # but it cost three genuine edge papers - 7685 rank 25 -> 38, 6162, and
+      # 4924. The additions above are the safe half of that change; revisit the
+      # removal once they have accumulated enough curated evidence to carry the
+      # track on their own.
     # `pruning` means network pruning here, but VLM/MLLM papers use the same word
     # for dropping *visual tokens* from a context window, and that class recurs
     # every batch (7504 Omni-Prune, 7517 WaveZip, 7523 OmniScope, 7527
@@ -400,6 +626,13 @@ tracks:
       # step" but most of this genre says "across denoising steps".
       - denoising steps
       - bit-serial
+      # `bit sparsification` restores this guard's original effect. It was
+      # calibrated when `quantization` was the track's only TASQ match (+18 vs
+      # -24); the 08-11..08-28 line added `sparsification` as a positive, which
+      # took the title to +36 and let the paper leak back onto the track.
+      # 1 hit over the 2342-item decided corpus, 0 kept — genuine edge work
+      # says "sparsification", not "bit sparsification" (a diffusion term).
+      - bit sparsification
 
   - id: vision-foundation-models
     name: Vision Foundation Models
@@ -418,6 +651,21 @@ tracks:
       - clip
       - visual language model
       - foundation model
+      # `multimodal` removed 2026-08-07. Over 1702 curated items it was the
+      # SOLE keyword carrying this track 322 times at a 6% keep rate — against
+      # an 18.8% base rate, i.e. 3x worse than chance. The word has drifted
+      # into generic LLM vocabulary and no longer marks a vision foundation
+      # model; `dinov2` / `sam` / `clip` / `foundation model` do the real work.
+    # `video clip` / `video clips` added 2026-08-14 as a false-context guard.
+    # `clip` is the model here, but whole-word matching cannot tell it from a
+    # video segment, and long-video papers use the segment sense constantly
+    # (9319 "video clip captioning", 9171 "per clip", 9267 "inter-clip").
+    # Both plural and singular are listed because `video clip` compiles to
+    # `video[\s-]+clip` and does not match "clips". Neither phrase appears in
+    # ANY of the 420 kept items, so the guard cannot cost a real foundation-
+    # model paper. Effect is small on its own (1 extra decided-Ignore item out
+    # over 60 dates) — `clip` scores 18.3% as the sole keyword carrying this
+    # track, only just under the 21.1% base rate — but it is free and correct.
     # `clip` means the CLIP model here, but it is also the ordinary English word
     # for a video segment, and codec/world-model papers use it constantly: 7792
     # ("any demonstrated clip") and 7814 ("reduces a source clip to a compact
@@ -452,6 +700,7 @@ tracks:
       - action recognition
       - audio-visual
       - video clip
+      - video clips
 
   - id: open-source-cv-tooling
     name: Open-Source CV Tooling
@@ -465,12 +714,32 @@ tracks:
     positive_keywords:
       - opencv
       - open-source
-      - open source
       - library
       - toolkit
       - sdk
       - computer vision toolkit
-      - github
+      # Duplicate `open source` removed 2026-08-11 — a correctness fix, not a
+      # tuning judgement. `keyword_matches` splits the keyword on `[\s-]+` and
+      # rejoins with `[\s-]+`, so `open source` and `open-source` compile to the
+      # SAME regex and both fired on every match: +36 instead of +18 for a title
+      # hit, +20 instead of +10 for a body hit. Every paper that merely promised
+      # open-source code got this track scored twice. Removing the duplicate
+      # loses zero matching coverage; `open-source` still matches "open source".
+      # Measured over 49 dates: 43 decided-Ignore items pushed out of the
+      # top-25 queues, zero kept items moved.
+      # Removing `open-source` ENTIRELY was measured and REJECTED: 60 Ignore out
+      # but it cost item 6506 (GEST-Engine, Watch) rank 12 -> 41. The word is
+      # weak (199 matches, 10.1% keep vs a 19.3% base rate) but not empty, and
+      # no replacement clears the base rate - `open-source framework` 12.5%,
+      # `api` 12.5%, `codebase` 0%, `reference implementation` 0 hits.
+      # `github` removed 2026-08-07. It was the SOLE keyword carrying this
+      # track 601 times out of 807 matches, at a 17% keep rate — dead on the
+      # 18.8% base rate, i.e. zero information. A repository URL in an abstract
+      # is a code-availability signal, and `score_implementation` already
+      # measures exactly that; using it as a topic keyword double-counted it
+      # into `relevance` (weight 0.55) on top of `implementation` (0.10).
+      # This track is meant to mean "an open-source CV tool", not "a paper
+      # that has a repo".
     negative_keywords: []
 
   - id: sensors-cameras-standards
@@ -509,8 +778,52 @@ tracks:
     positive_keywords:
       - dataset
       - benchmark
-      - evaluation protocol
       - leaderboard
       - test set
+      # `test set` re-probed 2026-08-28 and REJECTED for the second time, with
+      # a lesson about the A/B window attached. On the current corpus it is
+      # still the weakest keyword here (11.8% keep over 68 matches against a
+      # 23.1% base rate), and over a 27-day window removing it looked free:
+      # 12 items out (8 decided Ignore, 4 undecided and off-domain — glioma
+      # segmentation, radiologist gaze, image insertion, adversarial fusion),
+      # kept item 9946 (LF-GICP LiDAR odometry, Evaluate) pulled in, zero kept
+      # items dropped. Re-run over 06-01..08-27 it reproduces the original
+      # rejection exactly: 7192 (Watch) drops out of its queue, and 4924
+      # (Watch) 15 -> 23, 7928 (Prototype) 11 -> 21, 9143 (Evaluate) 10 -> 19,
+      # 9856 (Watch) 11 -> 18 all pay rank. A 27-day window is too short to
+      # clear a positive-keyword removal — use at least a quarter.
+      #
+      # Probed the same way and REJECTED because they drop kept items:
+      # `sam` (15.9%, n=69) evicts 8020 and 10549 — the latter is the 08-26
+      # zero-shot tower-component inspection paper decided Evaluate that same
+      # day — and `clip` (17.4%, n=121) evicts 9146. Below the base rate but
+      # not empty: unlike `test set` they name a specific tool the radar tracks.
       - ground truth
+      # `evaluation protocol` removed 2026-08-11: 40 matches at a 10.0% keep
+      # rate, 0.52x the 19.3% base rate. It is a methods-section phrase, not a
+      # subject-matter word. Measured over 49 dates: 7 decided-Ignore items
+      # pushed out, zero kept items moved.
+      # `test set` (52 matches, 5.8% keep, 0.30x base - the worst ratio in the
+      # config) was A/B'd and REJECTED for now: removing it cost 4924 and 7192,
+      # both Watch.
+      # `benchmark` (694 matches, 11.8% keep, 304 of them as the SOLE keyword
+      # carrying this track at an 11.5% keep rate) is the single largest lever
+      # left, and 2026-08-12 finally establishes WHY it must stay. Removing it
+      # is by far the biggest measurable win available - 174 decided-Ignore
+      # items pushed out over 49 dates, only 2 kept items dropped - but the 19
+      # kept items it demotes are, specifically, this radar's own
+      # industrial-inspection benchmark papers:
+      #   6806 Semiconductor Inspection low-false-call benchmark  14 -> 20
+      #   8826 LIBAD Li-ion electrode anomaly benchmark            7 -> 13
+      #   5879 ICME cross-scenario defect detection challenge      11 -> 18
+      #   1010 Multi-class battery detection                        7 -> 18
+      #   7172 DRGBT-1K tracking benchmark                          5 -> 20
+      # An on-domain paper that publishes a benchmark is exactly what this
+      # radar wants to rank highly, and `benchmark` is what lifts it. REJECTED
+      # for the third time; treat this as settled unless the track is redesigned.
+      # Both are symptoms of the standing design question - this track
+      # classifies paper FORMAT, not subject - which a keyword edit cannot fix.
+      # The productive direction is the opposite one: add subject vocabulary
+      # (see the 2026-08-12 additions to Industrial Vision Inspection and 3D
+      # Sensors) so on-domain papers stop depending on the format track at all.
     negative_keywords: []
