@@ -39,7 +39,25 @@ negative_topics:
   # tracking, OSS tooling); medical imaging is an unrelated domain and these
   # phrases are medical-specific enough not to collide with any radar track.
   - medical imaging
-  - computed tomography
+  # `computed tomography` was REMOVED 2026-08-18. Re-probed against 1981
+  # curated items it scored 14 hits at a 21% keep rate — dead on the 20.3%
+  # base rate, i.e. no signal — and all three kept hits are the radar's own
+  # non-destructive inspection work: 1348 (Defect Detection in X-ray
+  # Tomography of Aerospace Composites), 7081 (XCT-SAM, industrial CT domain
+  # adaptation), 9260 (Metal Artifact Reduction in Cone-Beam CT). Industrial
+  # XCT is a core inspection modality, so the phrase was actively demoting the
+  # domain it was supposed to protect. Removing it leaves only 2 decided-Ignore
+  # items with no penalty at all; the scoped medical forms below recover the
+  # rest. `cone-beam ct` was rejected as a replacement — it hits 9260.
+  - chest ct
+  - pet/ct
+  - low-dose ct
+  - liver
+  # `clinically` added 2026-08-18: `clinical` has been listed since May and the
+  # matcher is whole-word, so "Clinically-Constrained" never fired. 29 hits,
+  # 0 kept. Third instance of this morphological miss in one round, after
+  # radiology/radiological and photogrammetry/photogrammetric.
+  - clinically
   - histopathology
   - surgical
   - clinical
@@ -55,3 +73,539 @@ negative_topics:
   - image restoration
   - low-light image enhancement
   - text-to-image
+  # Video-QA / spatial-reasoning / embodied-agent noise — the 2026-08-06 queue
+  # had 6 of 18 Ignore items in this family (ChronoVision, GST-Bench,
+  # StreamArena, TAU-Bench and friends) and 14 of 18 Ignore items carried no
+  # penalty at all. Each phrase below was probed against the whole decided
+  # corpus (1702 items, 320 kept) and hits ZERO kept items:
+  #   question answering 40, spatial reasoning 27, embodied agents 15,
+  #   video reasoning 7.
+  # Deliberately NOT added, all probed and rejected because they hit kept items:
+  #   `video understanding` (MMVIAD, 3 kept), `world model` (BWM simulator,
+  #   3 kept), `embodied intelligence` (EmbodiedGen V2, GAUGE, 3 kept),
+  #   `temporal reasoning` (multi-object-tracking active learning, 1 kept).
+  - question answering
+  - spatial reasoning
+  - embodied agents
+  - video reasoning
+  # Document / handwriting AI — 2026-08-06 item 8503 (DTRNet, handwritten
+  # Chinese text recognition) scored zero penalty. Both morphological forms are
+  # listed because the matcher is whole-word: `handwriting` does not match
+  # "handwritten". `text recognition` was rejected — it hits a kept industrial
+  # visual-inspection paper.
+  - handwritten
+  - handwriting
+  # Human-centric leftovers — sign-language recognition and crowd counting each
+  # recur as their own small class (8459, 8461 on 2026-08-06); `activity
+  # recognition` covers the RF/wireless human-activity papers (8540).
+  - sign language
+  - activity recognition
+  - crowd counting
+  # Dental imaging — a medical sub-case the existing `clinical` / `medical
+  # imaging` phrases miss (8456 still ranked 15). `tooth` is deliberately NOT
+  # used: gear-tooth flank inspection is the radar's own domain.
+  - dental
+  # Medical modality/anatomy tail — added 2026-08-11. Medical stayed the #1
+  # Ignore class over the 08-07..08-10 queues (7 of the 48 unpenalised Ignore
+  # items) and again leaked one modality at a time past the existing phrases:
+  # ultrasound (8803), brain MRI (8790), cortical atrophy (8889), CT lung
+  # nodules (8839), cross-modality translation (8807), single-cell/omics (8787,
+  # 8880). Each phrase below hits ZERO kept items over 1802 curated items:
+  #   ultrasound 16, lesion 15, tumor 11, radiology 9, single-cell 5,
+  #   neurodegenerative 4, gene expression 2, multi-organ 2, nodule 2.
+  # Measured over 49 dates: 11 decided-Ignore items pushed out, zero kept moved.
+  # This finally SETTLES the standing question of consolidating to a bare
+  # `medical`: probed and REJECTED — 74 hits but 6 of them kept, including 3587
+  # (Comparing Commercial Depth Sensor Accuracy for Medical Applications,
+  # Evaluate) and two zero-shot anomaly-detection items. Keep enumerating the
+  # tail; the bare word touches the radar's own sensor and inspection work.
+  # `cortical` was dropped as too thin (1 hit); `neurodegenerative` covers 8889.
+  - ultrasound
+  - lesion
+  - tumor
+  - radiology
+  - single-cell
+  - neurodegenerative
+  - gene expression
+  - multi-organ
+  - nodule
+  # Tail phrases from the 2026-08-11 queue — added 2026-08-12. This is the
+  # small half of the round; negatives are near their ceiling and the batch was
+  # measured at only 2 decided-Ignore items pushed out on its own. It is kept
+  # because it is free: every phrase hits ZERO kept items over 1827 curated
+  # items, and each one covers a class that turned up again in this queue.
+  #   driving scene 6 (8983), surround-view 4 (9042), frame interpolation 4
+  #   (9070), music 5 (8999), human-object interaction 5, camouflaged object 1.
+  # `driving scene` and `surround-view` are the scoped forms: bare `driving` was
+  # probed and REJECTED (97 hits, 11 kept — it hits SfM, SLAM and the
+  # LiDAR-camera extrinsic calibration work). `scene graph` was probed and
+  # REJECTED for 9012 (16 hits, 6 kept, including Hydra++ and G-MASt3R-SfM).
+  - driving scene
+  - surround-view
+  - frame interpolation
+  - music
+  - human-object interaction
+  - camouflaged object
+  # Tail phrases from the 2026-08-12 and 2026-08-13 queues — added 2026-08-14.
+  # 33 of the 50 items across those two queues were Ignore and 21 of them
+  # carried no penalty at all. Each phrase below hits ZERO kept items over the
+  # 1986 curated items and covers a class that showed up in this pair of
+  # queues; contexts were grepped by hand for figurative usage before adding.
+  # Media forensics (9273): forgery 6, deepfake 12.
+  # Long-video / story understanding (9253, 9104, 9319): narrative 15,
+  #   long-form video 9, cinematic 7, audio description 2.
+  # Generative content tail, the class that keeps leaking past `image
+  #   generation` (9248, 9224, 9171): head avatar 4, try-on 4, 3d content 5,
+  #   talking head 1, human animation 1, texture generation 1.
+  # Human-centric tail (9275, 9221): prosthetic 3, whole-body 9 — the latter
+  #   also catches whole-body PET/CT, which is a medical sub-case.
+  # One-off domains seen this round: image compression 5 (9113), volumetric
+  #   video 2 (9181), business 4 (9187), plant species 1 + plant disease 2
+  #   (9154), visible image fusion 4 (9276), class activation 1 +
+  #   explainable artificial intelligence 3 (9106), sea ice 1 (9151),
+  #   driving world 2 (9189).
+  # Probed and REJECTED, all because they hit kept items: `image fusion`
+  # (8840 irpol-fuse), `humanoid` (3 kept), `egocentric` (8 kept, incl. 826
+  # and 803), `hand pose` (826, 803), `hand-object` (9280), `teleoperation`
+  # (6332, 7588), `explainable` (8762 RobustDefect-LLM), `cultural` (8004,
+  # 9245), `avatar` (2153), `species` (7749), `snapshot compressive` (1020).
+  # `motion tracking` was clean (4 hits) but dropped anyway: too thin to be
+  # worth blunting a phrase an industrial tracking paper could legitimately use.
+  # Measured over 60 dates together with the topics.yaml changes of the same
+  # date: 25 decided-Ignore items pushed out of the top-25 queues, and zero
+  # kept items dropped out of any queue.
+  - forgery
+  - deepfake
+  - narrative
+  - long-form video
+  - cinematic
+  - audio description
+  - head avatar
+  - try-on
+  - 3d content
+  - talking head
+  - human animation
+  - texture generation
+  - prosthetic
+  - whole-body
+  - image compression
+  - volumetric video
+  - business
+  - plant species
+  - plant disease
+  - visible image fusion
+  - class activation
+  - explainable artificial intelligence
+  - sea ice
+  - driving world
+  # Medical modality/anatomy tail, round 3 — added 2026-08-18 after the
+  # 08-13..08-17 backfill window. Medical is still the #1 Ignore class and it
+  # took rank 1 of the 08-17 queue with ZERO penalty: item 9348 (Unsupervised
+  # Anomaly Detection for Image Dataset Quality Assurance in Multi-Center
+  # Breast MRI, final 39.94) says "medical AI", "radiological" and "breast MRI"
+  # and matches none of the phrases we carry. `radiology` was already listed
+  # and missed it — whole-word matching again, exactly like handwriting /
+  # handwritten. Keep rate over 1981 curated items (20.3% base rate); every
+  # phrase below hits ZERO kept items:
+  #   mri 31, patient 35, medical image 25, anatomy 24, cancer 19,
+  #   pathology 19, physiological 9, radiological 5, echocardiography 5,
+  #   oncology 4, dermatology 4.
+  # Incremental over the existing negative list: 55 currently-unpenalised
+  # decided-Ignore items gain a penalty, zero kept items move.
+  # `medical image` is listed even though `medical imaging` is already here:
+  # the two compile to disjoint regexes (\bimage\b does not match "imaging"),
+  # and the singular form is the clean one — `medical imaging` itself hits 2
+  # kept items. `radiological` is kept despite 0 incremental coverage purely as
+  # the morphological guard next to `radiology`.
+  # Probed and REJECTED because they hit kept items:
+  #   `x-ray` (12 hits, 6 kept — X-ray tomography of aerospace defects, XCT-SAM
+  #   industrial adaptation, hazelnut X-ray grading: this is the radar's own
+  #   non-destructive inspection domain, the sharpest instance yet of the
+  #   broad-negative-hits-industrial trap), `diagnostic` (77, 6 kept),
+  #   `surgery` (10, 2), `microscopy` (14, 2), `retinal` (10, 2 — "Programmable
+  #   Silicon Retina on Pixel Processor Array"), `anatomical` (47, 2),
+  #   `endoscopic`/`colonoscopy` (EndoMD-SLAM), `biomedical` (TransBiolab
+  #   transparent labware), `disease` (HERCULES multi-robot SLAM).
+  # Dropped as pure redundancy (0 incremental over the phrases above):
+  #   `prostate`, `mammography`, `carcinoma`, `breast cancer`. Bare `breast` was
+  #   deliberately NOT taken even though it is 0-kept: its non-medical sense is
+  #   "woody breast poultry fillets", i.e. food-quality inspection.
+  - mri
+  - patient
+  - medical image
+  - anatomy
+  - cancer
+  - pathology
+  - physiological
+  - radiological
+  - echocardiography
+  - oncology
+  - dermatology
+  # Biometrics, presentation-attack sub-case — added 2026-08-18. The existing
+  # biometrics phrases enumerate modalities (iris, vein, gait, ...) and keep
+  # missing the attack-detection framing: 9573 (GBU-Palm palm PAD) and 9365
+  # (ID-card PAD) both landed in the 08-14/08-17 top ten unpenalised.
+  # `presentation attack` is the modality-independent phrase: 5 hits, 0 kept,
+  # 5 incremental. Bare `spoofing` was not needed — every hit already carries
+  # `face recognition` or a listed modality.
+  - presentation attack
+  # Round 2 of 2026-08-18, mined by hand from the 08-16 and 08-17 top-25 queues
+  # after the medical/biometrics round above was already in place. The pattern
+  # those two queues show is no longer medical: it is that a decided-Ignore item
+  # reaches the top ten carrying ZERO penalty on nothing but the format tracks
+  # (`dataset` / `benchmark` / `simulator`). 9439 (appliance manipulation) took
+  # rank 2 and 9435 (visual dexterity in simulation) rank 4 on 08-16 that way.
+  # `benchmark` itself is settled as un-removable — see the Datasets &
+  # Benchmarks comment in topics.yaml — so the lever left is to name the SUBJECT
+  # of each class. Keep rate measured over 1981 curated items (20.3% base rate,
+  # 792 currently-unpenalised decided-Ignore items); every phrase below hits
+  # ZERO kept items, and contexts were grepped by hand for figurative usage.
+  #
+  # Agentic / computer-use / LLM-reasoning vocabulary — the class that produced
+  # 9434 (UI-Mate GUI agents) and 9439. All ten `gui` hits are GUI-agent papers;
+  # `chain-of-thought` is the single largest clean phrase found this round.
+  #   chain-of-thought 22 hits / 8 incremental, gui 10/9, computer-use 5/3,
+  #   reward model 5/2, task planning 2/1, appliance 1/1, web agent 1/1.
+  - gui
+  - computer-use
+  - chain-of-thought
+  - reward model
+  - web agent
+  - task planning
+  - appliance
+  # Human-motion generation / action recognition. `activity recognition` has
+  # been listed since 08-06 and never fired on any of these: the literature
+  # says "action recognition", which is a different phrase to a whole-word
+  # matcher. Same morphological miss as radiology/radiological.
+  #   human motion 16/11, action recognition 15/6, motion generation 8/6,
+  #   human mesh 4/3.
+  - human motion
+  - human mesh
+  - motion generation
+  - action recognition
+  # Affective computing / audio-visual / remote physiology. `physiological` is
+  # already listed and missed every rPPG paper — they say "heart rate".
+  #   audio-visual 17/11, emotion 10/6, facial expression 6/5, heart rate 5/2.
+  - audio-visual
+  - emotion
+  - facial expression
+  - heart rate
+  # Media, captioning and e-commerce content generation — the tail that keeps
+  # leaking past `image editing` / `image generation` (9390 GRNEdit, 9395
+  # PosterText, 9397 TransAnyText).
+  #   video editing 13/2, video captioning 7/3, e-commerce 5/3,
+  #   3d scene generation 4/3, image captioning 4/1, sentiment 3/1,
+  #   content moderation 2/1, hateful 1/1.
+  - e-commerce
+  - video editing
+  - video captioning
+  - image captioning
+  - 3d scene generation
+  - hateful
+  - content moderation
+  - sentiment
+  # Geospatial and plant-phenotyping tail. `remote sensing` is listed but misses
+  # the land-use literature and the satellite papers that never say it.
+  #   land cover 11/4, phenotyping 7/5.
+  - land cover
+  - phenotyping
+  # Biometrics tail — the modality-by-modality leak continues past
+  # `face recognition` / `presentation attack`.
+  #   iris recognition 2/2, gaze estimation 1/1, gaze prediction 1/1.
+  - iris recognition
+  - gaze estimation
+  - gaze prediction
+  #
+  # Probed and REJECTED this round because they hit kept items:
+  #   `satellite` (39 hits, 1 kept — 6669 NGPS aerial geo-localization; the
+  #   scoped `satellite imagery`, `satellite image` and `geo-localization` all
+  #   hit the same item, so the whole family stays out and `land cover` is what
+  #   is taken instead), `long-horizon` (43, 5 — streaming 3D reconstruction
+  #   and SLAM use it constantly), `knowledge distillation` (22, 5 — the
+  #   lightweight-model work this radar wants), `visual grounding` (19, 1),
+  #   `dexterous` and `dexterous manipulation` (18/13, 1 — 2858 event-based
+  #   tactile force sensing), `human pose` (12, 1), `hallucination` (13, 1 —
+  #   6386 GHOST hallucinates surface texture), `scene generation` unscoped
+  #   (11, 1), `motion capture` (10, 1 — 8635 active-LED-marker pose solver),
+  #   `pedestrian` (10, 1), `gaze` unscoped (10, 1), `food` (10, 1),
+  #   `instruction following` (15, 1), `recommendation` (7, 1),
+  #   `text-to-video` (6, 1), `federated learning` (5, 1 — 6235 FedTR
+  #   industrial visual inspection), `aerial imagery` (4, 1), `story` (3, 2).
+  # Rejected on the figurative-usage grep despite a clean kept count:
+  #   `fashion` (16 hits, 0 kept, but 4 of them are "in an end-to-end /
+  #   offline / autoregressive / multi-stage fashion" — the standard CV-abstract
+  #   idiom, and `fashion retrieval` already covers the real class),
+  #   `household` (9, 0 kept, but 2 are incidental: "50 household object
+  #   categories" is a category-level 6-DoF pose dataset, i.e. YCB-style
+  #   benchmarks this radar does care about; `appliance` is the scoped form
+  #   taken instead), `poster` (1 hit, and "accepted as a poster" is a
+  #   standing risk; `e-commerce` already covers the item).
+  # Dropped as too thin to be worth blunting the word: `speaker` (2
+  # incremental, and a loudspeaker is plausible sensor hardware), `ocean` (1).
+  # `visual question` (21 hits, 0 kept) and `video summarization` were dropped
+  # as pure redundancy — 0 incremental over `question answering`.
+  # Domain-noise tail found on the 2026-08-19 tuning round, mined by hand from
+  # the 157 zero-penalty Ignore items published since 08-01 (the 08-18 queue
+  # alone contributed 9694 moiré removal, 9716 benthic segmentation, 9726
+  # multi-modal salient object detection and 9678 agentic survey writing).
+  # Format below is `phrase hits/incremental` over the 2006 decided items,
+  # where incremental counts only items no existing negative already reaches.
+  # Every phrase here has zero kept hits.
+  #   marine 6/5, salient object 6/4, document retrieval 3/3, astronomy 3/2,
+  #   document understanding 6/2, astronomical 1/1, speech 9/1.
+  # `marine` is the wildlife/agronomy class reaching the water: FathomNet
+  # species detection, zooplankton segmentation, benthic ecology, sonar marine
+  # surveys. All 6 decided hits are Ignore. It is kept over the narrow forms
+  # (`marine species`, `marine ecology`, `marine survey` — one hit each) because
+  # splitting it into six single-hit phrases is brittle, but it is the one
+  # phrase in this block with a known on-domain collision: 8634 (TriView-YOLO,
+  # ground-penetrating-radar cavity detection) says "soft marine clay" as a soil
+  # descriptor and takes the penalty for it. That item is undecided and sat at
+  # rank 27 of 150 before the change and 45 after, so no queue moved — but this
+  # is exactly the NDT/geotechnical adjacency the radar cares about. Drop
+  # `marine` for the narrow forms if a marine-inspection item is ever kept.
+  # Ship-hull and underwater weld inspection would likewise be on-domain; no
+  # such item has ever been kept.
+  # `salient object` is taken over `saliency` (26 hits, 5 kept — saliency maps
+  # are a legitimate interpretability tool in kept work); the narrow form is
+  # exactly the SOD-benchmark literature. `salient objects` adds 0 incremental
+  # and is left out.
+  # `document understanding` / `document retrieval` close the scholarly-figure
+  # and document-AI class. Note this class was recorded as handled in an
+  # earlier round but neither phrase was ever actually in this file. `ocr`
+  # deliberately stays out — industrial character verification is on-domain.
+  # `speech` is nearly redundant with `audio-visual` / `music` above (1
+  # incremental) but is clean over 9 hits and deepens the penalty on the
+  # audio-multimodal tail rather than leaving it at a single match.
+  # `astronomy` + `astronomical` are listed as a pair for the same reason as
+  # radiology/radiological and photogrammetry/photogrammetric: the matcher is
+  # whole-word, so one form never fires on the other.
+  # Rejected on kept hits this round: `underwater` (11, 1 — 6161 Wat3R
+  # underwater 3D geometry), `species` (21, 1), `ecological` (8, 1),
+  # `ecosystem` (6, 1), `world model` (29, 5), `video understanding` (52, 4),
+  # `egocentric` (53, 7), `novel view synthesis` (51, 12 — the closed class),
+  # `surveillance` (30, 4), `sports` (18, 4), `text-to-video` (6, 1),
+  # `railway` (3, 1), `traversability` (4, 1).
+  # Rejected on the figurative-usage grep despite a clean kept count:
+  #   `sound` (5 hits, 0 kept, but "confirming the representation is sound" is
+  #   the standard idiom, and `audio-visual` already covers the real class).
+  # Dropped as too thin: `movie` (4, and `long-form video` / `cinematic` /
+  # `audio description` already reach that class), `skeleton-based` (4, of
+  # which 2 are false-context — a "skeleton-based recall loss" on road graphs
+  # and a privacy-taxonomy percentage — and `action recognition` covers 9590).
+  - marine
+  - salient object
+  - speech
+  - document understanding
+  - document retrieval
+  - astronomy
+  - astronomical
+  # AI-media forensics — the 2026-08-19..08-21 window's #1 zero-penalty Ignore
+  # class, and the one that produced the worst false-context match yet: 9849
+  # (AGIDefect-4K) reached rank 2 on 08-21 because its "defects" are generative
+  # artifacts in synthesised images, not manufacturing defects, so it rode
+  # `defect` / `defect detection` / `defects` straight onto the Industrial
+  # Vision Inspection track. 9817 (GAP-SAM manipulation localization, rank 8)
+  # and 9977 (Frozen DINO image-edit localization, rank 24) are the same class.
+  # `deepfake` has been listed since May and covers only the video half; the
+  # still-image forensics half was entirely unpenalised. Probed against 2190
+  # decided items (490 kept, 22.4% base rate), each phrase hits ZERO kept:
+  #   forensic 21, forensics 9, ai-generated image 9, forgery 6,
+  #   image manipulation 5, manipulation localization 5.
+  # `forensic` and `forensics` are listed as a pair for the whole-word reason
+  # (radiology/radiological, photogrammetry/photogrammetric, clinical/clinically).
+  # Both were context-grepped: all 25 distinct hits are media authenticity, none
+  # is industrial traceability or failure forensics.
+  - forensic
+  - forensics
+  # (`forgery` is not repeated here — it is already carried above and a duplicate entry silently adds +10 penalty)
+  - ai-generated image
+  - image manipulation
+  - manipulation localization
+  # VLM token-efficiency papers — visual-token pruning/compression for LLM
+  # inference cost, which is not edge CV deployment (9986 ClustRS, rank 18 on
+  # 08-19, matched `deployment` + `pruning`). The PLURAL is the clean form and
+  # this is a textbook [[broad-form-negative-trap]] pair: `visual token`
+  # (17 hits) hits kept 8733 "Visual Token Codec", and `token pruning`
+  # (17 hits) hits kept 8214 "Defect-Preserving Token Pruning" — the radar's
+  # own work. `visual tokens` is 20 hits, 0 kept.
+  - visual tokens
+  # Omni-modal LLM assistants (9774 OmniAssistBench, rank 9 on 08-21). 5 hits,
+  # 0 kept, all unambiguously Omni-LLM benchmark papers.
+  - omni-modal
+  # Rejected this round on kept hits: `inpainting` (22, 6 — incl. 9306, a
+  # generative approach to PV-module defect classification), `quality
+  # assessment` (26, 6 — incl. 9011 structured-light covariance and 9167
+  # hazelnut X-ray), `hand pose` (15, 2), `human pose` (15, 1),
+  # `generative model` (8, 2), `reinforcement learning` (70, 8),
+  # `basketball` (4, 1 — "basketball court" as a planar scene in 5372
+  # Planar-SfM), `grape` (2, 1), `underwater` (14, 1, re-confirmed).
+  # Rejected on the figurative-usage grep despite a clean kept count:
+  #   `manuscript` (9, 0 — but "upon acceptance of this manuscript" and "in
+  #   this manuscript we release two datasets" are the standard idiom),
+  #   `provenance` (7, 0 — the dataset-curation sense would hit an industrial
+  #   dataset paper), `no-reference` (5, 0 — "requiring no reference photos"
+  #   is a different sense), `inverse problems` (5, 0 — a legitimate term for
+  #   inverse rendering and deflectometry, and 3437 is electrical capacitance
+  #   tomography, which is industrial sensing).
+  # Too thin to spend: `cuneiform` (2), `vector graphics` (3), `image forgery`
+  # (2), `synthetic image detection` (2), `aigc` (2), `weed` (2), `vineyard` (1)
+  # — all subsumed by the broader phrases above or by existing negatives.
+  # -------------------------------------------------------------------------
+  # 2026-08-25 round. The 08-22..08-24 queues (75 candidates, 50 Ignore) had no
+  # single dominant new domain; the recurring zero-penalty residue was LLM
+  # vocabulary that has no CV content at all — multimodal-LLM evaluation,
+  # LLM-agent orchestration, captioning, and alignment/RLHF training papers.
+  # Probed against 2156 decided items (477 kept, 22.1% base rate). Every phrase
+  # below hits ZERO kept items and every distinct hit was context-grepped:
+  #   multimodal models 46, captioning 29, caption 28, multi-agent 23,
+  #   reward models 11, instruction tuning 14, reward model 6,
+  #   preference optimization 4, sonar 5.
+  - multimodal models
+  - multi-agent
+  - captioning
+  - caption
+  - instruction tuning
+  # (`reward model` is not repeated here — already carried above; `reward modeling` below is the legitimate second form)
+  - reward models
+  - preference optimization
+  # `sonar` closes the acoustic half of the marine class: `marine` and
+  # `underwater` leave side-scan / synthetic-aperture / forward-looking sonar
+  # papers unpenalised (10058, 10198 both landed in the 08-22..08-24 queues).
+  # Only 5 hits, but all five are unambiguously acoustic seabed imaging.
+  - sonar
+  # Rejected this round on kept hits: `underwater` (17, 1 — 6161 Wat3R, the
+  # THIRD time this phrase has been probed and rejected; stop re-probing it),
+  # `captions` (35, 1 — hits 8798 Ego-OSCAR, a Prototype item, and the A/B
+  # confirmed it drops that item from rank 2 to rank 4 on 08-08),
+  # `embodied` (85, 14), `egocentric` (57, 8), `anatomical` (49, 2),
+  # `facial` (39, 1), `vision-language-action` (34, 2), `world model` (31, 7),
+  # `world models` (31, 4), `knowledge distillation` (23, 4), `agent` (108, 3)
+  # and `agents` (91, 5) — the bare agent forms hit the radar's own
+  # industrial-anomaly-detection agents (576 AnomalyCLAW, 1832 IndusAgent), so
+  # `multi-agent` is the narrow form that survives — `disease` (38, 2),
+  # `hallucination` (14, 2), `cifar` (12, 1), `gaze` (11, 1),
+  # `light field` (4, 1), `street view` (5, 1), `quadruped` (5, 3).
+  # Rejected on wrong-sense risk despite a clean kept count: `multimodal model`
+  # (5, 0) — all five observed hits are the LMM sense, but "our multimodal
+  # model fuses depth and intensity" is a sentence an on-domain RGB-D fusion
+  # paper would plausibly write, and the plural carries 46 of the 51 hits.
+  # Too thin to spend: `place solution` (3), `place technical report` (1),
+  # `chemical structure` (1), `multistatic` (1), `geolocalization` (1),
+  # `document classification` (1).
+  # 2026-08-26 round — mined from the 08-25 queue (17 of 25 candidates were
+  # Ignore) plus an n-gram sweep of the 688 currently-unpenalised decided
+  # Ignore items. Probed against 2181 decided items (476 kept, 21.8% base
+  # rate); every phrase below hits ZERO kept items and every distinct hit was
+  # context-grepped in the full 10k-item corpus for figurative usage.
+  #
+  # Retrieval / RAG — retrieval and RAG papers ride `dataset` + `benchmark`
+  # into the queues with no penalty at all (10338 cross-modal hashing, 10333
+  # WeMM-Embedding on 08-25).
+  #   image retrieval 12, retrieval-augmented 12, cross-modal retrieval 4.
+  - image retrieval
+  - cross-modal retrieval
+  - retrieval-augmented
+  # `world modeling` — the GERUND is the separable form, and this is the
+  # cleanest [[broad-form-negative-trap]] instance yet found: `world model`
+  # (26 hits) and `world models` (30) have each been probed and rejected twice
+  # for hitting 7 and 4 kept items (BWM simulator, GAUGE physical-fidelity
+  # benchmark, ContactGuard). `world modeling` hits 12 Ignore and zero kept —
+  # all twelve are generative long-horizon video world models.
+  - world modeling
+  # `multimodal learning` — generic multimodal-fusion ML (system neuroscience,
+  # urban trajectories, vision-tabular modality-missingness). 9 hits, zero
+  # kept. `multi-modal learning` (1 hit) is a distinct regex under the
+  # whole-word matcher but too thin to carry.
+  - multimodal learning
+  # Human-centric leftovers — the class is long-running (see
+  # [[human-centric-noise-recurring]]); these are the phrasings the existing
+  # two-word `human <x>` negatives miss. Singular and plural are separate
+  # regexes under the whole-word matcher, so both `human video` and
+  # `human videos` are carried, same as radiology/radiological.
+  #   human videos 8, hand-object interaction 7, dynamic human 6, human video 4.
+  # `hand-object` (bare) was REJECTED again: it hits kept 9280 (RGB-D handover
+  # prediction) — the narrow form is what survives.
+  - human videos
+  - human video
+  - hand-object interaction
+  - dynamic human
+  # Astronomy — a small but real class that the existing `astronomy` /
+  # `astronomical` pair misses entirely, because sky-survey abstracts use the
+  # object vocabulary instead (10317 "Decoupling candidate dual AGN from
+  # chance superpositions in the GOTHIC survey" reached rank 23 on 08-25 with
+  # a ZERO penalty, and it matched the Industrial track on `inspection` /
+  # `visual inspection` in the astronomical sense — a [[false-context-track-
+  # matches]] case). `galaxy` was REJECTED for polysemy: it hits "Samsung
+  # Galaxy S21 Ultra" as the reference device of an INT8 depth-latency paper,
+  # which is exactly the kind of edge-deployment work the radar wants.
+  - galactic
+  - galaxies
+  # `authenticity` — the media-forensics class (see
+  # [[ai-media-forensics-noise-class]]); 46 corpus hits, all generated-media
+  # provenance, none industrial traceability. Carried partly to restore the
+  # strength the duplicated `forgery` entry was supplying by accident.
+  - authenticity
+  # `reward modeling` — the gerund companion to `reward model` above, added for
+  # the same reason: it is the legitimate second phrase for the RLHF /
+  # video-reward class, replacing the accidental duplicate.
+  - reward modeling
+  # Rejected this round despite a clean kept count, on wrong-sense risk against
+  # the radar's own domain — there is no exemption mechanism, so a phrase that
+  # can fire on an on-domain paper is not worth its Ignore hits:
+  #   `tampering` (3) and `forged` (17 corpus) — anti-counterfeit / tamper-
+  #   evident inspection and forged metal parts are both industrial-vision
+  #   subjects; `engagement` (5) — gear/tool engagement; `photometric`
+  #   (18, 17 kept — photometric stereo is a core radar topic).
+  # Rejected on kept hits: `hand-object` (10, 1), `text-to-video` (6, 1),
+  # `human preference` (7, 1), `recommendation` (7, 1).
+  # Too thin to spend: `hashing` (2), `cross-modal hashing` (1),
+  # `multimodal retrieval` (3), `image forensics` (3), `telescope` (1),
+  # `stellar` (2), `supermassive` (1), `dynamic humans` (1).
+  # A/B over the trailing 27 days against the live config, real classifier,
+  # top-25 queue rebuilt per day: 6 items pushed out of a queue (4 decided
+  # Ignore, 2 undecided and off-domain), and ZERO kept items dropped.
+  # Added 2026-08-28 from the 08-26 / 08-27 misfires. Each phrase was probed
+  # against the whole decided corpus (2342 items, 23.1% base keep rate) and
+  # kept only at zero kept-item hits.
+  #
+  # `transcription` (8 Ignore, 0 kept) — the document-AI / manuscript class,
+  # which the existing `handwritten` / `handwriting` / `document understanding`
+  # trio keeps missing: 10420 (AraMS-28k, historical Arabic manuscripts)
+  # reached rank 8 of the 08-27 queue with a ZERO penalty. Bare `manuscript`
+  # was REJECTED despite a clean 12/0: three of its twelve hits are the
+  # meta-usage ("in this manuscript we release ..."), so an on-domain paper
+  # using that phrasing would be penalised for its prose. `historical
+  # manuscripts` (3) and `manuscript recognition` (2) are clean but too thin,
+  # and `text recognition` is DIRTY (15/2 — it hits 6235 FedTR, industrial
+  # visual inspection).
+  #
+  # `aesthetic` (10, 0) — aesthetic-critique / generated-image quality
+  # assessment (10447 AesCanvas). The plural `aesthetics` is DIRTY: it hits
+  # kept 516 (BabelDOC, layout-preserving PDF translation), so only the
+  # singular is carried — the usual narrow-form-survives split.
+  #
+  # `dataset distillation` (5, 0) — method research with no industrial path
+  # (10544 DeCO). Deliberately NOT bare `distillation`: knowledge distillation
+  # to a small backbone is core Edge AI vocabulary.
+  #
+  # `leaf disease` (3, 0) and `plant health` (2, 0) — two holes in the agronomy
+  # class: `plant disease` / `plant species` / `phenotyping` all missed 10438
+  # (tea leaf disease, rank 2 on 08-27) and 10534 (CropCop plant-health, rank 6
+  # on 08-26), both at a ZERO penalty. `crop disease` was REJECTED: 1 Ignore
+  # against kept 4395 (HERCULES multi-robot SLAM, "crop" in the agricultural
+  # robotics sense).
+  #
+  # A/B over 2026-08-01..08-27 against the live config, real classifier, top-25
+  # rebuilt per day: 2 Ignore items pushed out and kept item 8980
+  # (AlbumentationsX, Evaluate) pulled IN at rank 25. Zero kept items dropped.
+  # Singular and plural are separate regexes under the whole-word matcher, so
+  # both forms are carried: 10420 fires the singular ("raw diacritised
+  # transcription") but its neighbours in the class only ever say
+  # "transcriptions" (4 Ignore, 0 kept).
+  - transcription
+  - transcriptions
+  - aesthetic
+  - dataset distillation
+  - leaf disease
+  - plant health
