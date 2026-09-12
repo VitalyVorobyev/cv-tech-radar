@@ -54,7 +54,10 @@ def collect_timeline(
             .where(
                 Item.first_decided_at.is_not(None),
                 Item.first_decided_at >= earliest_monday,
-                RadarDecision.previous_ring.is_(None),  # FIRST decision per item
+                # FIRST decision per item, and only one a human ratified —
+                # first_decided_at now tracks the first *confirmed* decision.
+                RadarDecision.previous_ring.is_(None),
+                RadarDecision.confirmed_at.is_not(None),
             )
         ).all()
     )

@@ -40,7 +40,6 @@ from radar.reports.ecosystem import (
     EcosystemBoardRow,
     collect_ecosystem_board_rows,
     collect_ecosystem_events,
-    seed_ring,
 )
 from radar.reports.timeline import collect_timeline
 from radar.schemas import AppConfig, RadarRing
@@ -149,20 +148,31 @@ def _serialize_item_detail(
             .order_by(RadarDecision.created_at.asc(), RadarDecision.id.asc())
         )
     )
+    # This bundle is the PUBLIC surface. Only confirmed decisions may appear —
+    # an unratified agent proposal must not leak into it in any form, so it is
+    # excluded from the history and never surfaced as a pending proposal here.
+    confirmed = [d for d in decisions if d.confirmed_at is not None]
     history: list[HistoryEntryOut] = []
     last_ring: str | None = None
-    for d in decisions:
+    for d in confirmed:
         if d.ring != last_ring:
-            history.append(HistoryEntryOut(ring=d.ring, at=d.created_at))
+            history.append(
+                HistoryEntryOut(
+                    ring=d.ring,
+                    at=d.created_at,
+                    origin=d.origin,
+                    confirmed_at=d.confirmed_at,
+                )
+            )
             last_ring = d.ring
 
-    latest = decisions[-1] if decisions else None
+    latest = confirmed[-1] if confirmed else None
     tracks = (latest.tracks_json or []) if latest else []
     movement = (
         classify_movement(
             current_ring=latest.ring,
             previous_ring=latest.previous_ring,
-            decided_at=latest.created_at,
+            decided_at=latest.confirmed_at or latest.created_at,
             first_decided_at=item.first_decided_at,
             now=now,
         )
@@ -303,8 +313,10 @@ def _serialize_artifact_detail(artifact: Artifact, *, now: datetime) -> Artifact
         for event in events_sorted
     ]
 
+    # Confirmed only — same reason as _serialize_item_detail above.
     decisions_sorted = sorted(
-        artifact.decisions, key=lambda decision: (decision.created_at, decision.id)
+        (d for d in artifact.decisions if d.confirmed_at is not None),
+        key=lambda decision: (decision.created_at, decision.id),
     )
     decisions = [
         ArtifactDecisionEntry(
@@ -318,7 +330,7 @@ def _serialize_artifact_detail(artifact: Artifact, *, now: datetime) -> Artifact
         )
         for decision in decisions_sorted
     ]
-    ring = decisions_sorted[-1].ring if decisions_sorted else seed_ring(artifact.status)
+    ring = decisions_sorted[-1].ring if decisions_sorted else ""
 
     return ArtifactDetailResponse(
         artifact_id=artifact.id,

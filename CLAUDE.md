@@ -54,10 +54,12 @@ uv run radar candidates --date today
 uv run radar score-debug --date today
 # Curate via the cv-radar-curator skill, filling TODO blocks in the candidate Markdown.
 uv run radar apply reports/candidates/YYYY-MM-DD.md --dry-run
-uv run radar apply reports/candidates/YYYY-MM-DD.md
+uv run radar apply reports/candidates/YYYY-MM-DD.md   # records PROPOSALS, not radar entries
+# Then the human gate: review the queue at http://127.0.0.1:7878/#/queue and confirm.
 uv run radar digest --date today
 # Or for individual decisions:
-uv run radar decide ITEM_ID --ring Watch --reason "..." --action "..."
+uv run radar decide ITEM_ID --ring Watch --reason "..." --action "..."   # a proposal
+uv run radar confirm ITEM_ID                                            # the human gate
 uv run radar decisions --date today
 ```
 
@@ -69,10 +71,41 @@ uv run radar ecosystem --days 7                 # list recent release events
 uv run radar artifact-decide KEY --ring Prototype --reason "..."
 ```
 
+## The Manual Gate (read this before touching decisions)
+
+**Nothing reaches the radar without a human confirming it.** A decision row is only a
+*proposal* until `confirmed_at` is set; the board, the digest, the timeline and the public
+static bundle all read through `latest_confirmed_decision_subq()` in `radar/decisions.py`
+and never see an unratified proposal.
+
+- `record_decision()` / `record_artifact_decision()` take a **required** `origin`
+  (`DecisionOrigin.HUMAN` or `.AGENT`). There is deliberately no default — a new call site
+  must state which it is, and the failure mode is a `TypeError`, not a silent leak.
+- `radar apply` (and `daily-publish`, and `POST /api/jobs/apply`) always writes
+  `origin=AGENT`, regardless of who ran it. Running the command is not the same as
+  reviewing 25 items.
+- `radar decide` / `radar artifact-decide` also propose by default.
+- **Agents must never pass `--confirm`, and never run `radar confirm` /
+  `radar artifact-confirm`.** Those are the human gate. Confirming is the user's job,
+  normally from the Review tab in the UI.
+- `POST /api/decisions` and `POST /api/ecosystem/decisions` hardcode `origin=HUMAN`
+  server-side (it is not a client field) — a POST there is a person clicking in the
+  curator UI, and it supersedes any pending proposal for that item.
+
+If you add a surface that renders radar state, join it through
+`latest_confirmed_decision_subq()` and add it to `tests/test_review_gate.py`.
+
 `radar apply` is the bulk-decision bridge: the curator fills `### Claude decision` blocks
 in the candidate Markdown with a small YAML payload (`ring`, `tracks`, `reason`, `action`,
 `uncertain`), and `apply` parses + records them in a single transaction.
-`radar digest` writes a short Markdown summary sectioned by ring. See [docs/daily-workflow.md](docs/daily-workflow.md).
+`radar digest` writes a short Markdown summary sectioned by ring. Both read only confirmed
+decisions. See [docs/daily-workflow.md](docs/daily-workflow.md).
+
+Review the pending backlog:
+
+```bash
+uv run radar serve      # then open http://127.0.0.1:7878/#/queue — the Review inbox
+```
 
 Use `--date today` for the current local date, or an ISO date like `2026-05-07`. Every CLI command accepts `--db-path` and `--config-dir` overrides; the smoke-test recipe in [docs/skill-workflows.md](docs/skill-workflows.md) uses `.tmp-real-run/` for an isolated run.
 

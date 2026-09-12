@@ -196,6 +196,21 @@ class SourcesResponse(BaseModel):
 class HistoryEntryOut(BaseModel):
     ring: str
     at: datetime
+    origin: str = "human"
+    confirmed_at: datetime | None = None
+
+
+class PendingProposalOut(BaseModel):
+    """An agent proposal awaiting a human. Never on the radar."""
+
+    decision_id: int
+    ring: str
+    tracks: list[str] = Field(default_factory=list)
+    reason: str = ""
+    action: str = ""
+    uncertain: bool = False
+    decided_by: str = ""
+    created_at: datetime
 
 
 class ItemDetailOut(BaseModel):
@@ -203,6 +218,8 @@ class ItemDetailOut(BaseModel):
     title: str
     abstract: str
     url: str
+    # Empty string when the item is not on the radar — either never decided, or
+    # its only decision is an unratified proposal (see `pending_proposal`).
     ring: str
     track: str
     tracks: list[str]
@@ -214,6 +231,97 @@ class ItemDetailOut(BaseModel):
     decided_by: str | None
     history: list[HistoryEntryOut]
     movement: Movement | None
+    pending_proposal: PendingProposalOut | None = None
+
+
+# --- Review inbox (the manual gate) -----------------------------------------
+
+
+class ReviewProposalOut(BaseModel):
+    """An unratified agent decision. Recorded, but not on the radar."""
+
+    decision_id: int
+    ring: str
+    tracks: list[str] = Field(default_factory=list)
+    reason: str = ""
+    action: str = ""
+    uncertain: bool = False
+    decided_by: str = ""
+    created_at: datetime
+
+
+class ReviewItemOut(BaseModel):
+    id: int
+    type: str
+    title: str
+    abstract: str
+    url: str
+    pdf_url: str | None = None
+    source: str
+    published_at: datetime
+    tracks: list[str] = Field(default_factory=list)
+    scores: CandidateScoresOut
+    proposal: ReviewProposalOut
+    previous_confirmed_ring: str | None = None
+    llm_judgment: LLMJudgmentOut | None = None
+
+
+class ReviewCountsOut(BaseModel):
+    Use: int = 0
+    Prototype: int = 0
+    Evaluate: int = 0
+    Watch: int = 0
+    Ignore: int = 0
+
+
+class ReviewResponse(BaseModel):
+    pending_total: int
+    counts: ReviewCountsOut
+    items: list[ReviewItemOut] = Field(default_factory=list)
+
+
+class ReviewSummaryResponse(BaseModel):
+    papers_pending: int
+    ecosystem_pending: int
+
+
+class ReviewConfirmRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    decision_id: int
+    confirmed_by: str = "web-curator"
+
+
+class ReviewBulkConfirmRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    decision_ids: list[int] = Field(min_length=1)
+    confirmed_by: str = "web-curator"
+
+
+class ReviewBulkDismissRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    item_ids: list[int] = Field(min_length=1)
+    reason: str = ""
+    decided_by: str = "web-curator"
+
+
+class ConfirmedOut(BaseModel):
+    decision_id: int
+    item_id: int
+    ring: str
+    confirmed_at: datetime
+
+
+class ConfirmBulkResult(BaseModel):
+    confirmed: list[int] = Field(default_factory=list)
+    failed: list[dict] = Field(default_factory=list)
+
+
+class DismissBulkResult(BaseModel):
+    dismissed: list[int] = Field(default_factory=list)
+    failed: list[dict] = Field(default_factory=list)
 
 
 class TimelineWeekOut(BaseModel):
@@ -343,6 +451,36 @@ class ArtifactDecisionCreate(BaseModel):
 class ArtifactDecisionCreatedOut(BaseModel):
     decision_id: int
     created_at: datetime
+
+
+class EcosystemReviewItemOut(BaseModel):
+    """An artifact awaiting the gate. `suggested_ring` is a hint, not a place."""
+
+    artifact_id: int
+    key: str
+    name: str
+    description: str = ""
+    status: str = ""
+    capability: str = ""
+    homepage_url: str | None = None
+    ecosystems: list[str] = Field(default_factory=list)
+    tracks: list[str] = Field(default_factory=list)
+    suggested_ring: str
+    proposal: ReviewProposalOut | None = None
+
+
+class EcosystemReviewResponse(BaseModel):
+    pending_total: int
+    items: list[EcosystemReviewItemOut] = Field(default_factory=list)
+
+
+class EcosystemReviewConfirmRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    artifact_id: int
+    ring: RadarRing | None = None
+    reason: str = ""
+    decided_by: str = "web-curator"
 
 
 # --- Content-date listings (Queue / Digest date-grid landing) ---------------

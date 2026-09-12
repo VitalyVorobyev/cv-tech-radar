@@ -14,6 +14,7 @@ from radar.curation import (
 )
 from radar.db import session_scope
 from radar.models import Item, RadarDecision
+from radar.reports.digest import collect_board_rows
 from radar.schemas import RadarRing
 
 FIXTURE_PATH = Path(__file__).parent / "fixtures" / "candidates_filled.md"
@@ -108,6 +109,7 @@ def test_apply_appends_and_warns_on_prior_decision(db_engine):
                 decision_reason="prior",
                 action="",
                 decided_by="prev",
+                origin="human",
                 uncertain=False,
             )
         )
@@ -197,3 +199,23 @@ def _candidate_text(*, item_id: int, body: str) -> str:
         "\n"
         f"{body}\n"
     )
+
+
+def test_apply_records_unconfirmed_proposals(db_engine):
+    """`radar apply` is the agent bridge — it must never place anything.
+
+    This is the regression that started the manual gate: the curator skill's
+    YAML blocks used to become radar decisions the moment `apply` ran.
+    """
+    _seed_fixture_items(db_engine)
+    proposals = parse_proposals_file(FIXTURE_PATH)
+    with session_scope(db_engine) as session:
+        apply_proposals(session, proposals, decided_by="claude-curator", dry_run=False)
+
+    with session_scope(db_engine) as session:
+        stored = session.scalars(select(RadarDecision)).all()
+        assert stored
+        assert all(d.origin == "agent" for d in stored)
+        assert all(d.confirmed_at is None for d in stored)
+        # Nothing reaches the radar, at any ring, even with Ignore included.
+        assert collect_board_rows(session, include_ignore=True) == []

@@ -14,6 +14,10 @@ interface CandidateRowProps {
   expanded: boolean;
   focused: boolean;
   onToggle: () => void;
+  /** Review inbox: a proposal was confirmed as-is from the expanded panel. */
+  onConfirm?: () => void;
+  /** Review inbox: a proposal was dismissed from the expanded panel. */
+  onDismiss?: () => void;
 }
 
 export function CandidateRow({
@@ -21,24 +25,27 @@ export function CandidateRow({
   expanded,
   focused,
   onToggle,
+  onConfirm,
+  onDismiss,
 }: CandidateRowProps) {
   const rowRef = useRef<HTMLDivElement>(null);
 
-  // Active ring: current decision wins over suggestion
-  const activeRing = candidate.current_decision?.ring ?? candidate.ring_suggested;
+  // Active ring: a confirmed decision wins over a proposal, which wins over
+  // the pipeline suggestion.
+  const proposal = candidate.proposal ?? null;
+  const activeRing =
+    candidate.current_decision?.ring ?? proposal?.ring ?? candidate.ring_suggested;
   const hasDecision = candidate.current_decision !== null;
+  // "Proposed, not on the radar" — an agent wrote this decision and no human
+  // has confirmed it yet. Visually distinct from the saved-decision accent:
+  // an outlined marker plus a muted inset rule down the left edge of the row.
+  const isProposal = proposal !== null && !hasDecision;
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       onToggle();
     }
-  }
-
-  // mod+s inside panel: click the Save button
-  function handlePanelSave() {
-    const saveBtn = rowRef.current?.querySelector<HTMLButtonElement>("[data-save='true']");
-    saveBtn?.click();
   }
 
   return (
@@ -70,6 +77,7 @@ export function CandidateRow({
             : "1px solid transparent",
           borderRadius: "var(--radius-sm)",
           background: "transparent",
+          boxShadow: isProposal ? "inset 2px 0 0 var(--color-muted)" : "none",
           transition: `border-color var(--duration-focus) ease-out`,
         }}
       >
@@ -101,6 +109,19 @@ export function CandidateRow({
               }}
             >
               ·
+            </span>
+          )}
+          {isProposal && (
+            <span
+              aria-label="Proposed, not on the radar"
+              title={`Proposed by ${proposal.decided_by} — not on the radar`}
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-micro)",
+                color: "var(--color-muted)",
+              }}
+            >
+              ◦
             </span>
           )}
         </span>
@@ -176,7 +197,8 @@ export function CandidateRow({
         {expanded && (
           <CandidatePanel
             candidate={candidate}
-            onSave={() => handlePanelSave()}
+            onConfirm={onConfirm}
+            onDismiss={onDismiss}
           />
         )}
       </div>

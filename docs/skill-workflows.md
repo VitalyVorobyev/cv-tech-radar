@@ -85,6 +85,10 @@ which items should become Watch/Evaluate/Ignore.
 Apply decisions in bulk (recommended) — the curator fills `### Claude decision` TODO
 blocks in the generated Markdown with a small YAML payload, then:
 
+> These land as **proposals**, not radar entries. Confirm them in the Review tab
+> (`#/queue`) or with `radar confirm <item_id>` — see
+> [daily-workflow.md](daily-workflow.md#the-gate).
+
 ```bash
 uv run radar apply ".tmp-real-run/reports/$latest_date.md" \
   --db-path .tmp-real-run/radar.sqlite --dry-run
@@ -93,7 +97,7 @@ uv run radar apply ".tmp-real-run/reports/$latest_date.md" \
 uv run radar decisions --date "$latest_date" --db-path .tmp-real-run/radar.sqlite
 ```
 
-Or record a single decision directly:
+Or propose a single decision directly:
 
 ```bash
 uv run radar decide ITEM_ID \
@@ -101,6 +105,8 @@ uv run radar decide ITEM_ID \
   --reason "Relevant but needs more evidence." \
   --action "Read PDF later." \
   --db-path .tmp-real-run/radar.sqlite
+# ...then, as the human, put it on the radar:
+uv run radar confirm ITEM_ID --db-path .tmp-real-run/radar.sqlite
 ```
 
 Expected output:

@@ -8,11 +8,18 @@ See [skill-workflows.md](skill-workflows.md) for a short tutorial on using them.
 Use when reviewing candidate queues, assigning rings, writing decision reasons, and
 updating radar state.
 
+> **The skill proposes; it does not publish.** Since the manual gate landed, the
+> `### Claude decision` blocks this skill fills in become *proposals*: `radar apply`
+> records them unconfirmed, and they stay off the radar until the user confirms them in
+> the Review tab. The skill body lives outside this repo (`$CODEX_HOME/skills/`), so if it
+> still describes `apply` as "updating radar state", that wording is stale — see
+> [daily-workflow.md](daily-workflow.md#the-gate).
+
 Why it matters:
 
 - This is the core habit of the project.
-- It should encode the difference between a candidate queue, a visible radar item,
-  and an Atlas/public candidate.
+- It should encode the difference between a candidate queue, a *proposed* radar item,
+  a confirmed radar item, and an Atlas/public candidate.
 - It should keep daily output short and skeptical.
 
 Useful bundled references:

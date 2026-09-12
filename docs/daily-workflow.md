@@ -1,8 +1,14 @@
 # Daily Workflow
 
 The radar is built around one short daily ritual: read a candidate queue, fill in decisions,
-apply them in bulk, and produce a short digest. Claude (via the `cv-radar-curator` skill) is
-the proposer; you are the editor. The deterministic Python pipeline does the rest.
+apply them in bulk, confirm what belongs on the radar, and produce a short digest. Claude
+(via the `cv-radar-curator` skill) is the proposer; you are the editor. The deterministic
+Python pipeline does the rest.
+
+> **The manual gate.** `radar apply` records *proposals*, not radar entries. Nothing appears
+> on the radar, in the digest, or in the public static bundle until a human confirms it —
+> normally in the **Review** tab (`#/queue`), or with `radar confirm <item_id>`. See
+> [The gate](#the-gate) below.
 
 > Running the radar UI? See [Run the UI locally](../README.md#run-the-ui-locally)
 > for the two-terminal `radar serve` + `npm run dev` recipe.
@@ -15,6 +21,7 @@ Two umbrella commands wrap the deterministic stages around a single curation ste
 uv run radar daily-fetch                 # fetch-arxiv → classify → candidates → fetch-ecosystem
 # Curate via the cv-radar-curator skill — fill in TODO blocks in the candidate Markdown.
 uv run radar daily-publish reports/candidates/$(date -I).md   # apply → digest
+# Then confirm what belongs on the radar: open #/queue and work the Review inbox.
 ```
 
 `daily-fetch` runs everything inside one SQLite transaction and prints a summary of
@@ -127,6 +134,40 @@ Editing the inventory — adding or removing a tracked library — is a config e
 to `config/artifacts.yaml`, not a daily action.
 
 ## Re-running and idempotency
+
+## The gate
+
+Every decision row carries an `origin` (`human` or `agent`) and a nullable `confirmed_at`.
+**`confirmed_at IS NOT NULL` is the only thing that puts an item on the radar.**
+
+| Path | Writes | On the radar? |
+|---|---|---|
+| Review tab: Confirm | stamps the proposal confirmed | yes |
+| Review tab: change ring + Save, drag a dot, Promote/Remove | a `human` decision | yes, immediately |
+| Review tab: Dismiss | a human `Ignore` decision | no (and it leaves the inbox for good) |
+| `radar apply` / `daily-publish` / the apply job | `agent` proposals | **no** — pending review |
+| `radar decide` / `radar artifact-decide` | an `agent` proposal | **no** — pending review |
+| `radar confirm` / `radar artifact-confirm` | ratifies a pending proposal | yes |
+
+An item is *pending* when its most recent decision is unconfirmed. That means confirming a
+proposal, or overriding it at a different ring, clears it from the inbox with no extra
+bookkeeping — and re-running `radar apply` over already-confirmed items cannot silently
+change the radar: the re-proposal simply queues for review behind the confirmed ring.
+
+Dismissing is a real decision, not a hide. The row joins the `Ignore` corpus that scoring
+tuning is calibrated against, this time with a human label on it.
+
+The **Review** tab (`#/queue`) is the working surface: pending proposals ranked by proposed
+ring then score, with ring/track/text filters, `j`/`k` to move, `c` confirm, `d` dismiss,
+`x` select, and bulk `Confirm N` / `Dismiss N`. Agent `Ignore` proposals are hidden behind a
+toggle — they are already off the radar, so they are not part of the working backlog.
+`#/queue/YYYY-MM-DD` still shows that day's candidate queue as before.
+
+The ecosystem lane works the same way. `config/artifacts.yaml`'s `status` field only
+*suggests* a ring (`seed_ring`); an artifact reaches the ecosystem radar once you confirm it
+from the pending list on the Ecosystem tab, or with `radar artifact-confirm <key>`.
+
+## Notes
 
 - `radar apply` is **append-only**. Re-running on the same Markdown adds a second
   decision row per item and prints a warning per duplicate. Latest decision wins for

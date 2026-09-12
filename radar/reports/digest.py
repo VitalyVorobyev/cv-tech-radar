@@ -5,9 +5,10 @@ from collections import OrderedDict
 from datetime import date, datetime
 from pathlib import Path
 
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session, aliased
 
+from radar.decisions import latest_confirmed_decision_subq
 from radar.models import (
     Artifact,
     ArtifactEvent,
@@ -37,10 +38,17 @@ def collect_digest_rows(
     target_date: date,
     days: int,
 ) -> list[tuple[Item, RadarDecision]]:
+    """Latest *confirmed* decision per item published in the window.
+
+    Gated like the board: the digest reports what is on the radar, so an
+    unratified agent proposal must not appear in it.
+    """
     start, end = date_window_bounds(target_date, days)
+    confirmed_ids = latest_confirmed_decision_subq().subquery()
     rows = session.execute(
         select(Item, RadarDecision)
-        .join(RadarDecision, RadarDecision.item_id == Item.id)
+        .join(confirmed_ids, RadarDecision.id == confirmed_ids.c.decision_id)
+        .join(Item, Item.id == RadarDecision.item_id)
         .where(Item.published_at >= start, Item.published_at <= end)
         .order_by(RadarDecision.created_at.desc())
     ).all()
@@ -61,29 +69,22 @@ def collect_board_rows(
     """Return (item, latest decision, latest final_score) for items currently on the radar.
 
     "Currently on the radar" means: each item is represented by its most-recent
-    decision regardless of when the item was published. This is the persistent
-    view — items decided weeks ago still appear here.
+    **confirmed** decision, regardless of when the item was published. This is
+    the persistent view — items confirmed weeks ago still appear here, and
+    unratified agent proposals never do.
+
+    This is the single gate shared by ``GET /api/board``, ``radar digest`` and
+    the public static bundle; see :func:`radar.decisions.latest_confirmed_decision_subq`.
 
     - decided_since: if set, drop items whose latest decision is older than this.
     - include_ignore: defaults False — the board is about attention, not the slush pile.
     """
-    latest_decision_subq = (
-        select(
-            RadarDecision.item_id,
-            func.max(RadarDecision.created_at).label("max_created"),
-        )
-        .group_by(RadarDecision.item_id)
-        .subquery()
-    )
+    confirmed_ids = latest_confirmed_decision_subq().subquery()
     decision_alias = aliased(RadarDecision)
     stmt = (
         select(Item, decision_alias, ItemClassification.final_score)
-        .join(latest_decision_subq, latest_decision_subq.c.item_id == Item.id)
-        .join(
-            decision_alias,
-            (decision_alias.item_id == latest_decision_subq.c.item_id)
-            & (decision_alias.created_at == latest_decision_subq.c.max_created),
-        )
+        .join(confirmed_ids, decision_alias.id == confirmed_ids.c.decision_id)
+        .join(Item, Item.id == decision_alias.item_id)
         .outerjoin(ItemClassification, ItemClassification.item_id == Item.id)
         # id DESC tiebreaker keeps the winner deterministic when two decisions
         # share the same created_at (a real case on SQLite's sub-second clock).

@@ -18,14 +18,24 @@ from rich.progress import (
 from rich.table import Table
 from sqlalchemy import select
 
-from radar.artifact_decisions import record_artifact_decision
+from radar.artifact_decisions import (
+    confirm_artifact_decision,
+    latest_pending_artifact_decision,
+    record_artifact_decision,
+)
 from radar.config import ConfigError, load_app_config
 from radar.curation import ProposalParseError
 from radar.db import ensure_sources, get_engine, init_db, session_scope
-from radar.decisions import DecisionError, list_decisions_for_date, parse_tracks, record_decision
+from radar.decisions import (
+    DecisionError,
+    confirm_decision,
+    list_decisions_for_date,
+    parse_tracks,
+    record_decision,
+)
 from radar.embeddings import find_near_duplicates
 from radar.eval import DEFAULT_LABELED_ITEMS_PATH, render_eval_table, run_eval
-from radar.models import Artifact, ArtifactEvent, Item
+from radar.models import Artifact, ArtifactEvent, Item, RadarDecision
 from radar.pipeline import (
     format_ecosystem_summary,
     format_fetch_summary,
@@ -40,7 +50,7 @@ from radar.pipeline import (
 )
 from radar.reports.score_debug import collect_score_debug_rows
 from radar.reports.static_bundle import BUNDLE_FILES, build_static_bundle
-from radar.schemas import RadarRing
+from radar.schemas import DecisionOrigin, RadarRing
 from radar.utils import date_window_bounds, parse_date_arg, utc_now
 
 app = typer.Typer(help="CV Radar command line interface.")
@@ -233,9 +243,23 @@ def decide_command(
         ),
     ] = None,
     decided_by: Annotated[str, typer.Option("--decided-by")] = "codex",
+    confirm: Annotated[
+        bool,
+        typer.Option(
+            "--confirm",
+            help="You are a human ratifying this. Puts the item on the radar immediately.",
+        ),
+    ] = False,
     db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
 ) -> None:
-    """Record a durable radar decision for an item."""
+    """Propose a radar decision for an item.
+
+    Writes an unconfirmed proposal by default — it is recorded but stays off
+    the radar until a human confirms it in the review inbox or with
+    ``radar confirm``. Pass ``--confirm`` only when you are the human making
+    the call; agents must never pass it.
+    """
+    origin = DecisionOrigin.HUMAN if confirm else DecisionOrigin.AGENT
     engine = get_engine(db_path)
     init_db(engine)
     with session_scope(engine) as session:
@@ -248,10 +272,14 @@ def decide_command(
                 reason=reason,
                 action=action,
                 decided_by=decided_by,
+                origin=origin,
             )
         except DecisionError as exc:
             raise typer.BadParameter(str(exc)) from exc
-        console.print(f"Recorded decision {decision.id}: item {item_id} -> {decision.ring}")
+        state = "Recorded decision" if confirm else "Recorded proposal"
+        console.print(f"{state} {decision.id}: item {item_id} -> {decision.ring}")
+        if not confirm:
+            console.print("[dim]Pending review — not on the radar until confirmed.[/dim]")
 
 
 @app.command("artifact-decide")
@@ -266,9 +294,20 @@ def artifact_decide_command(
     ] = None,
     uncertain: Annotated[bool, typer.Option("--uncertain")] = False,
     decided_by: Annotated[str, typer.Option("--decided-by")] = "codex",
+    confirm: Annotated[
+        bool,
+        typer.Option(
+            "--confirm",
+            help="You are a human ratifying this. Puts the artifact on the radar immediately.",
+        ),
+    ] = False,
     db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
 ) -> None:
-    """Record a durable radar decision for an ecosystem artifact."""
+    """Propose a radar decision for an ecosystem artifact.
+
+    Unconfirmed by default, exactly like ``radar decide``.
+    """
+    origin = DecisionOrigin.HUMAN if confirm else DecisionOrigin.AGENT
     engine = get_engine(db_path)
     init_db(engine)
     with session_scope(engine) as session:
@@ -284,11 +323,65 @@ def artifact_decide_command(
                 reason=reason,
                 action=action,
                 decided_by=decided_by,
+                origin=origin,
                 uncertain=uncertain,
             )
         except DecisionError as exc:
             raise typer.BadParameter(str(exc)) from exc
-        console.print(f"Recorded artifact decision {decision.id}: {key} -> {decision.ring}")
+        state = "Recorded artifact decision" if confirm else "Recorded artifact proposal"
+        console.print(f"{state} {decision.id}: {key} -> {decision.ring}")
+        if not confirm:
+            console.print("[dim]Pending review — not on the radar until confirmed.[/dim]")
+
+
+@app.command("confirm")
+def confirm_command(
+    item_id: Annotated[int, typer.Argument(help="SQLite item id whose proposal to ratify.")],
+    confirmed_by: Annotated[str, typer.Option("--confirmed-by")] = "cli-curator",
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+) -> None:
+    """Ratify an item's pending proposal so it reaches the radar.
+
+    This is the human gate. Agents must not run it.
+    """
+    engine = get_engine(db_path)
+    init_db(engine)
+    with session_scope(engine) as session:
+        latest = session.scalar(
+            select(RadarDecision)
+            .where(RadarDecision.item_id == item_id)
+            .order_by(RadarDecision.created_at.desc(), RadarDecision.id.desc())
+            .limit(1)
+        )
+        if latest is None:
+            raise typer.BadParameter(f"Item {item_id} has no decision to confirm")
+        if latest.confirmed_at is not None:
+            console.print(f"Item {item_id} is already on the radar as {latest.ring}.")
+            return
+        decision = confirm_decision(session, decision_id=latest.id, confirmed_by=confirmed_by)
+        console.print(f"Confirmed item {item_id} -> {decision.ring}")
+
+
+@app.command("artifact-confirm")
+def artifact_confirm_command(
+    key: Annotated[str, typer.Argument(help="Artifact key whose proposal to ratify.")],
+    confirmed_by: Annotated[str, typer.Option("--confirmed-by")] = "cli-curator",
+    db_path: Annotated[Path, typer.Option("--db-path")] = DefaultDbPath,
+) -> None:
+    """Ratify an artifact's pending proposal so it reaches the ecosystem radar."""
+    engine = get_engine(db_path)
+    init_db(engine)
+    with session_scope(engine) as session:
+        artifact = session.scalar(select(Artifact).where(Artifact.key == key))
+        if artifact is None:
+            raise typer.BadParameter(f"No artifact with key '{key}'")
+        pending = latest_pending_artifact_decision(session, artifact.id)
+        if pending is None:
+            raise typer.BadParameter(f"Artifact '{key}' has no pending proposal to confirm")
+        decision = confirm_artifact_decision(
+            session, decision_id=pending.id, confirmed_by=confirmed_by
+        )
+        console.print(f"Confirmed artifact {key} -> {decision.ring}")
 
 
 def _cli_run_apply(session, markdown_path: Path, *, decided_by: str, dry_run: bool):

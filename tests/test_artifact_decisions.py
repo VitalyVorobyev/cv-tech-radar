@@ -10,7 +10,7 @@ from sqlalchemy import select
 from radar.artifact_decisions import DecisionError, record_artifact_decision
 from radar.db import session_scope
 from radar.models import Artifact, ArtifactDecision
-from radar.schemas import RadarRing
+from radar.schemas import DecisionOrigin, RadarRing
 
 
 def _as_utc(moment: datetime) -> datetime:
@@ -44,6 +44,7 @@ def test_record_artifact_decision_rejects_unknown_artifact(db_engine):
             reason="No artifact.",
             action="",
             decided_by="tester",
+            origin=DecisionOrigin.HUMAN,
         )
 
 
@@ -58,6 +59,7 @@ def test_record_artifact_decision_defaults_to_artifact_tracks(db_engine):
             reason="Core dependency.",
             action="Keep on Use.",
             decided_by="tester",
+            origin=DecisionOrigin.HUMAN,
         )
         assert decision.tracks_json == ["Open-Source CV Tooling"]
 
@@ -73,6 +75,7 @@ def test_first_decision_sets_first_decided_at_and_null_previous_ring(db_engine):
             reason="first decision",
             action="",
             decided_by="tester",
+            origin=DecisionOrigin.HUMAN,
         )
         decision_created_at = decision.created_at
         assert decision.previous_ring is None
@@ -95,6 +98,7 @@ def test_second_decision_sets_previous_ring_and_keeps_first_decided_at(db_engine
             reason="first",
             action="",
             decided_by="tester",
+            origin=DecisionOrigin.HUMAN,
         )
         first_ring = first.ring
         first_created = first.created_at
@@ -108,6 +112,7 @@ def test_second_decision_sets_previous_ring_and_keeps_first_decided_at(db_engine
             reason="promote",
             action="",
             decided_by="tester",
+            origin=DecisionOrigin.HUMAN,
         )
         # previous_ring carries the prior decision's ring.
         assert second.previous_ring == first_ring
