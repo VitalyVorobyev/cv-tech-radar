@@ -95,7 +95,12 @@ def _seed_event(
     return event
 
 
-def test_board_seeds_uncurated_artifacts_by_status(client, api_db):
+def test_board_excludes_uncurated_artifacts(client, api_db):
+    """An artifact's config status suggests a ring; it never places one.
+
+    Before the manual gate, ``seed_ring`` put every enabled artifact straight
+    on the ecosystem radar. Now nothing is placed without a confirmed decision.
+    """
     _db_path, engine = api_db
     with session_scope(engine) as session:
         adopted = _seed_artifact(session, key="opencv-x", name="OpenCV X", status="adopted")
@@ -109,14 +114,32 @@ def test_board_seeds_uncurated_artifacts_by_status(client, api_db):
         )
 
     body = client.get("/api/ecosystem/board").json()
-    rings = body["rings"]
-    # adopted -> seed ring Use; watchlist -> seed ring Watch.
-    assert [a["key"] for a in rings["Use"]] == ["opencv-x"]
-    assert [a["key"] for a in rings["Watch"]] == ["rerun-x"]
-    assert rings["Use"][0]["ecosystems"] == ["github"]
-    assert rings["Use"][0]["movement"] is None  # uncurated -> no movement
-    assert body["counts"]["Use"] == 1
-    assert body["counts"]["Watch"] == 1
+    assert body["rings"]["Use"] == []
+    assert body["rings"]["Watch"] == []
+    assert body["counts"]["Use"] == 0
+    assert body["counts"]["Watch"] == 0
+
+    # They are waiting in the review inbox instead, with their seed ring as a
+    # suggestion the curator can accept in one click.
+    review = client.get("/api/ecosystem/review").json()
+    assert review["pending_total"] == 2
+    suggested = {row["key"]: row["suggested_ring"] for row in review["items"]}
+    assert suggested == {"opencv-x": "Use", "rerun-x": "Watch"}
+    assert all(row["proposal"] is None for row in review["items"])
+
+
+def test_ecosystem_review_confirm_places_artifact_on_board(client, api_db):
+    _db_path, engine = api_db
+    with session_scope(engine) as session:
+        artifact = _seed_artifact(session, key="opencv-x", name="OpenCV X", status="adopted")
+        artifact_id = artifact.id
+
+    post = client.post("/api/ecosystem/review/confirm", json={"artifact_id": artifact_id})
+    assert post.status_code == 201, post.text
+
+    body = client.get("/api/ecosystem/board").json()
+    assert [a["key"] for a in body["rings"]["Use"]] == ["opencv-x"]
+    assert client.get("/api/ecosystem/review").json()["pending_total"] == 0
 
 
 def test_board_decision_overrides_seed_ring(client, api_db):

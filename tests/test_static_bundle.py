@@ -60,6 +60,9 @@ def _add_decision(
             decision_reason=reason,
             action="",
             decided_by="tester",
+            origin="human",
+            confirmed_at=created_at,
+            confirmed_by="tester",
             uncertain=False,
             previous_ring=previous_ring,
             created_at=created_at,
@@ -231,7 +234,8 @@ def test_build_static_bundle_writes_ecosystem_files(db_engine, app_config, tmp_p
     released = now - timedelta(days=3)
 
     with session_scope(db_engine) as session:
-        # adopted -> seed ring Use; watchlist -> seed ring Watch.
+        # opencv gets a confirmed decision below and so reaches the bundle;
+        # rerun stays uncurated and must not appear on the public radar at all.
         _add_artifact(
             session,
             artifact_id=1,
@@ -305,6 +309,9 @@ def test_build_static_bundle_writes_ecosystem_files(db_engine, app_config, tmp_p
                 decision_reason="Core dependency.",
                 action="",
                 decided_by="tester",
+                origin="human",
+                confirmed_at=now - timedelta(days=1),
+                confirmed_by="tester",
                 uncertain=False,
                 previous_ring=None,
                 created_at=now - timedelta(days=1),
@@ -317,9 +324,10 @@ def test_build_static_bundle_writes_ecosystem_files(db_engine, app_config, tmp_p
 
     eco_board = json.loads((target / "ecosystem-board.json").read_text())
     assert [a["key"] for a in eco_board["rings"]["Use"]] == ["opencv"]
-    assert [a["key"] for a in eco_board["rings"]["Watch"]] == ["rerun"]
+    # rerun has no confirmed decision — the public bundle must not place it.
+    assert eco_board["rings"]["Watch"] == []
     assert eco_board["counts"]["Use"] == 1
-    assert eco_board["counts"]["Watch"] == 1
+    assert eco_board["counts"]["Watch"] == 0
     opencv_row = eco_board["rings"]["Use"][0]
     assert opencv_row["capability"] == "cv-imaging"
     assert opencv_row["ecosystems"] == ["github"]
@@ -341,13 +349,14 @@ def test_build_static_bundle_writes_ecosystem_files(db_engine, app_config, tmp_p
     assert [r["last_version"] for r in detail["refs"]] == ["4.11.0"]
     assert [e["version"] for e in detail["events"]] == ["4.11.0", "4.10.9"]
     assert [d["ring"] for d in detail["decisions"]] == ["Use"]
-    # Uncurated artifact still gets a detail file, seeded by status.
+    # An uncurated artifact still gets a detail file (a deep link must resolve),
+    # but with no ring — it is not on the radar.
     detail2 = json.loads((artifacts_dir / "2.json").read_text())
-    assert detail2["ring"] == "Watch"
+    assert detail2["ring"] == ""
     assert detail2["decisions"] == []
 
     meta = json.loads((target / "meta.json").read_text())
     assert meta["ecosystem_artifact_count"] == 2
     assert meta["ecosystem_event_count"] == 2
     assert meta["ecosystem_ring_counts"]["Use"] == 1
-    assert meta["ecosystem_ring_counts"]["Watch"] == 1
+    assert meta["ecosystem_ring_counts"]["Watch"] == 0

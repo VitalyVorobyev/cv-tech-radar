@@ -20,6 +20,12 @@ export interface HotkeyMap {
   "5"?: HotkeyHandler;
   /** u — toggle uncertain */
   u?: HotkeyHandler;
+  /** c — confirm the focused proposal (review inbox) */
+  c?: HotkeyHandler;
+  /** x — toggle bulk selection on the focused row (review inbox) */
+  x?: HotkeyHandler;
+  /** d — dismiss the focused proposal (review inbox) */
+  d?: HotkeyHandler;
   /** Cmd/Ctrl+S — save expanded panel */
   "mod+s"?: HotkeyHandler;
   /** / — focus filter input */

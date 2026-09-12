@@ -96,11 +96,14 @@ def test_cli_smoke_init_classify_candidates(tmp_path):
         ],
     )
     assert result.exit_code == 0
-    assert "Recorded decision" in result.output
+    # `decide` proposes; it does not place the item on the radar.
+    assert "Recorded proposal" in result.output
 
     with session_scope(engine) as session:
         stored = session.query(RadarDecision).one()
         assert stored.ring == "Watch"
+        assert stored.origin == "agent"
+        assert stored.confirmed_at is None
 
     result = runner.invoke(
         app,
@@ -108,6 +111,15 @@ def test_cli_smoke_init_classify_candidates(tmp_path):
     )
     assert result.exit_code == 0
     assert "Relevant enough to track." in result.output
+
+    # `confirm` is the human gate — after it, the item is really on the radar.
+    result = runner.invoke(app, ["confirm", "1", "--db-path", str(db_path)])
+    assert result.exit_code == 0, result.output
+    assert "Confirmed item 1 -> Watch" in result.output
+    with session_scope(engine) as session:
+        stored = session.query(RadarDecision).one()
+        assert stored.confirmed_at is not None
+        assert stored.confirmed_by == "cli-curator"
 
 
 def _seed_items(engine, ids: list[int]) -> None:
@@ -313,11 +325,15 @@ def test_artifact_decide_records_decision(tmp_path):
         ],
     )
     assert result.exit_code == 0, result.output
-    assert "Recorded artifact decision" in result.output
+    # Unconfirmed by default: the CLI proposes, it does not place.
+    assert "Recorded artifact proposal" in result.output
+    assert "Pending review" in result.output
 
     with session_scope(engine) as session:
         stored = session.query(ArtifactDecision).one()
         assert stored.ring == "Prototype"
+        assert stored.origin == "agent"
+        assert stored.confirmed_at is None
         # --tracks omitted → defaults to the artifact's own tracks.
         assert stored.tracks_json == ["Open-Source CV Tooling"]
 

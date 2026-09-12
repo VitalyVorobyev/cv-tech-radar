@@ -1,6 +1,10 @@
-// Main queue view — the only view in Phase A.
-// Renders the candidate list, filter bar, hotkeys, and shortcut sheet.
-// Extension points: Chrome accepts a filterSlot; app.tsx can switch views on URL hash.
+// Queue route. Two surfaces behind one slug:
+//   `#/queue`             → the review inbox (every pending proposal, ranked,
+//                            not date-scoped) — see views/ReviewInbox.tsx.
+//   `#/queue/YYYY-MM-DD`  → the per-day candidate queue below, unchanged:
+//                            candidate list, filter bar, hotkeys, shortcut sheet.
+// The date grid that used to live at `#/queue` is now the inbox's
+// "browse by date" control.
 
 import { useState, useCallback, useEffect, useId } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -9,8 +13,8 @@ import { api } from "../lib/api";
 import { useHotkeys } from "../lib/hotkeys";
 import { Chrome } from "../ui/Chrome";
 import { CandidateRow } from "../ui/CandidateRow";
-import { ContentDateGrid } from "../ui/ContentDateGrid";
 import { ShortcutSheet } from "../ui/ShortcutSheet";
+import { ReviewInbox } from "./ReviewInbox";
 import type { Ring } from "../lib/api";
 import { writeUrlParams } from "../lib/urlState";
 
@@ -63,10 +67,7 @@ function readQueueDate(): string {
 }
 
 export function QueueView() {
-  const filterId = useId();
-  const dateId = useId();
-
-  // Date is part of the route (`#/queue/2026-05-13`); "" shows the date grid.
+  // Date is part of the route (`#/queue/2026-05-13`); "" is the review inbox.
   const [date, setDate] = useState<string>(readQueueDate);
 
   // A date-grid pick or a deep link changes the hash — keep state in sync.
@@ -76,11 +77,19 @@ export function QueueView() {
     return () => window.removeEventListener("hashchange", handler);
   }, []);
 
+  if (date === "") return <ReviewInbox />;
+  // Remount on date change so per-day UI state (focus, expansion) resets.
+  return <DateQueue key={date} date={date} />;
+}
+
+function DateQueue({ date }: { date: string }) {
+  const filterId = useId();
+  const dateId = useId();
+
   // Server state — date is part of the cache key so changing it refetches.
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["queue", date],
     queryFn: () => api.queue(date),
-    enabled: date !== "",
   });
 
   // UI state
@@ -203,44 +212,6 @@ export function QueueView() {
     "?": handleQuestion,
     Escape: handleEscape,
   });
-
-  // Browse mode — no date in the hash. Show the date grid instead of a queue.
-  if (date === "") {
-    return (
-      <div
-        style={{
-          minHeight: "100dvh",
-          display: "flex",
-          flexDirection: "column",
-          maxWidth: "80rem",
-          margin: "0 auto",
-        }}
-      >
-        <Chrome />
-        <main
-          style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}
-        >
-          <h2
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--text-display-l)",
-              fontWeight: 400,
-              margin: 0,
-              letterSpacing: "var(--tracking-tight)",
-            }}
-          >
-            Queue
-          </h2>
-          <ContentDateGrid
-            kind="queue"
-            onPick={(picked) => {
-              window.location.hash = `#/queue/${picked}${window.location.search}`;
-            }}
-          />
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div

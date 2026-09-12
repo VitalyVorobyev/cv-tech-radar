@@ -16,6 +16,7 @@ from radar.api.routes.meta import router as meta_router
 from radar.api.routes.near_duplicates import router as near_duplicates_router
 from radar.api.routes.ollama import router as ollama_router
 from radar.api.routes.queue import router as queue_router
+from radar.api.routes.review import router as review_router
 from radar.api.routes.score_debug import router as score_debug_router
 from radar.api.routes.timeline import router as timeline_router
 
@@ -36,5 +37,6 @@ router.include_router(score_debug_router)
 router.include_router(near_duplicates_router)
 router.include_router(ollama_router)
 router.include_router(content_dates_router)
+router.include_router(review_router)
 
 __all__ = ["router"]

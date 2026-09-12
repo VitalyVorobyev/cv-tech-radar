@@ -76,6 +76,8 @@ class Item(Base):
     organizations_json: Mapped[list[str]] = mapped_column(JSON, default=list)
     metadata_json: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    # First *confirmed* decision — an agent proposal does not stamp this.
+    # Drives the timeline chart and the "new" movement badge.
     first_decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
 
     classification: Mapped[ItemClassification | None] = relationship(
@@ -109,6 +111,15 @@ class ItemClassification(Base):
 
 
 class RadarDecision(Base):
+    """A ring assignment for an item. Append-only, latest-wins.
+
+    A row is only a *proposal* until a human ratifies it: ``confirmed_at IS NOT
+    NULL`` is the radar's manual gate, and nothing reaches the board, the
+    digest, or the public static bundle without it. Agent-authored rows
+    (``origin == "agent"``, written by ``radar apply``) land unconfirmed and
+    wait in the review inbox.
+    """
+
     __tablename__ = "radar_decisions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -118,6 +129,9 @@ class RadarDecision(Base):
     decision_reason: Mapped[str] = mapped_column(Text, default="")
     action: Mapped[str] = mapped_column(Text, default="")
     decided_by: Mapped[str] = mapped_column(String(120), default="")
+    origin: Mapped[str] = mapped_column(String(20), default="agent", index=True)
+    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
+    confirmed_by: Mapped[str | None] = mapped_column(String(120))
     uncertain: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     previous_ring: Mapped[str | None] = mapped_column(String(40))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
@@ -191,6 +205,8 @@ class Artifact(Base):
     enabled: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    # First *confirmed* decision — an agent proposal does not stamp this.
+    # Drives the timeline chart and the "new" movement badge.
     first_decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
 
     refs: Mapped[list[ArtifactRef]] = relationship(
@@ -270,7 +286,13 @@ class ArtifactEvent(Base):
 
 
 class ArtifactDecision(Base):
-    """Curator ring assignment for an artifact. Append-only, latest-wins."""
+    """Curator ring assignment for an artifact. Append-only, latest-wins.
+
+    Gated exactly like :class:`RadarDecision`: ``confirmed_at IS NOT NULL`` is
+    what puts an artifact on the ecosystem radar. An artifact with no confirmed
+    decision is not placed at all — ``radar.reports.ecosystem.seed_ring`` only
+    *suggests* a ring in the review inbox.
+    """
 
     __tablename__ = "artifact_decisions"
 
@@ -281,6 +303,9 @@ class ArtifactDecision(Base):
     decision_reason: Mapped[str] = mapped_column(Text, default="")
     action: Mapped[str] = mapped_column(Text, default="")
     decided_by: Mapped[str] = mapped_column(String(120), default="")
+    origin: Mapped[str] = mapped_column(String(20), default="agent", index=True)
+    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
+    confirmed_by: Mapped[str | None] = mapped_column(String(120))
     uncertain: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     previous_ring: Mapped[str | None] = mapped_column(String(40))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)

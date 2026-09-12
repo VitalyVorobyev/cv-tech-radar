@@ -41,11 +41,16 @@ class ContentDates:
 
 
 def _decided_counts_by_day(session: Session) -> dict[str, int]:
-    """Map UTC published-day -> count of distinct items with >=1 decision."""
+    """Map UTC published-day -> count of distinct items a human has reviewed.
+
+    Counts confirmed decisions only, so the queue date grid reflects real
+    review progress rather than how many proposals an agent has written.
+    """
     day = func.date(Item.published_at)
     rows = session.execute(
         select(day.label("day"), func.count(func.distinct(Item.id)).label("n"))
         .join(RadarDecision, RadarDecision.item_id == Item.id)
+        .where(RadarDecision.confirmed_at.is_not(None))
         .group_by(day)
     ).all()
     return {row.day: row.n for row in rows if row.day is not None}

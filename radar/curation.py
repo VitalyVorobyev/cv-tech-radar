@@ -9,7 +9,7 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from radar.decisions import DecisionError, has_prior_decision, record_decision
-from radar.schemas import DecisionProposal
+from radar.schemas import DecisionOrigin, DecisionProposal
 
 CANDIDATE_HEADING_RE = re.compile(r"^## Candidate \d+:\s*(.+)$")
 ITEM_ID_RE = re.compile(r"^- Item ID:\s*(\d+)\s*$")
@@ -162,6 +162,13 @@ def apply_proposals(
     decided_by: str,
     dry_run: bool,
 ) -> ApplyReport:
+    """Record parsed curator proposals as *unconfirmed* radar decisions.
+
+    This is the agent bridge, so every row it writes is a proposal
+    (``DecisionOrigin.AGENT``) regardless of who invoked the command. Running
+    ``radar apply`` is not the same as reviewing 25 items — the rows stay
+    invisible until a human confirms them in the review inbox.
+    """
     report = ApplyReport()
     for parsed in proposals:
         if parsed.proposal is None:
@@ -185,6 +192,7 @@ def apply_proposals(
                 reason=parsed.proposal.reason,
                 action=parsed.proposal.action,
                 decided_by=decided_by,
+                origin=DecisionOrigin.AGENT,
                 uncertain=parsed.proposal.uncertain,
             )
         except DecisionError as exc:

@@ -9,7 +9,7 @@ from radar.db import session_scope
 from radar.decisions import DecisionError, list_decisions_for_date, parse_tracks, record_decision
 from radar.filters.keyword_filter import classify_items_for_date
 from radar.models import Item, RadarDecision
-from radar.schemas import RadarRing
+from radar.schemas import DecisionOrigin, RadarRing
 
 
 def _as_utc(moment: datetime) -> datetime:
@@ -55,6 +55,7 @@ def test_record_decision_defaults_to_classifier_tracks(db_engine, app_config):
             reason="Relevant but needs more evidence.",
             action="Read PDF later.",
             decided_by="tester",
+            origin=DecisionOrigin.HUMAN,
         )
         assert decision.id is not None
         assert decision.tracks_json
@@ -79,6 +80,7 @@ def test_record_decision_rejects_unknown_item(db_engine):
             reason="No item.",
             action="",
             decided_by="tester",
+            origin=DecisionOrigin.HUMAN,
         )
 
 
@@ -103,6 +105,7 @@ def test_record_decision_first_decision_sets_previous_ring_and_first_decided_at(
             reason="first decision",
             action="",
             decided_by="tester",
+            origin=DecisionOrigin.HUMAN,
         )
         decision_id = decision.id
         decision_created_at = decision.created_at
@@ -129,6 +132,7 @@ def test_record_decision_second_decision_sets_previous_ring_and_keeps_first(db_e
             reason="first",
             action="",
             decided_by="tester",
+            origin=DecisionOrigin.HUMAN,
         )
         first_ring = first.ring
         first_created = first.created_at
@@ -142,6 +146,7 @@ def test_record_decision_second_decision_sets_previous_ring_and_keeps_first(db_e
             reason="promote",
             action="",
             decided_by="tester",
+            origin=DecisionOrigin.HUMAN,
         )
         assert second.previous_ring == first_ring
 

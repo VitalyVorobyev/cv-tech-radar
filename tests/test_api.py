@@ -66,7 +66,13 @@ def _seed_decision(
     reason: str,
     created_at: datetime,
     uncertain: bool = False,
+    confirmed: bool = True,
 ) -> None:
+    """Seed a decision. Confirmed by default — these tests assert radar state.
+
+    Pass ``confirmed=False`` to seed an unratified agent proposal, which must
+    stay invisible to every radar surface.
+    """
     session.add(
         RadarDecision(
             item_id=item_id,
@@ -75,6 +81,9 @@ def _seed_decision(
             decision_reason=reason,
             action="",
             decided_by="tester",
+            origin="human" if confirmed else "agent",
+            confirmed_at=created_at if confirmed else None,
+            confirmed_by="tester" if confirmed else None,
             uncertain=uncertain,
             created_at=created_at,
         )
@@ -613,6 +622,9 @@ def test_get_item_happy_path_with_history_and_movement(client, api_db):
                 decision_reason="initial watch",
                 action="",
                 decided_by="tester",
+                origin="human",
+                confirmed_at=first_decided,
+                confirmed_by="tester",
                 uncertain=False,
                 previous_ring=None,
                 created_at=first_decided,
@@ -626,6 +638,9 @@ def test_get_item_happy_path_with_history_and_movement(client, api_db):
                 decision_reason="promoted to Use",
                 action="ship it",
                 decided_by="tester",
+                origin="human",
+                confirmed_at=second_decided,
+                confirmed_by="tester",
                 uncertain=False,
                 previous_ring=RadarRing.WATCH.value,
                 created_at=second_decided,
@@ -704,6 +719,9 @@ def test_timeline_returns_requested_weeks_with_correct_buckets(client, api_db):
                     decision_reason="seed",
                     action="",
                     decided_by="tester",
+                    origin="human",
+                    confirmed_at=decided_at,
+                    confirmed_by="tester",
                     uncertain=False,
                     previous_ring=None,
                     created_at=decided_at,
@@ -754,6 +772,9 @@ def test_board_items_include_movement_field(client, api_db):
                 decision_reason="initial",
                 action="",
                 decided_by="tester",
+                origin="human",
+                confirmed_at=first_decided,
+                confirmed_by="tester",
                 uncertain=False,
                 previous_ring=None,
                 created_at=first_decided,
@@ -767,6 +788,9 @@ def test_board_items_include_movement_field(client, api_db):
                 decision_reason="promoted",
                 action="",
                 decided_by="tester",
+                origin="human",
+                confirmed_at=second_decided,
+                confirmed_by="tester",
                 uncertain=False,
                 previous_ring=RadarRing.WATCH.value,
                 created_at=second_decided,
