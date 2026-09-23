@@ -44,6 +44,9 @@ def _decide(session, item_id: int) -> None:
             decision_reason="r",
             action="",
             decided_by="tester",
+            origin="human",
+            confirmed_at=datetime(2026, 5, 17, 9, 0, tzinfo=UTC),
+            confirmed_by="tester",
             created_at=datetime(2026, 5, 17, 9, 0, tzinfo=UTC),
         )
     )

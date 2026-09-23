@@ -114,6 +114,9 @@ def _add_decision(
             decision_reason=reason,
             action="",
             decided_by="tester",
+            origin="human",
+            confirmed_at=created_at,
+            confirmed_by="tester",
             uncertain=uncertain,
             created_at=created_at,
         )

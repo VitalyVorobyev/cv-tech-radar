@@ -62,16 +62,28 @@ config/artifacts.yaml
   artifact is `adopted`, OR a track/`extra_keywords` keyword matched. Severity:
   `high` for major releases, `medium` for other relevant events, else `low`.
 - **Decisions** (`artifact_decisions.py`) — append-only curator ring
-  assignments, latest-wins, mirroring `radar/decisions.py`.
+  assignments, latest-wins, mirroring `radar/decisions.py` including the manual
+  gate (`origin` + `confirmed_at`).
 
-Before any decision, an artifact shows a **seed ring**: `adopted` → `Use`,
-`watchlist` → `Watch`, so it appears on the board immediately.
+## The seed ring is a suggestion, not a placement
+
+An artifact with no confirmed decision shows a **seed ring** — `adopted` → `Use`,
+`watchlist` → `Watch` — in the ecosystem review list. It is a starting point for the
+curator, nothing more: the artifact does **not** appear on the ecosystem radar until a
+human confirms a ring for it.
+
+This used to be the other way round: `seed_ring()` placed every enabled artifact on the
+board straight from its `config/artifacts.yaml` status, which meant the radar showed
+things nobody had actually decided on. Confirming a seed ring is one click, and after that
+the artifact behaves like any other radar entry.
 
 ## CLI
 
 ```bash
 uv run radar fetch-ecosystem      # poll all artifacts, emit new release events
 uv run radar ecosystem --days 7   # list recent events (--all to include non-relevant)
+uv run radar artifact-decide KEY --ring Prototype --reason "..."   # a proposal
+uv run radar artifact-confirm KEY                                  # the human gate
 ```
 
 `fetch-ecosystem` accepts `--db-path` / `--config-dir`. GitHub polls
@@ -82,7 +94,8 @@ unauthenticated unless `CV_RADAR_GITHUB_TOKEN` is set (lifts the 60 req/hr cap;
 
 `radar/api/routes/ecosystem.py` mirrors the papers routes:
 `/ecosystem/board`, `/ecosystem/events`, `/ecosystem/artifacts/{id}`, and
-`POST /ecosystem/decisions`. The frontend `EcosystemView` reuses the polar
+`POST /ecosystem/decisions`. `GET /ecosystem/review` lists the artifacts still
+waiting on the gate and `POST /ecosystem/review/confirm` places one. The frontend `EcosystemView` reuses the polar
 `RadarPlot` with the four fixed capability quadrants, plus a release-event feed.
 The static bundle ships `ecosystem-board.json`, `ecosystem-events.json`, and
 one `ecosystem-artifacts/<id>.json` per artifact.

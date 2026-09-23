@@ -6,8 +6,8 @@
 // `#/radar`.
 
 import { useEffect, useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { isStaticMode } from "./lib/api";
+import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
+import { api, isStaticMode } from "./lib/api";
 
 const IS_STATIC = isStaticMode();
 import { QueueView } from "./views/QueueView";
@@ -116,7 +116,9 @@ interface TabSpec {
 
 const PAPERS_TABS_FULL: TabSpec[] = [
   { value: "radar", label: "Radar" },
-  { value: "queue", label: "Queue" },
+  // Route slug stays `queue` so `#/queue/2026-05-13` deep links keep working;
+  // the tab is the review inbox. Curator-only — never in PAPERS_TABS_STATIC.
+  { value: "queue", label: "Review" },
   { value: "timeline", label: "Timeline" },
   { value: "tracks", label: "Tracks" },
   { value: "manual-add", label: "Add paper" },
@@ -149,6 +151,18 @@ function tabsForLane(lane: Lane): TabSpec[] {
   return IS_STATIC ? PAPERS_TABS_STATIC : PAPERS_TABS_FULL;
 }
 
+// Pending agent proposals waiting on a human. Curator-only: the static build
+// has no backend, so the query never runs there.
+function usePendingReviewCount(): number | null {
+  const { data } = useQuery({
+    queryKey: ["review-summary"],
+    queryFn: () => api.reviewSummary(),
+    enabled: !IS_STATIC,
+    staleTime: 30_000,
+  });
+  return data ? data.papers_pending : null;
+}
+
 function LaneNav({
   route,
   onNavigate,
@@ -158,6 +172,7 @@ function LaneNav({
 }) {
   const lane = laneOf(route);
   const tabs = tabsForLane(lane);
+  const pendingReview = usePendingReviewCount();
   return (
     <nav
       aria-label="Primary"
@@ -225,6 +240,18 @@ function LaneNav({
               }}
             >
               {tab.label}
+              {tab.value === "queue" && pendingReview !== null && pendingReview > 0 && (
+                <span
+                  aria-label={`${pendingReview} pending review`}
+                  style={{
+                    marginLeft: "0.375rem",
+                    fontSize: "var(--text-micro)",
+                    color: "var(--color-accent)",
+                  }}
+                >
+                  {pendingReview}
+                </span>
+              )}
             </button>
           );
         })}

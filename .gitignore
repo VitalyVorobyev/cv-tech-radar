@@ -209,6 +209,7 @@ tempCodeRunnerFile.py
 # CV Radar generated runtime state
 data/radar.sqlite
 data/radar.sqlite-*
+data/backups/
 data/raw/
 data/exports/*
 !data/exports/examples/

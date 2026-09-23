@@ -292,6 +292,8 @@ export function EcosystemView({ surface }: { surface: EcoSurface }) {
             </div>
           )}
 
+          {surface === "radar" && canEdit && <EcosystemReviewSection />}
+
           {surface === "radar" && (
             <>
               <div
@@ -370,6 +372,135 @@ export function EcosystemView({ surface }: { surface: EcoSurface }) {
         <ArtifactPanel artifactId={selectedId} onClose={() => setSelectedId(null)} />
       )}
     </div>
+  );
+}
+
+// --- Pending artifact review ----------------------------------------------
+// The ecosystem lane's half of the manual gate. Artifacts whose ring has never
+// been confirmed by a human (or whose latest decision is an agent proposal)
+// sit here until someone accepts them. This is a one-time backlog of a couple
+// of dozen items, so there is no bulk selection — one click per artifact.
+
+function EcosystemReviewSection() {
+  const queryClient = useQueryClient();
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["ecosystem-review"],
+    queryFn: () => api.ecosystemReview(),
+  });
+
+  const confirm = useMutation({
+    mutationFn: ({ artifactId, ring }: { artifactId: number; ring: Ring }) =>
+      api.confirmEcosystemReview({
+        artifact_id: artifactId,
+        ring,
+        reason: `Confirmed ${ring} in ecosystem review.`,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ecosystem-review"] });
+      queryClient.invalidateQueries({ queryKey: ["ecosystem-board"] });
+      queryClient.invalidateQueries({ queryKey: ["review-summary"] });
+    },
+  });
+
+  if (isLoading || isError) return null;
+  const items = data?.items ?? [];
+  if (items.length === 0) return null;
+
+  return (
+    <section
+      aria-label="Pending artifact review"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "0.5rem",
+        border: "1px solid var(--color-rule)",
+        borderRadius: "var(--radius-sm)",
+        padding: "0.875rem 1rem",
+      }}
+    >
+      <div
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: "var(--text-micro)",
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          color: "var(--color-muted)",
+        }}
+      >
+        Pending review · {data?.pending_total ?? items.length} artifacts
+      </div>
+      <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+        {items.map((artifact) => {
+          const ring = artifact.proposal?.ring ?? artifact.suggested_ring;
+          const reason = artifact.proposal?.reason ?? artifact.description;
+          return (
+            <li
+              key={artifact.artifact_id}
+              style={{
+                display: "flex",
+                alignItems: "baseline",
+                gap: "0.75rem",
+                flexWrap: "wrap",
+                padding: "0.5rem 0",
+                borderTop: "1px solid var(--color-rule)",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "1.05rem",
+                  minWidth: "10rem",
+                }}
+              >
+                {artifact.name}
+              </span>
+              <span
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "var(--text-micro)",
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  color: "var(--color-accent)",
+                }}
+              >
+                {ring}
+              </span>
+              <span
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "var(--text-small)",
+                  color: "var(--color-muted)",
+                  flex: 1,
+                  minWidth: "12rem",
+                }}
+              >
+                {reason}
+              </span>
+              <button
+                type="button"
+                disabled={confirm.isPending}
+                onClick={() =>
+                  confirm.mutate({ artifactId: artifact.artifact_id, ring })
+                }
+                style={{
+                  background: "transparent",
+                  border: "1px solid var(--color-rule)",
+                  borderRadius: "var(--radius-sm)",
+                  cursor: "pointer",
+                  color: "inherit",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "var(--text-micro)",
+                  letterSpacing: "0.04em",
+                  padding: "0.25rem 0.625rem",
+                }}
+              >
+                Confirm {ring}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }
 

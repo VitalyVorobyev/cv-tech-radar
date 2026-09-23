@@ -63,6 +63,9 @@ def test_content_dates_endpoint(client, api_db):
                 decision_reason="r",
                 action="",
                 decided_by="tester",
+                origin="human",
+                confirmed_at=datetime(2026, 5, 16, 12, 0, tzinfo=UTC),
+                confirmed_by="tester",
                 created_at=datetime(2026, 5, 16, 12, 0, tzinfo=UTC),
             )
         )

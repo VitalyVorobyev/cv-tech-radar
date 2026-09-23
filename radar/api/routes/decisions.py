@@ -14,6 +14,7 @@ from radar.api.schemas import (
     DecisionOut,
 )
 from radar.decisions import DecisionError, list_decisions_in_window, record_decision
+from radar.schemas import DecisionOrigin
 from radar.utils import parse_date_arg
 
 router = APIRouter(tags=["decisions"])
@@ -28,6 +29,8 @@ def create_decision(
     payload: DecisionCreate,
     session: Annotated[Session, Depends(get_session)],
 ) -> DecisionCreatedOut:
+    # Origin is fixed server-side, never taken from the payload: a POST to this
+    # endpoint is a person clicking in the curator UI, and that self-confirms.
     try:
         decision = record_decision(
             session,
@@ -37,6 +40,7 @@ def create_decision(
             reason=payload.reason,
             action=payload.action,
             decided_by=payload.decided_by,
+            origin=DecisionOrigin.HUMAN,
             uncertain=payload.uncertain,
         )
     except DecisionError as exc:
