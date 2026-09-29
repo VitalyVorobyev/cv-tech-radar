@@ -38,9 +38,8 @@ from radar.reports.ecosystem import (
     EcosystemBoardRow,
     collect_ecosystem_board_rows,
     collect_ecosystem_events,
-    seed_ring,
 )
-from radar.schemas import RadarRing
+from radar.schemas import DecisionOrigin, RadarRing
 from radar.utils import parse_date_arg, utc_now
 
 router = APIRouter(tags=["ecosystem"])
@@ -199,7 +198,8 @@ def get_ecosystem_artifact(
     ]
 
     decisions_sorted = sorted(
-        artifact.decisions, key=lambda decision: (decision.created_at, decision.id)
+        (d for d in artifact.decisions if d.confirmed_at is not None),
+        key=lambda decision: (decision.created_at, decision.id),
     )
     decisions = [
         ArtifactDecisionEntry(
@@ -213,7 +213,9 @@ def get_ecosystem_artifact(
         )
         for decision in decisions_sorted
     ]
-    ring = decisions_sorted[-1].ring if decisions_sorted else seed_ring(artifact.status)
+    # Empty when the artifact is not on the radar; the review inbox is where
+    # seed_ring() is offered as a suggestion.
+    ring = decisions_sorted[-1].ring if decisions_sorted else ""
 
     return ArtifactDetailResponse(
         artifact_id=artifact.id,
@@ -249,6 +251,7 @@ def create_ecosystem_decision(
             reason=payload.reason,
             action=payload.action,
             decided_by=payload.decided_by,
+            origin=DecisionOrigin.HUMAN,
             uncertain=payload.uncertain,
         )
     except DecisionError as exc:

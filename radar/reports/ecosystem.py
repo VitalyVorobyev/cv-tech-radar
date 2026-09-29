@@ -29,10 +29,14 @@ RECENT_EVENT_WINDOW_DAYS = 14
 
 
 def seed_ring(status: str) -> str:
-    """Return the pre-curation ring for an artifact with the given ``status``.
+    """Return the *suggested* ring for an uncurated artifact.
 
-    ``adopted`` artifacts seed to ``Use`` (already in the user's stack);
-    everything else (``watchlist`` and any unexpected value) seeds to ``Watch``.
+    ``adopted`` artifacts suggest ``Use`` (already in the user's stack);
+    everything else (``watchlist`` and any unexpected value) suggests ``Watch``.
+
+    This is a suggestion shown in the ecosystem review inbox, **not** a
+    placement: an artifact reaches the ecosystem radar only once a human
+    confirms a decision for it.
     """
     return RadarRing.USE.value if status == "adopted" else RadarRing.WATCH.value
 
@@ -41,9 +45,8 @@ def seed_ring(status: str) -> str:
 class EcosystemBoardRow:
     """One artifact's resolved board state.
 
-    ``ring`` is the latest decision's ring, or :func:`seed_ring` when the
-    artifact has not been curated. ``decided_at`` / ``previous_ring`` come from
-    that latest decision (``None`` when uncurated).
+    ``ring`` is the latest *confirmed* decision's ring. ``decided_at`` /
+    ``previous_ring`` come from that decision.
     """
 
     artifact: Artifact
@@ -60,12 +63,14 @@ def collect_ecosystem_board_rows(
     *,
     include_ignore: bool = False,
 ) -> list[EcosystemBoardRow]:
-    """Return one :class:`EcosystemBoardRow` per enabled artifact.
+    """Return one :class:`EcosystemBoardRow` per *confirmed* enabled artifact.
 
-    - ``ring``: the ring of the latest :class:`ArtifactDecision` (by
-      ``created_at`` desc, ``id`` desc tiebreak), else the seed ring.
-    - artifacts whose resolved ring is ``Ignore`` are dropped unless
-      ``include_ignore`` is True.
+    - ``ring``: the ring of the latest confirmed :class:`ArtifactDecision` (by
+      ``created_at`` desc, ``id`` desc tiebreak).
+    - artifacts with no confirmed decision are not on the radar at all — they
+      wait in the ecosystem review inbox with :func:`seed_ring` as a
+      suggestion.
+    - artifacts whose ring is ``Ignore`` are dropped unless ``include_ignore``.
     """
     artifacts = list(
         session.scalars(
@@ -76,15 +81,12 @@ def collect_ecosystem_board_rows(
     rows: list[EcosystemBoardRow] = []
     recent_threshold = utc_now() - timedelta(days=RECENT_EVENT_WINDOW_DAYS)
     for artifact in artifacts:
-        latest = _latest_decision(session, artifact.id)
+        latest = _latest_confirmed_decision(session, artifact.id)
         if latest is None:
-            ring = seed_ring(artifact.status)
-            decided_at: datetime | None = None
-            previous_ring: str | None = None
-        else:
-            ring = latest.ring
-            decided_at = latest.created_at
-            previous_ring = latest.previous_ring
+            continue  # not on the radar until a human confirms a ring
+        ring = latest.ring
+        decided_at: datetime | None = latest.confirmed_at or latest.created_at
+        previous_ring: str | None = latest.previous_ring
 
         if ring == RadarRing.IGNORE.value and not include_ignore:
             continue
@@ -138,10 +140,14 @@ def collect_ecosystem_events(
     return list(session.execute(stmt).all())
 
 
-def _latest_decision(session: Session, artifact_id: int) -> ArtifactDecision | None:
+def _latest_confirmed_decision(session: Session, artifact_id: int) -> ArtifactDecision | None:
+    """The artifact's latest human-confirmed decision — the ecosystem gate."""
     return session.scalar(
         select(ArtifactDecision)
-        .where(ArtifactDecision.artifact_id == artifact_id)
+        .where(
+            ArtifactDecision.artifact_id == artifact_id,
+            ArtifactDecision.confirmed_at.is_not(None),
+        )
         .order_by(ArtifactDecision.created_at.desc(), ArtifactDecision.id.desc())
         .limit(1)
     )

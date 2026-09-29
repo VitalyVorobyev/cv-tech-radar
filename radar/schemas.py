@@ -16,6 +16,19 @@ class RadarRing(StrEnum):
     IGNORE = "Ignore"
 
 
+class DecisionOrigin(StrEnum):
+    """Who authored a decision.
+
+    ``HUMAN`` decisions are self-confirming — a person made the call, so they
+    reach the radar immediately. ``AGENT`` decisions are *proposals*: they are
+    recorded and kept, but stay invisible until a human ratifies them. This is
+    the radar's manual gate; see ``radar.decisions.confirm_decision``.
+    """
+
+    HUMAN = "human"
+    AGENT = "agent"
+
+
 class ItemType(StrEnum):
     PAPER = "paper"
     BLOG_POST = "blog_post"

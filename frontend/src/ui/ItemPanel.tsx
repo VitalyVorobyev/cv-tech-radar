@@ -95,6 +95,22 @@ export function ItemPanel({
     },
   });
 
+  // Accept the agent's proposal as-is. Until this lands the item has no ring
+  // and does not appear on the radar.
+  const confirmProposal = useMutation({
+    mutationFn: async () => {
+      const decisionId = data?.pending_proposal?.decision_id;
+      if (decisionId === undefined) throw new Error("no pending proposal");
+      return api.confirmReview(decisionId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["item", itemId] });
+      queryClient.invalidateQueries({ queryKey: ["board"] });
+      queryClient.invalidateQueries({ queryKey: ["review"] });
+      queryClient.invalidateQueries({ queryKey: ["review-summary"] });
+    },
+  });
+
   // Esc to close.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -184,6 +200,13 @@ export function ItemPanel({
           onPromote={promote.mutate}
           onRemove={remove.mutate}
           removePending={remove.isPending}
+          onConfirmProposal={confirmProposal.mutate}
+          confirmPending={confirmProposal.isPending}
+          confirmError={
+            confirmProposal.error instanceof Error
+              ? confirmProposal.error.message
+              : null
+          }
           onSelectItem={onSelectItem}
         />
       )}
@@ -197,6 +220,9 @@ function ItemPanelBody({
   onPromote,
   onRemove,
   removePending,
+  onConfirmProposal,
+  confirmPending,
+  confirmError,
   onSelectItem,
 }: {
   data: ItemDetail;
@@ -204,8 +230,12 @@ function ItemPanelBody({
   onPromote(target: Ring): void;
   onRemove(): void;
   removePending: boolean;
+  onConfirmProposal(): void;
+  confirmPending: boolean;
+  confirmError: string | null;
   onSelectItem?(itemId: number): void;
 }) {
+  const proposal = data.pending_proposal ?? null;
   const ringIsAccent = data.ring === "Use" || data.ring === "Prototype";
   const promoteTarget =
     data.ring && data.ring !== "Ignore" ? nextRing(data.ring as Ring, "promote") : null;
@@ -228,7 +258,7 @@ function ItemPanelBody({
       </h2>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", alignItems: "center" }}>
-        {data.ring && (
+        {data.ring ? (
           <span
             style={{
               fontFamily: "var(--font-mono)",
@@ -243,6 +273,8 @@ function ItemPanelBody({
           >
             {data.ring}
           </span>
+        ) : (
+          <span style={pillMutedStyle}>Not on the radar</span>
         )}
         {data.track && (
           <button
@@ -268,6 +300,66 @@ function ItemPanelBody({
         )}
         {data.movement && <span style={pillMutedStyle}>{MOVEMENT_LABEL[data.movement]}</span>}
       </div>
+
+      {proposal && !IS_STATIC && (
+        <section
+          aria-label="Pending proposal"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.5rem",
+            borderLeft: "2px solid var(--color-rule)",
+            paddingLeft: "0.75rem",
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "var(--text-micro)",
+              color: "var(--color-muted)",
+              letterSpacing: "0.04em",
+            }}
+          >
+            Proposed by {proposal.decided_by} — not on the radar
+          </div>
+          {proposal.reason && (
+            <div
+              style={{
+                fontFamily: "var(--font-display)",
+                fontStyle: "italic",
+                fontSize: "var(--text-small)",
+                color: "var(--color-muted)",
+                lineHeight: 1.5,
+              }}
+            >
+              &ldquo;{proposal.reason}&rdquo;
+            </div>
+          )}
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <button
+              type="button"
+              style={actionStyle}
+              disabled={confirmPending}
+              onClick={() => onConfirmProposal()}
+            >
+              {confirmPending ? "Confirming…" : `Confirm ${proposal.ring}`}
+            </button>
+            {proposal.uncertain && <span style={pillMutedStyle}>uncertain</span>}
+          </div>
+          {confirmError && (
+            <span
+              role="alert"
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-micro)",
+                color: "var(--color-accent)",
+              }}
+            >
+              {confirmError}
+            </span>
+          )}
+        </section>
+      )}
 
       {data.reason && (
         <blockquote
@@ -298,6 +390,9 @@ function ItemPanelBody({
         >
           {data.history.map((entry, i) => {
             const last = i === data.history.length - 1;
+            // `confirmed_at: null` = an agent proposal nobody has accepted yet.
+            // Older payloads omit the field entirely; treat those as confirmed.
+            const pending = entry.confirmed_at === null;
             return (
               <span
                 key={`${entry.ring}-${entry.at}`}
@@ -310,13 +405,20 @@ function ItemPanelBody({
                 )}
                 <span
                   style={{
-                    color: last ? "var(--color-accent)" : "var(--color-muted)",
+                    color:
+                      last && !pending ? "var(--color-accent)" : "var(--color-muted)",
                     textTransform: "uppercase",
                     letterSpacing: "0.06em",
+                    fontStyle: pending ? "italic" : "normal",
                   }}
-                  title={formatHistoryAt(entry.at)}
+                  title={
+                    `${formatHistoryAt(entry.at)}` +
+                    `${entry.origin ? ` · ${entry.origin}` : ""}` +
+                    `${pending ? " · proposed, not confirmed" : ""}`
+                  }
                 >
                   {entry.ring}
+                  {pending ? "?" : ""}
                 </span>
               </span>
             );

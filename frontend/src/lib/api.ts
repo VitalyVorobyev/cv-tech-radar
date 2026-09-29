@@ -62,6 +62,11 @@ export interface Candidate {
   pipeline_rationale: string;
   current_decision: Decision | null;
   llm_judgment: LLMJudgment | null;
+  /** Unconfirmed agent proposal. Only set when the candidate came from the
+   *  review inbox — `/api/queue` rows never carry it. */
+  proposal?: ReviewProposal | null;
+  /** Ring a human last confirmed for this item, if any. Review inbox only. */
+  previous_confirmed_ring?: Ring | null;
 }
 
 export interface QueueResponse {
@@ -128,6 +133,10 @@ export interface BoardItem {
 export interface HistoryEntry {
   ring: Ring;
   at: string;
+  /** null while the decision is an unconfirmed proposal. */
+  confirmed_at?: string | null;
+  /** Who authored the decision — a human curator or an agent. */
+  origin?: "human" | "agent";
 }
 
 export interface ItemDetail {
@@ -135,7 +144,8 @@ export interface ItemDetail {
   title: string;
   abstract: string;
   url: string;
-  ring: Ring | "";
+  /** Empty/null while the item's only decision is an unconfirmed proposal. */
+  ring: Ring | "" | null;
   track: string;
   tracks: string[];
   reason: string;
@@ -146,6 +156,8 @@ export interface ItemDetail {
   decided_by: string | null;
   history: HistoryEntry[];
   movement: Movement | null;
+  /** Set when the item's latest decision is an agent proposal awaiting a human. */
+  pending_proposal?: ReviewProposal | null;
 }
 
 export interface TimelineWeek {
@@ -697,6 +709,119 @@ export interface ArtifactDecisionRequest {
   decided_by?: string;
 }
 
+// Review inbox --------------------------------------------------------------
+// The manual human gate. An agent-authored decision is a *proposal*: it is
+// recorded but stays off the radar until a human confirms it. Everything in
+// this section is a curator action, so every client method refuses in the
+// public static build.
+
+export interface ReviewProposal {
+  decision_id: number;
+  ring: Ring;
+  reason: string;
+  action: string;
+  uncertain: boolean;
+  decided_by: string;
+  created_at: string;
+  /** Present on `/api/review` rows; the item-detail and ecosystem variants of
+   *  the same payload omit it. */
+  tracks?: string[];
+}
+
+export interface ReviewItem {
+  id: number;
+  type: string;
+  title: string;
+  abstract: string;
+  url: string;
+  pdf_url: string | null;
+  source: string;
+  published_at: string;
+  tracks: string[];
+  scores: Scores;
+  proposal: ReviewProposal;
+  previous_confirmed_ring: Ring | null;
+  llm_judgment: LLMJudgment | null;
+}
+
+/** Pending counts by proposed ring. Unfiltered, so the ring chips keep their
+ *  totals while a filter is active. Same shape as BoardCounts. */
+export type ReviewCounts = BoardCounts;
+
+export interface ReviewResponse {
+  /** Total pending matching the filters — ignores limit/offset. */
+  pending_total: number;
+  counts: ReviewCounts;
+  items: ReviewItem[];
+}
+
+export interface ReviewQuery {
+  ring?: Ring | null;
+  track?: string | null;
+  q?: string | null;
+  include_ignore?: boolean;
+  limit?: number;
+  offset?: number;
+}
+
+export interface ReviewSummaryResponse {
+  papers_pending: number;
+  ecosystem_pending: number;
+}
+
+export interface ReviewConfirmResponse {
+  decision_id: number;
+  item_id: number;
+  ring: Ring;
+  confirmed_at: string;
+}
+
+export interface ReviewConfirmFailure {
+  decision_id: number;
+  error: string;
+}
+
+export interface ReviewConfirmBulkResponse {
+  confirmed: number[];
+  failed: ReviewConfirmFailure[];
+}
+
+export interface ReviewDismissFailure {
+  item_id: number;
+  error: string;
+}
+
+export interface ReviewDismissBulkResponse {
+  dismissed: number[];
+  failed: ReviewDismissFailure[];
+}
+
+export interface EcosystemReviewItem {
+  artifact_id: number;
+  key: string;
+  name: string;
+  description: string;
+  status: string;
+  capability: string;
+  homepage_url: string | null;
+  ecosystems: string[];
+  tracks: string[];
+  /** Seed ring derived from the artifact status; use when `proposal` is null. */
+  suggested_ring: Ring;
+  proposal: ReviewProposal | null;
+}
+
+export interface EcosystemReviewResponse {
+  pending_total: number;
+  items: EcosystemReviewItem[];
+}
+
+export interface EcosystemReviewConfirmRequest {
+  artifact_id: number;
+  ring?: Ring;
+  reason?: string;
+}
+
 export const api = {
   health(): Promise<HealthResponse> {
     return request<HealthResponse>("/api/health");
@@ -1026,6 +1151,86 @@ export const api = {
       return refuseInStatic<DecisionResponse>("postEcosystemDecision");
     }
     return request<DecisionResponse>("/api/ecosystem/decisions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  },
+
+  // ---- review inbox -------------------------------------------------------
+
+  review(query: ReviewQuery = {}): Promise<ReviewResponse> {
+    if (isStaticMode()) return refuseInStatic<ReviewResponse>("review");
+    const params = new URLSearchParams();
+    if (query.ring) params.set("ring", query.ring);
+    if (query.track) params.set("track", query.track);
+    if (query.q) params.set("q", query.q);
+    if (query.include_ignore) params.set("include_ignore", "true");
+    if (query.limit !== undefined) params.set("limit", String(query.limit));
+    if (query.offset !== undefined) params.set("offset", String(query.offset));
+    const qs = params.toString();
+    return request<ReviewResponse>(`/api/review${qs ? `?${qs}` : ""}`);
+  },
+
+  reviewSummary(): Promise<ReviewSummaryResponse> {
+    if (isStaticMode()) {
+      return refuseInStatic<ReviewSummaryResponse>("reviewSummary");
+    }
+    return request<ReviewSummaryResponse>("/api/review/summary");
+  },
+
+  confirmReview(decisionId: number): Promise<ReviewConfirmResponse> {
+    if (isStaticMode()) {
+      return refuseInStatic<ReviewConfirmResponse>("confirmReview");
+    }
+    return request<ReviewConfirmResponse>("/api/review/confirm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ decision_id: decisionId }),
+    });
+  },
+
+  confirmReviewBulk(decisionIds: number[]): Promise<ReviewConfirmBulkResponse> {
+    if (isStaticMode()) {
+      return refuseInStatic<ReviewConfirmBulkResponse>("confirmReviewBulk");
+    }
+    return request<ReviewConfirmBulkResponse>("/api/review/confirm-bulk", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ decision_ids: decisionIds }),
+    });
+  },
+
+  dismissReviewBulk(
+    itemIds: number[],
+    reason?: string,
+  ): Promise<ReviewDismissBulkResponse> {
+    if (isStaticMode()) {
+      return refuseInStatic<ReviewDismissBulkResponse>("dismissReviewBulk");
+    }
+    const body: { item_ids: number[]; reason?: string } = { item_ids: itemIds };
+    if (reason) body.reason = reason;
+    return request<ReviewDismissBulkResponse>("/api/review/dismiss-bulk", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  },
+
+  ecosystemReview(): Promise<EcosystemReviewResponse> {
+    if (isStaticMode()) {
+      return refuseInStatic<EcosystemReviewResponse>("ecosystemReview");
+    }
+    return request<EcosystemReviewResponse>("/api/ecosystem/review");
+  },
+
+  confirmEcosystemReview(
+    body: EcosystemReviewConfirmRequest,
+  ): Promise<DecisionResponse> {
+    if (isStaticMode()) {
+      return refuseInStatic<DecisionResponse>("confirmEcosystemReview");
+    }
+    return request<DecisionResponse>("/api/ecosystem/review/confirm", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),

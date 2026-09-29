@@ -17,6 +17,7 @@ from radar.api.schemas import (
     BoardRingsOut,
     LLMJudgmentOut,
 )
+from radar.decisions import latest_confirmed_decision_subq
 from radar.models import Item, RadarDecision
 from radar.reports.digest import collect_board_rows
 from radar.schemas import RadarRing
@@ -100,30 +101,12 @@ def _count_all_rings(
     *,
     decided_since: datetime | None,
 ) -> BoardCountsOut:
-    """Return per-ring counts of latest decisions (includes Ignore even when hidden).
+    """Return per-ring counts of latest confirmed decisions (Ignore included).
 
-    Picks exactly one decision per item — max(id) among rows tied at
-    max(created_at) — so counts match the deduped `rings` payload produced by
-    `collect_board_rows`.
+    Shares the gate with `collect_board_rows` so the counts match the deduped
+    `rings` payload — unconfirmed proposals are counted by neither.
     """
-    latest_created_subq = (
-        select(
-            RadarDecision.item_id,
-            func.max(RadarDecision.created_at).label("max_created"),
-        )
-        .group_by(RadarDecision.item_id)
-        .subquery()
-    )
-    latest_decision_id_subq = (
-        select(func.max(RadarDecision.id).label("decision_id"))
-        .join(
-            latest_created_subq,
-            (RadarDecision.item_id == latest_created_subq.c.item_id)
-            & (RadarDecision.created_at == latest_created_subq.c.max_created),
-        )
-        .group_by(RadarDecision.item_id)
-        .subquery()
-    )
+    latest_decision_id_subq = latest_confirmed_decision_subq().subquery()
     stmt = (
         select(RadarDecision.ring, func.count())
         .join(
